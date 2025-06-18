@@ -35,6 +35,7 @@ const MenuSection: React.FC<MenuSectionProps> = ({
   const [selectedIngredients, setSelectedIngredients] = useState<Record<number, string[]>>({});
   const [selectedExtras, setSelectedExtras] = useState<Record<number, string[]>>({});
   const [showExtrasPopup, setShowExtrasPopup] = useState<number | null>(null);
+  const [showIngredientsPopup, setShowIngredientsPopup] = useState<number | null>(null);
 
   const toggleExpanded = (itemId: number) => {
     const newExpanded = new Set(expandedItems);
@@ -132,6 +133,14 @@ const MenuSection: React.FC<MenuSectionProps> = ({
     setShowExtrasPopup(null);
   };
 
+  const openIngredientsPopup = (itemId: number) => {
+    setShowIngredientsPopup(itemId);
+  };
+
+  const closeIngredientsPopup = () => {
+    setShowIngredientsPopup(null);
+  };
+
   // Early return if no items
   if (!items || items.length === 0) {
     console.warn(`MenuSection ${title}: No items provided`);
@@ -180,6 +189,84 @@ const MenuSection: React.FC<MenuSectionProps> = ({
           </p>
         )}
       </div>
+
+      {/* Wunsch Pizza Ingredients Popup */}
+      {showIngredientsPopup && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full max-h-[80vh] overflow-y-auto">
+            <div className="sticky top-0 bg-white border-b border-gray-200 p-4 rounded-t-xl">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-bold text-gray-900">Wunsch Pizza Zutaten</h3>
+                <button
+                  onClick={closeIngredientsPopup}
+                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                >
+                  <X className="w-5 h-5 text-gray-500" />
+                </button>
+              </div>
+              <p className="text-sm text-gray-600 mt-1">
+                Wählen Sie 4 Zutaten für Ihre Wunsch Pizza ({(selectedIngredients[showIngredientsPopup] || []).length}/4)
+              </p>
+            </div>
+            
+            <div className="p-4 space-y-3">
+              {wunschPizzaIngredients.map((ingredient) => {
+                const itemIngredients = selectedIngredients[showIngredientsPopup] || [];
+                const isSelected = itemIngredients.includes(ingredient.name);
+                const isDisabled = ingredient.disabled || (!isSelected && itemIngredients.length >= 4);
+                
+                return (
+                  <label
+                    key={ingredient.name}
+                    className={`flex items-center p-3 rounded-lg border-2 transition-all duration-200 ${
+                      isSelected
+                        ? 'border-blue-500 bg-blue-50 cursor-pointer'
+                        : isDisabled
+                        ? 'border-gray-200 bg-gray-100 cursor-not-allowed'
+                        : 'border-gray-200 hover:border-blue-300 hover:bg-blue-50 cursor-pointer'
+                    }`}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={isSelected}
+                      disabled={isDisabled}
+                      onChange={() => !isDisabled && handleIngredientToggle(showIngredientsPopup, ingredient.name)}
+                      className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 focus:ring-2 disabled:opacity-50"
+                    />
+                    <div className="ml-3 flex-1">
+                      <div className={`font-medium ${isDisabled ? 'text-gray-400' : 'text-gray-900'}`}>
+                        {ingredient.name}
+                      </div>
+                      {ingredient.disabled && (
+                        <div className="text-xs text-gray-400 mt-0.5">
+                          (nicht verfügbar)
+                        </div>
+                      )}
+                    </div>
+                  </label>
+                );
+              })}
+            </div>
+            
+            <div className="sticky bottom-0 bg-white border-t border-gray-200 p-4 rounded-b-xl">
+              <div className="flex items-center justify-between mb-3">
+                <span className="font-medium text-gray-900">
+                  Gewählte Zutaten: {(selectedIngredients[showIngredientsPopup] || []).length}/4
+                </span>
+                <span className="font-bold text-blue-600">
+                  {(selectedIngredients[showIngredientsPopup] || []).length === 4 ? '✓ Vollständig' : 'Noch auswählen'}
+                </span>
+              </div>
+              <button
+                onClick={closeIngredientsPopup}
+                className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg transition-colors"
+              >
+                Zutaten bestätigen
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Pizza Extras Popup */}
       {showExtrasPopup && (
@@ -404,49 +491,6 @@ const MenuSection: React.FC<MenuSectionProps> = ({
                       </div>
                     </div>
                   )}
-
-                  {/* Wunsch Pizza ingredient selection */}
-                  {isWunschPizza && isExpanded && (
-                    <div className="mt-2.5 md:mt-3 pt-2.5 md:pt-3 border-t border-gray-100">
-                      <div className="mb-2">
-                        <div className="text-sm font-medium text-gray-700 mb-1">
-                          Wählen Sie 4 Zutaten ({itemIngredients.length}/4):
-                        </div>
-                        <div className="text-xs text-gray-500">
-                          Klicken Sie auf die gewünschten Zutaten
-                        </div>
-                      </div>
-                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 max-h-48 overflow-y-auto">
-                        {wunschPizzaIngredients.map((ingredient) => {
-                          const isSelected = itemIngredients.includes(ingredient.name);
-                          const isDisabled = ingredient.disabled || (!isSelected && itemIngredients.length >= 4);
-                          
-                          return (
-                            <button
-                              key={ingredient.name}
-                              type="button"
-                              onClick={() => !isDisabled && handleIngredientToggle(item.id, ingredient.name)}
-                              disabled={isDisabled}
-                              className={`p-2 text-xs rounded-md border transition-all duration-200 text-left ${
-                                isSelected
-                                  ? 'border-blue-500 bg-blue-50 text-blue-700 font-medium'
-                                  : isDisabled
-                                  ? 'border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed'
-                                  : 'border-gray-200 bg-white hover:border-blue-300 hover:bg-blue-50 text-gray-700 cursor-pointer'
-                              }`}
-                            >
-                              {ingredient.name}
-                              {ingredient.disabled && (
-                                <span className="block text-xs text-gray-400 mt-0.5">
-                                  (nicht verfügbar)
-                                </span>
-                              )}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  )}
                 </div>
 
                 {/* Right side - Price and controls - Mobile smaller gaps */}
@@ -471,14 +515,14 @@ const MenuSection: React.FC<MenuSectionProps> = ({
                   {isWunschPizza && (
                     <button
                       type="button"
-                      onClick={() => toggleExpanded(item.id)}
+                      onClick={() => openIngredientsPopup(item.id)}
                       className="flex items-center gap-1 md:gap-1.5 px-1.5 md:px-2 py-1 md:py-1.5 bg-green-50 hover:bg-green-100 border border-green-200 hover:border-green-300 rounded-md transition-all duration-300 text-xs font-medium text-green-700"
                     >
                       <span>Zutaten</span>
-                      {isExpanded ? (
-                        <ChevronUp className="w-3 h-3" />
-                      ) : (
-                        <ChevronDown className="w-3 h-3" />
+                      {itemIngredients.length > 0 && (
+                        <span className="bg-green-200 text-green-800 text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold">
+                          {itemIngredients.length}
+                        </span>
                       )}
                     </button>
                   )}
