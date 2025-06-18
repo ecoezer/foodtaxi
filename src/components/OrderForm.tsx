@@ -17,12 +17,13 @@ interface OrderItem {
   quantity: number;
   selectedSize?: PizzaSize;
   selectedIngredients?: string[];
+  selectedExtras?: string[];
 }
 
 interface OrderFormProps {
   orderItems: OrderItem[];
-  onRemoveItem: (id: number, selectedSize?: PizzaSize, selectedIngredients?: string[]) => void;
-  onUpdateQuantity: (id: number, quantity: number, selectedSize?: PizzaSize, selectedIngredients?: string[]) => void;
+  onRemoveItem: (id: number, selectedSize?: PizzaSize, selectedIngredients?: string[], selectedExtras?: string[]) => void;
+  onUpdateQuantity: (id: number, quantity: number, selectedSize?: PizzaSize, selectedIngredients?: string[], selectedExtras?: string[]) => void;
 }
 
 // Constants
@@ -152,8 +153,8 @@ type OrderFormData = z.infer<typeof orderFormSchema>;
 // Sub-components
 const OrderItemComponent = memo<{
   item: OrderItem;
-  onRemove: (id: number, selectedSize?: PizzaSize, selectedIngredients?: string[]) => void;
-  onUpdateQuantity: (id: number, quantity: number, selectedSize?: PizzaSize, selectedIngredients?: string[]) => void;
+  onRemove: (id: number, selectedSize?: PizzaSize, selectedIngredients?: string[], selectedExtras?: string[]) => void;
+  onUpdateQuantity: (id: number, quantity: number, selectedSize?: PizzaSize, selectedIngredients?: string[], selectedExtras?: string[]) => void;
 }>(({ item, onRemove, onUpdateQuantity }) => (
   <div className="flex items-start justify-between bg-gray-50 p-2 sm:p-3 md:p-4 rounded-lg group hover:bg-gray-100 transition-all duration-200">
     <div className="flex-1 min-w-0">
@@ -169,6 +170,11 @@ const OrderItemComponent = memo<{
             Zutaten: {item.selectedIngredients.join(', ')}
           </span>
         )}
+        {item.selectedExtras && item.selectedExtras.length > 0 && (
+          <span className="text-xs text-purple-600 ml-1 sm:ml-2 block">
+            Extras: {item.selectedExtras.join(', ')} (+{(item.selectedExtras.length * 1.50).toFixed(2)}€)
+          </span>
+        )}
       </p>
       <p className="text-xs sm:text-sm text-gray-600 mt-1">
         {(item.menuItem.price * item.quantity).toFixed(2).replace('.', ',')} €
@@ -178,7 +184,7 @@ const OrderItemComponent = memo<{
       <div className="flex items-center gap-1 sm:gap-2 bg-white rounded-lg shadow-sm border border-gray-200">
         <button
           type="button"
-          onClick={() => onUpdateQuantity(item.menuItem.id, Math.max(0, item.quantity - 1), item.selectedSize, item.selectedIngredients)}
+          onClick={() => onUpdateQuantity(item.menuItem.id, Math.max(0, item.quantity - 1), item.selectedSize, item.selectedIngredients, item.selectedExtras)}
           className="p-1 hover:bg-gray-100 rounded-l-lg transition-colors"
           aria-label="Menge verringern"
         >
@@ -189,7 +195,7 @@ const OrderItemComponent = memo<{
         </span>
         <button
           type="button"
-          onClick={() => onUpdateQuantity(item.menuItem.id, item.quantity + 1, item.selectedSize, item.selectedIngredients)}
+          onClick={() => onUpdateQuantity(item.menuItem.id, item.quantity + 1, item.selectedSize, item.selectedIngredients, item.selectedExtras)}
           className="p-1 hover:bg-gray-100 rounded-r-lg transition-colors"
           aria-label="Menge erhöhen"
         >
@@ -198,7 +204,7 @@ const OrderItemComponent = memo<{
       </div>
       <button
         type="button"
-        onClick={() => onRemove(item.menuItem.id, item.selectedSize, item.selectedIngredients)}
+        onClick={() => onRemove(item.menuItem.id, item.selectedSize, item.selectedIngredients, item.selectedExtras)}
         className="text-red-500 hover:text-red-700 transition-colors p-1 hover:bg-red-50 rounded-full"
         aria-label="Artikel entfernen"
       >
@@ -438,6 +444,9 @@ const OrderForm: React.FC<OrderFormProps> = ({ orderItems, onRemoveItem, onUpdat
           if (item.selectedIngredients && item.selectedIngredients.length > 0) {
             itemText += ` - Zutaten: ${item.selectedIngredients.join(', ')}`;
           }
+          if (item.selectedExtras && item.selectedExtras.length > 0) {
+            itemText += ` - Extras: ${item.selectedExtras.join(', ')} (+${(item.selectedExtras.length * 1.50).toFixed(2)}€)`;
+          }
           return itemText;
         })
         .join('\n');
@@ -521,7 +530,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ orderItems, onRemoveItem, onUpdat
       <div className="space-y-2 sm:space-y-3 max-h-48 sm:max-h-64 overflow-y-auto">
         {orderItems.map((item, index) => (
           <OrderItemComponent
-            key={`${item.menuItem.id}-${item.selectedSize?.name || 'default'}-${item.selectedIngredients?.join(',') || 'none'}-${index}`}
+            key={`${item.menuItem.id}-${item.selectedSize?.name || 'default'}-${item.selectedIngredients?.join(',') || 'none'}-${item.selectedExtras?.join(',') || 'none'}-${index}`}
             item={item}
             onRemove={onRemoveItem}
             onUpdateQuantity={onUpdateQuantity}

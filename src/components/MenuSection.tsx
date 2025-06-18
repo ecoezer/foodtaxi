@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { MenuItem, PizzaSize } from '../types';
 import { useInView } from 'react-intersection-observer';
 import { Plus, ChevronDown, ChevronUp, X } from 'lucide-react';
-import { wunschPizzaIngredients } from '../data/menuItems';
+import { wunschPizzaIngredients, pizzaExtras } from '../data/menuItems';
 
 interface MenuSectionProps {
   title: string;
@@ -10,7 +10,7 @@ interface MenuSectionProps {
   description?: string;
   subTitle?: string;
   bgColor: string;
-  onAddToOrder: (item: MenuItem, selectedSize?: PizzaSize, selectedIngredients?: string[]) => void;
+  onAddToOrder: (item: MenuItem, selectedSize?: PizzaSize, selectedIngredients?: string[], selectedExtras?: string[]) => void;
 }
 
 const MenuSection: React.FC<MenuSectionProps> = ({
@@ -30,6 +30,7 @@ const MenuSection: React.FC<MenuSectionProps> = ({
   const [expandedItems, setExpandedItems] = useState<Set<number>>(new Set());
   const [selectedSizes, setSelectedSizes] = useState<Record<number, PizzaSize>>({});
   const [selectedIngredients, setSelectedIngredients] = useState<Record<number, string[]>>({});
+  const [selectedExtras, setSelectedExtras] = useState<Record<number, string[]>>({});
 
   const toggleExpanded = (itemId: number) => {
     const newExpanded = new Set(expandedItems);
@@ -72,21 +73,51 @@ const MenuSection: React.FC<MenuSectionProps> = ({
     });
   };
 
+  const handleExtraToggle = (itemId: number, extra: string) => {
+    setSelectedExtras(prev => {
+      const currentExtras = prev[itemId] || [];
+      const isSelected = currentExtras.includes(extra);
+      
+      if (isSelected) {
+        // Remove extra
+        return {
+          ...prev,
+          [itemId]: currentExtras.filter(ext => ext !== extra)
+        };
+      } else {
+        // Add extra
+        return {
+          ...prev,
+          [itemId]: [...currentExtras, extra]
+        };
+      }
+    });
+  };
+
   const handleAddToOrder = (item: MenuItem) => {
     const selectedSize = selectedSizes[item.id];
     const ingredients = selectedIngredients[item.id] || [];
-    onAddToOrder(item, selectedSize, ingredients);
+    const extras = selectedExtras[item.id] || [];
+    onAddToOrder(item, selectedSize, ingredients, extras);
   };
 
   const getDisplayPrice = (item: MenuItem) => {
     const selectedSize = selectedSizes[item.id];
+    const extras = selectedExtras[item.id] || [];
+    
+    let basePrice: number;
     if (selectedSize) {
-      return selectedSize.price;
+      basePrice = selectedSize.price;
+    } else if (item.sizes && item.sizes.length > 0) {
+      basePrice = item.sizes[0].price; // Default to first size (Medium)
+    } else {
+      basePrice = item.price;
     }
-    if (item.sizes && item.sizes.length > 0) {
-      return item.sizes[0].price; // Default to first size (Medium)
-    }
-    return item.price;
+    
+    // Add extras cost (each extra is €1.50)
+    const extrasPrice = extras.length * 1.50;
+    
+    return basePrice + extrasPrice;
   };
 
   return (
@@ -121,7 +152,9 @@ const MenuSection: React.FC<MenuSectionProps> = ({
           const selectedSize = selectedSizes[item.id];
           const displayPrice = getDisplayPrice(item);
           const itemIngredients = selectedIngredients[item.id] || [];
+          const itemExtras = selectedExtras[item.id] || [];
           const isWunschPizza = item.isWunschPizza;
+          const isPizza = item.isPizza || item.isWunschPizza;
 
           return (
             <div
@@ -190,6 +223,35 @@ const MenuSection: React.FC<MenuSectionProps> = ({
                                     handleIngredientToggle(item.id, ingredient);
                                   }}
                                   className="ml-1 text-blue-500 hover:text-blue-700"
+                                >
+                                  <X className="w-3 h-3" />
+                                </button>
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Show selected extras for all pizzas */}
+                      {isPizza && itemExtras.length > 0 && (
+                        <div className="mt-2 p-2 bg-green-50 rounded-md border border-green-200">
+                          <div className="text-xs font-medium text-green-700 mb-1">
+                            Gewählte Extras (+{itemExtras.length * 1.50}€):
+                          </div>
+                          <div className="flex flex-wrap gap-1">
+                            {itemExtras.map((extra, idx) => (
+                              <span
+                                key={idx}
+                                className="inline-flex items-center text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full"
+                              >
+                                {extra} (+1.50€)
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleExtraToggle(item.id, extra);
+                                  }}
+                                  className="ml-1 text-green-500 hover:text-green-700"
                                 >
                                   <X className="w-3 h-3" />
                                 </button>
@@ -278,6 +340,43 @@ const MenuSection: React.FC<MenuSectionProps> = ({
                       </div>
                     </div>
                   )}
+
+                  {/* Pizza extras selection for all pizzas */}
+                  {isPizza && isExpanded && (
+                    <div className="mt-2.5 md:mt-3 pt-2.5 md:pt-3 border-t border-gray-100">
+                      <div className="mb-2">
+                        <div className="text-sm font-medium text-gray-700 mb-1">
+                          Extras hinzufügen (je +1,50€):
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          Wählen Sie beliebige Extras für Ihre Pizza
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 max-h-48 overflow-y-auto">
+                        {pizzaExtras.map((extra) => {
+                          const isSelected = itemExtras.includes(extra.name);
+                          
+                          return (
+                            <button
+                              key={extra.name}
+                              type="button"
+                              onClick={() => handleExtraToggle(item.id, extra.name)}
+                              className={`p-2 text-xs rounded-md border transition-all duration-200 text-left ${
+                                isSelected
+                                  ? 'border-green-500 bg-green-50 text-green-700 font-medium'
+                                  : 'border-gray-200 bg-white hover:border-green-300 hover:bg-green-50 text-gray-700 cursor-pointer'
+                              }`}
+                            >
+                              <div>{extra.name}</div>
+                              <div className="text-xs text-gray-500 mt-0.5">
+                                +{extra.price.toFixed(2).replace('.', ',')}€
+                              </div>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Right side - Price and controls - Mobile smaller gaps */}
@@ -314,6 +413,22 @@ const MenuSection: React.FC<MenuSectionProps> = ({
                     </button>
                   )}
 
+                  {/* Pizza extras selector button for all pizzas */}
+                  {isPizza && !isWunschPizza && (
+                    <button
+                      type="button"
+                      onClick={() => toggleExpanded(item.id)}
+                      className="flex items-center gap-1 md:gap-1.5 px-1.5 md:px-2 py-1 md:py-1.5 bg-purple-50 hover:bg-purple-100 border border-purple-200 hover:border-purple-300 rounded-md transition-all duration-300 text-xs font-medium text-purple-700"
+                    >
+                      <span>Extras</span>
+                      {isExpanded ? (
+                        <ChevronUp className="w-3 h-3" />
+                      ) : (
+                        <ChevronDown className="w-3 h-3" />
+                      )}
+                    </button>
+                  )}
+
                   {/* Mobile smaller price display box */}
                   <div className="text-right">
                     <div className="bg-gray-50 rounded-md px-2.5 md:px-3 py-1 md:py-1.5 group-hover:bg-orange-50 transition-colors duration-300 border border-gray-200 group-hover:border-orange-200">
@@ -323,6 +438,11 @@ const MenuSection: React.FC<MenuSectionProps> = ({
                       {selectedSize && (
                         <div className="text-xs text-gray-600 mt-0.5">
                           {selectedSize.name} {selectedSize.description && `(${selectedSize.description})`}
+                        </div>
+                      )}
+                      {itemExtras.length > 0 && (
+                        <div className="text-xs text-green-600 mt-0.5">
+                          +{itemExtras.length} Extra{itemExtras.length > 1 ? 's' : ''}
                         </div>
                       )}
                     </div>

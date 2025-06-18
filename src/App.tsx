@@ -280,16 +280,16 @@ function App() {
   }, [findCartElement, calculateScrollPosition, animateCartHighlight, performFallbackScroll]);
 
   // =================== MEMOIZED CALLBACKS ===================
-  const memoizedAddItem = useCallback((menuItem: MenuItem, selectedSize?: PizzaSize, selectedIngredients?: string[]) => {
-    addItem(menuItem, selectedSize, selectedIngredients);
+  const memoizedAddItem = useCallback((menuItem: MenuItem, selectedSize?: PizzaSize, selectedIngredients?: string[], selectedExtras?: string[]) => {
+    addItem(menuItem, selectedSize, selectedIngredients, selectedExtras);
   }, [addItem]);
 
-  const memoizedRemoveItem = useCallback((id: number, selectedSize?: PizzaSize, selectedIngredients?: string[]) => {
-    removeItem(id, selectedSize, selectedIngredients);
+  const memoizedRemoveItem = useCallback((id: number, selectedSize?: PizzaSize, selectedIngredients?: string[], selectedExtras?: string[]) => {
+    removeItem(id, selectedSize, selectedIngredients, selectedExtras);
   }, [removeItem]);
 
-  const memoizedUpdateQuantity = useCallback((id: number, quantity: number, selectedSize?: PizzaSize, selectedIngredients?: string[]) => {
-    updateQuantity(id, quantity, selectedSize, selectedIngredients);
+  const memoizedUpdateQuantity = useCallback((id: number, quantity: number, selectedSize?: PizzaSize, selectedIngredients?: string[], selectedExtras?: string[]) => {
+    updateQuantity(id, quantity, selectedSize, selectedIngredients, selectedExtras);
   }, [updateQuantity]);
 
   // =================== RENDER HELPER FUNCTIONS ===================
