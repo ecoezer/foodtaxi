@@ -34,6 +34,7 @@ const MenuSection: React.FC<MenuSectionProps> = ({
   const [selectedSizes, setSelectedSizes] = useState<Record<number, PizzaSize>>({});
   const [selectedIngredients, setSelectedIngredients] = useState<Record<number, string[]>>({});
   const [selectedExtras, setSelectedExtras] = useState<Record<number, string[]>>({});
+  const [showExtrasPopup, setShowExtrasPopup] = useState<number | null>(null);
 
   const toggleExpanded = (itemId: number) => {
     const newExpanded = new Set(expandedItems);
@@ -123,6 +124,14 @@ const MenuSection: React.FC<MenuSectionProps> = ({
     return basePrice + extrasPrice;
   };
 
+  const openExtrasPopup = (itemId: number) => {
+    setShowExtrasPopup(itemId);
+  };
+
+  const closeExtrasPopup = () => {
+    setShowExtrasPopup(null);
+  };
+
   // Early return if no items
   if (!items || items.length === 0) {
     console.warn(`MenuSection ${title}: No items provided`);
@@ -171,6 +180,76 @@ const MenuSection: React.FC<MenuSectionProps> = ({
           </p>
         )}
       </div>
+
+      {/* Pizza Extras Popup */}
+      {showExtrasPopup && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full max-h-[80vh] overflow-y-auto">
+            <div className="sticky top-0 bg-white border-b border-gray-200 p-4 rounded-t-xl">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-bold text-gray-900">Pizza Extras wählen</h3>
+                <button
+                  onClick={closeExtrasPopup}
+                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                >
+                  <X className="w-5 h-5 text-gray-500" />
+                </button>
+              </div>
+              <p className="text-sm text-gray-600 mt-1">
+                Wählen Sie beliebige Extras für Ihre Pizza (je +1,50€)
+              </p>
+            </div>
+            
+            <div className="p-4 space-y-3">
+              {pizzaExtras.map((extra) => {
+                const itemExtras = selectedExtras[showExtrasPopup] || [];
+                const isSelected = itemExtras.includes(extra.name);
+                
+                return (
+                  <label
+                    key={extra.name}
+                    className={`flex items-center p-3 rounded-lg border-2 cursor-pointer transition-all duration-200 ${
+                      isSelected
+                        ? 'border-green-500 bg-green-50'
+                        : 'border-gray-200 hover:border-green-300 hover:bg-green-50'
+                    }`}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={isSelected}
+                      onChange={() => handleExtraToggle(showExtrasPopup, extra.name)}
+                      className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500 focus:ring-2"
+                    />
+                    <div className="ml-3 flex-1">
+                      <div className="font-medium text-gray-900">{extra.name}</div>
+                      <div className="text-sm text-gray-600">
+                        +{extra.price.toFixed(2).replace('.', ',')}€
+                      </div>
+                    </div>
+                  </label>
+                );
+              })}
+            </div>
+            
+            <div className="sticky bottom-0 bg-white border-t border-gray-200 p-4 rounded-b-xl">
+              <div className="flex items-center justify-between mb-3">
+                <span className="font-medium text-gray-900">
+                  Gewählte Extras: {(selectedExtras[showExtrasPopup] || []).length}
+                </span>
+                <span className="font-bold text-green-600">
+                  +{((selectedExtras[showExtrasPopup] || []).length * 1.50).toFixed(2).replace('.', ',')}€
+                </span>
+              </div>
+              <button
+                onClick={closeExtrasPopup}
+                className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg transition-colors"
+              >
+                Extras bestätigen
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Menu items container - Always show items, animation is optional */}
       <div className="space-y-2 md:space-y-2">
@@ -368,43 +447,6 @@ const MenuSection: React.FC<MenuSectionProps> = ({
                       </div>
                     </div>
                   )}
-
-                  {/* Pizza extras selection for all pizzas */}
-                  {isPizza && isExpanded && (
-                    <div className="mt-2.5 md:mt-3 pt-2.5 md:pt-3 border-t border-gray-100">
-                      <div className="mb-2">
-                        <div className="text-sm font-medium text-gray-700 mb-1">
-                          Extras hinzufügen (je +1,50€):
-                        </div>
-                        <div className="text-xs text-gray-500">
-                          Wählen Sie beliebige Extras für Ihre Pizza
-                        </div>
-                      </div>
-                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 max-h-48 overflow-y-auto">
-                        {pizzaExtras.map((extra) => {
-                          const isSelected = itemExtras.includes(extra.name);
-                          
-                          return (
-                            <button
-                              key={extra.name}
-                              type="button"
-                              onClick={() => handleExtraToggle(item.id, extra.name)}
-                              className={`p-2 text-xs rounded-md border transition-all duration-200 text-left ${
-                                isSelected
-                                  ? 'border-green-500 bg-green-50 text-green-700 font-medium'
-                                  : 'border-gray-200 bg-white hover:border-green-300 hover:bg-green-50 text-gray-700 cursor-pointer'
-                              }`}
-                            >
-                              <div>{extra.name}</div>
-                              <div className="text-xs text-gray-500 mt-0.5">
-                                +{extra.price.toFixed(2).replace('.', ',')}€
-                              </div>
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  )}
                 </div>
 
                 {/* Right side - Price and controls - Mobile smaller gaps */}
@@ -442,17 +484,17 @@ const MenuSection: React.FC<MenuSectionProps> = ({
                   )}
 
                   {/* Pizza extras selector button for all pizzas */}
-                  {isPizza && !isWunschPizza && (
+                  {isPizza && (
                     <button
                       type="button"
-                      onClick={() => toggleExpanded(item.id)}
+                      onClick={() => openExtrasPopup(item.id)}
                       className="flex items-center gap-1 md:gap-1.5 px-1.5 md:px-2 py-1 md:py-1.5 bg-purple-50 hover:bg-purple-100 border border-purple-200 hover:border-purple-300 rounded-md transition-all duration-300 text-xs font-medium text-purple-700"
                     >
                       <span>Extras</span>
-                      {isExpanded ? (
-                        <ChevronUp className="w-3 h-3" />
-                      ) : (
-                        <ChevronDown className="w-3 h-3" />
+                      {itemExtras.length > 0 && (
+                        <span className="bg-purple-200 text-purple-800 text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold">
+                          {itemExtras.length}
+                        </span>
                       )}
                     </button>
                   )}
