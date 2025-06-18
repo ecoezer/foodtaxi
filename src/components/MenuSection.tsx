@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { MenuItem, PizzaSize } from '../types';
 import { useInView } from 'react-intersection-observer';
-import { Plus, X } from 'lucide-react';
+import { Plus, X, AlertCircle } from 'lucide-react';
 import { wunschPizzaIngredients, pizzaExtras } from '../data/menuItems';
 
 interface MenuSectionProps {
@@ -36,6 +36,7 @@ const MenuSection: React.FC<MenuSectionProps> = ({
   const [showExtrasPopup, setShowExtrasPopup] = useState<number | null>(null);
   const [showIngredientsPopup, setShowIngredientsPopup] = useState<number | null>(null);
   const [showSizePopup, setShowSizePopup] = useState<number | null>(null);
+  const [showSizeRequiredPopup, setShowSizeRequiredPopup] = useState<number | null>(null);
 
   const handleSizeSelect = (itemId: number, size: PizzaSize) => {
     setSelectedSizes(prev => ({
@@ -93,6 +94,22 @@ const MenuSection: React.FC<MenuSectionProps> = ({
     const selectedSize = selectedSizes[item.id];
     const ingredients = selectedIngredients[item.id] || [];
     const extras = selectedExtras[item.id] || [];
+    const hasSizes = item.sizes && item.sizes.length > 0;
+    const isWunschPizza = item.isWunschPizza;
+
+    // Check if size is required but not selected
+    if (hasSizes && !selectedSize) {
+      setShowSizeRequiredPopup(item.id);
+      return;
+    }
+
+    // Check if Wunsch Pizza needs ingredients
+    if (isWunschPizza && ingredients.length === 0) {
+      // For Wunsch Pizza, we could show a different popup or just open ingredients popup
+      setShowIngredientsPopup(item.id);
+      return;
+    }
+
     onAddToOrder(item, selectedSize, ingredients, extras);
   };
 
@@ -176,6 +193,15 @@ const MenuSection: React.FC<MenuSectionProps> = ({
     setShowIngredientsPopup(null);
   };
 
+  const closeSizeRequiredPopup = () => {
+    setShowSizeRequiredPopup(null);
+  };
+
+  const handleSizeRequiredAndOpenSizePopup = (itemId: number) => {
+    setShowSizeRequiredPopup(null);
+    setShowSizePopup(itemId);
+  };
+
   // Early return if no items
   if (!items || items.length === 0) {
     console.warn(`MenuSection ${title}: No items provided`);
@@ -224,6 +250,42 @@ const MenuSection: React.FC<MenuSectionProps> = ({
           </p>
         )}
       </div>
+
+      {/* Size Required Popup */}
+      {showSizeRequiredPopup && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full">
+            <div className="p-6 text-center">
+              <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-orange-100 mb-4">
+                <AlertCircle className="h-6 w-6 text-orange-600" />
+              </div>
+              
+              <h3 className="text-lg font-bold text-gray-900 mb-2">
+                Größe auswählen
+              </h3>
+              
+              <p className="text-sm text-gray-600 mb-6">
+                Bitte wählen Sie zuerst eine Größe für dieses Produkt aus, bevor Sie es zum Warenkorb hinzufügen.
+              </p>
+              
+              <div className="flex gap-3 justify-center">
+                <button
+                  onClick={closeSizeRequiredPopup}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+                >
+                  Abbrechen
+                </button>
+                <button
+                  onClick={() => handleSizeRequiredAndOpenSizePopup(showSizeRequiredPopup)}
+                  className="px-4 py-2 text-sm font-medium text-white bg-orange-500 hover:bg-orange-600 rounded-lg transition-colors"
+                >
+                  Größe wählen
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Size Selection Popup */}
       {showSizePopup && (
@@ -682,12 +744,7 @@ const MenuSection: React.FC<MenuSectionProps> = ({
                   <button
                     type="button"
                     onClick={() => handleAddToOrder(item)}
-                    disabled={!canAdd}
-                    className={`w-8 h-8 md:w-9 md:h-9 rounded-md md:rounded-lg text-white transition-all duration-300 flex items-center justify-center shadow-md hover:shadow-lg transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 group-hover:rotate-3 ${
-                      !canAdd
-                        ? 'bg-gray-400 cursor-not-allowed'
-                        : 'bg-gradient-to-br from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700'
-                    }`}
+                    className={`w-8 h-8 md:w-9 md:h-9 rounded-md md:rounded-lg text-white transition-all duration-300 flex items-center justify-center shadow-md hover:shadow-lg transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 group-hover:rotate-3 bg-gradient-to-br from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700`}
                     title={buttonTooltip}
                   >
                     <Plus className="w-4 h-4" />
