@@ -495,21 +495,40 @@ const MenuSection: React.FC<MenuSectionProps> = ({
 
                 {/* Right side - Price and controls - Mobile smaller gaps */}
                 <div className="flex flex-col items-end gap-1.5 md:gap-2 flex-shrink-0 relative z-10">
-                  {/* Mobile smaller size selector button */}
-                  {hasSizes && (
-                    <button
-                      type="button"
-                      onClick={() => toggleExpanded(item.id)}
-                      className="flex items-center gap-1 md:gap-1.5 px-1.5 md:px-2 py-1 md:py-1.5 bg-blue-50 hover:bg-blue-100 border border-blue-200 hover:border-blue-300 rounded-md transition-all duration-300 text-xs font-medium text-blue-700"
-                    >
-                      <span>Größe</span>
-                      {isExpanded ? (
-                        <ChevronUp className="w-3 h-3" />
-                      ) : (
-                        <ChevronDown className="w-3 h-3" />
-                      )}
-                    </button>
-                  )}
+                  {/* Size and Extras buttons on the same line */}
+                  <div className="flex items-center gap-1 md:gap-1.5">
+                    {/* Size selector button - positioned slightly to the left */}
+                    {hasSizes && (
+                      <button
+                        type="button"
+                        onClick={() => toggleExpanded(item.id)}
+                        className="flex items-center gap-1 md:gap-1.5 px-1.5 md:px-2 py-1 md:py-1.5 bg-blue-50 hover:bg-blue-100 border border-blue-200 hover:border-blue-300 rounded-md transition-all duration-300 text-xs font-medium text-blue-700"
+                      >
+                        <span>Größe</span>
+                        {isExpanded ? (
+                          <ChevronUp className="w-3 h-3" />
+                        ) : (
+                          <ChevronDown className="w-3 h-3" />
+                        )}
+                      </button>
+                    )}
+
+                    {/* Pizza extras selector button for all pizzas */}
+                    {isPizza && (
+                      <button
+                        type="button"
+                        onClick={() => openExtrasPopup(item.id)}
+                        className="flex items-center gap-1 md:gap-1.5 px-1.5 md:px-2 py-1 md:py-1.5 bg-purple-50 hover:bg-purple-100 border border-purple-200 hover:border-purple-300 rounded-md transition-all duration-300 text-xs font-medium text-purple-700"
+                      >
+                        <span>Extras</span>
+                        {itemExtras.length > 0 && (
+                          <span className="bg-purple-200 text-purple-800 text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold">
+                            {itemExtras.length}
+                          </span>
+                        )}
+                      </button>
+                    )}
+                  </div>
 
                   {/* Wunsch Pizza ingredient selector button */}
                   {isWunschPizza && (
@@ -522,22 +541,6 @@ const MenuSection: React.FC<MenuSectionProps> = ({
                       {itemIngredients.length > 0 && (
                         <span className="bg-green-200 text-green-800 text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold">
                           {itemIngredients.length}
-                        </span>
-                      )}
-                    </button>
-                  )}
-
-                  {/* Pizza extras selector button for all pizzas */}
-                  {isPizza && (
-                    <button
-                      type="button"
-                      onClick={() => openExtrasPopup(item.id)}
-                      className="flex items-center gap-1 md:gap-1.5 px-1.5 md:px-2 py-1 md:py-1.5 bg-purple-50 hover:bg-purple-100 border border-purple-200 hover:border-purple-300 rounded-md transition-all duration-300 text-xs font-medium text-purple-700"
-                    >
-                      <span>Extras</span>
-                      {itemExtras.length > 0 && (
-                        <span className="bg-purple-200 text-purple-800 text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold">
-                          {itemExtras.length}
                         </span>
                       )}
                     </button>
