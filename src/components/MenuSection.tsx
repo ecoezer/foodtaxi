@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { MenuItem, PizzaSize } from '../types';
 import { useInView } from 'react-intersection-observer';
-import { Plus, ChevronDown, ChevronUp, X } from 'lucide-react';
+import { Plus, X } from 'lucide-react';
 import { wunschPizzaIngredients, pizzaExtras } from '../data/menuItems';
 
 interface MenuSectionProps {
@@ -30,22 +30,12 @@ const MenuSection: React.FC<MenuSectionProps> = ({
     rootMargin: '50px 0px'
   });
 
-  const [expandedItems, setExpandedItems] = useState<Set<number>>(new Set());
   const [selectedSizes, setSelectedSizes] = useState<Record<number, PizzaSize>>({});
   const [selectedIngredients, setSelectedIngredients] = useState<Record<number, string[]>>({});
   const [selectedExtras, setSelectedExtras] = useState<Record<number, string[]>>({});
   const [showExtrasPopup, setShowExtrasPopup] = useState<number | null>(null);
   const [showIngredientsPopup, setShowIngredientsPopup] = useState<number | null>(null);
-
-  const toggleExpanded = (itemId: number) => {
-    const newExpanded = new Set(expandedItems);
-    if (newExpanded.has(itemId)) {
-      newExpanded.delete(itemId);
-    } else {
-      newExpanded.add(itemId);
-    }
-    setExpandedItems(newExpanded);
-  };
+  const [showSizePopup, setShowSizePopup] = useState<number | null>(null);
 
   const handleSizeSelect = (itemId: number, size: PizzaSize) => {
     setSelectedSizes(prev => ({
@@ -125,6 +115,14 @@ const MenuSection: React.FC<MenuSectionProps> = ({
     return basePrice + extrasPrice;
   };
 
+  const openSizePopup = (itemId: number) => {
+    setShowSizePopup(itemId);
+  };
+
+  const closeSizePopup = () => {
+    setShowSizePopup(null);
+  };
+
   const openExtrasPopup = (itemId: number) => {
     setShowExtrasPopup(itemId);
   };
@@ -189,6 +187,85 @@ const MenuSection: React.FC<MenuSectionProps> = ({
           </p>
         )}
       </div>
+
+      {/* Size Selection Popup */}
+      {showSizePopup && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full max-h-[80vh] overflow-y-auto">
+            <div className="sticky top-0 bg-white border-b border-gray-200 p-4 rounded-t-xl">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-bold text-gray-900">Größe wählen</h3>
+                <button
+                  onClick={closeSizePopup}
+                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                >
+                  <X className="w-5 h-5 text-gray-500" />
+                </button>
+              </div>
+              <p className="text-sm text-gray-600 mt-1">
+                Wählen Sie Ihre gewünschte Pizza-Größe
+              </p>
+            </div>
+            
+            <div className="p-4 space-y-3">
+              {items.find(item => item.id === showSizePopup)?.sizes?.map((size) => {
+                const isSelected = selectedSizes[showSizePopup]?.name === size.name;
+                
+                return (
+                  <label
+                    key={size.name}
+                    className={`flex items-center justify-between p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 ${
+                      isSelected
+                        ? 'border-blue-500 bg-blue-50'
+                        : 'border-gray-200 hover:border-blue-300 hover:bg-blue-50'
+                    }`}
+                  >
+                    <div className="flex items-center">
+                      <input
+                        type="radio"
+                        name={`size-${showSizePopup}`}
+                        checked={isSelected}
+                        onChange={() => handleSizeSelect(showSizePopup, size)}
+                        className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500 focus:ring-2"
+                      />
+                      <div className="ml-3">
+                        <div className="font-bold text-gray-900 text-lg">
+                          {size.name}
+                        </div>
+                        {size.description && (
+                          <div className="text-sm text-gray-600">
+                            {size.description}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    <div className="font-bold text-blue-600 text-lg">
+                      {size.price.toFixed(2).replace('.', ',')}€
+                    </div>
+                  </label>
+                );
+              })}
+            </div>
+            
+            <div className="sticky bottom-0 bg-white border-t border-gray-200 p-4 rounded-b-xl">
+              <div className="flex items-center justify-between mb-3">
+                <span className="font-medium text-gray-900">
+                  Gewählte Größe:
+                </span>
+                <span className="font-bold text-blue-600">
+                  {selectedSizes[showSizePopup]?.name || 'Keine ausgewählt'}
+                </span>
+              </div>
+              <button
+                onClick={closeSizePopup}
+                className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg transition-colors"
+              >
+                Größe bestätigen
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Wunsch Pizza Ingredients Popup */}
       {showIngredientsPopup && (
@@ -341,7 +418,6 @@ const MenuSection: React.FC<MenuSectionProps> = ({
       {/* Menu items container - Always show items, animation is optional */}
       <div className="space-y-2 md:space-y-2">
         {items.map((item, index) => {
-          const isExpanded = expandedItems.has(item.id);
           const hasSizes = item.sizes && item.sizes.length > 0;
           const selectedSize = selectedSizes[item.id];
           const displayPrice = getDisplayPrice(item);
@@ -456,41 +532,6 @@ const MenuSection: React.FC<MenuSectionProps> = ({
                       )}
                     </div>
                   </div>
-
-                  {/* Size selection - 25% smaller boxes */}
-                  {hasSizes && isExpanded && (
-                    <div className="mt-2.5 md:mt-3 pt-2.5 md:pt-3 border-t border-gray-100">
-                      <div className="w-full flex justify-center">
-                        <div className="w-full max-w-xs mx-auto">
-                          <div className="grid grid-cols-2 gap-1.5 w-full">
-                            {item.sizes!.map((size) => {
-                              const isSelected = selectedSize?.name === size.name;
-                              return (
-                                <button
-                                  key={size.name}
-                                  type="button"
-                                  onClick={() => handleSizeSelect(item.id, size)}
-                                  className={`w-full p-1.5 rounded-md border-2 transition-all duration-300 text-center ${
-                                    isSelected
-                                      ? 'border-orange-500 bg-orange-50 text-orange-700 shadow-sm transform scale-105'
-                                      : 'border-gray-200 bg-white hover:border-orange-300 hover:bg-orange-50 text-gray-700 hover:transform hover:scale-105'
-                                  }`}
-                                >
-                                  <div className="font-bold text-xs mb-0.5">{size.name}</div>
-                                  {size.description && (
-                                    <div className="text-xs text-gray-500 mb-0.5">{size.description}</div>
-                                  )}
-                                  <div className="font-bold text-xs">
-                                    {size.price.toFixed(2).replace('.', ',')} €
-                                  </div>
-                                </button>
-                              );
-                            })}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
                 </div>
 
                 {/* Right side - Price and controls - Mobile smaller gaps */}
@@ -501,14 +542,14 @@ const MenuSection: React.FC<MenuSectionProps> = ({
                     {hasSizes && (
                       <button
                         type="button"
-                        onClick={() => toggleExpanded(item.id)}
+                        onClick={() => openSizePopup(item.id)}
                         className="flex items-center gap-1 md:gap-1.5 px-1.5 md:px-2 py-1 md:py-1.5 bg-blue-50 hover:bg-blue-100 border border-blue-200 hover:border-blue-300 rounded-md transition-all duration-300 text-xs font-medium text-blue-700"
                       >
                         <span>Größe</span>
-                        {isExpanded ? (
-                          <ChevronUp className="w-3 h-3" />
-                        ) : (
-                          <ChevronDown className="w-3 h-3" />
+                        {selectedSize && (
+                          <span className="bg-blue-200 text-blue-800 text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold">
+                            ✓
+                          </span>
                         )}
                       </button>
                     )}
