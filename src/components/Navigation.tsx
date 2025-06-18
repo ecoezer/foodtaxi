@@ -11,7 +11,7 @@ const Navigation = () => {
   const navRef = useRef<HTMLDivElement>(null);
 
   const navigationItems = [
-    ['doener', '🥙', 'Dönergerichte'],
+    ['doener', '🥙', 'Spezialitäten'],
     ['pizza', '🍕', 'Pizza'],
     ['burger', '🍔', 'Hamburger'],
     ['pasta', '🍝', 'Pasta & Al Forno'],
