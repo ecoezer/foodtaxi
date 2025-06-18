@@ -574,11 +574,58 @@ const MenuSection: React.FC<MenuSectionProps> = ({
                 </div>
 
                 {/* Right side - Price and controls - Mobile smaller gaps */}
-                <div className="flex flex-col items-end gap-1.5 md:gap-2 flex-shrink-0 relative z-10">
-                  {/* Button order for Wunsch Pizza: Größe, then Zutaten, then Extras on same line */}
+                <div className="flex flex-col items-center gap-1.5 md:gap-2 flex-shrink-0 relative z-10">
+                  {/* Wunsch Pizza: All 3 buttons on same line, centered */}
                   {isWunschPizza ? (
-                    <>
-                      {/* Size selector button first for Wunsch Pizza */}
+                    <div className="flex items-center justify-center gap-1 md:gap-1.5">
+                      {/* Size selector button */}
+                      {hasSizes && (
+                        <button
+                          type="button"
+                          onClick={() => openSizePopup(item.id)}
+                          className="flex items-center gap-1 px-1.5 md:px-2 py-1 md:py-1.5 bg-blue-50 hover:bg-blue-100 border border-blue-200 hover:border-blue-300 rounded-md transition-all duration-300 text-xs font-medium text-blue-700"
+                        >
+                          <span>Größe</span>
+                          {selectedSize && (
+                            <span className="bg-blue-200 text-blue-800 text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold">
+                              ✓
+                            </span>
+                          )}
+                        </button>
+                      )}
+
+                      {/* Ingredients selector button */}
+                      <button
+                        type="button"
+                        onClick={() => openIngredientsPopup(item.id)}
+                        className="flex items-center gap-1 px-1.5 md:px-2 py-1 md:py-1.5 bg-green-50 hover:bg-green-100 border border-green-200 hover:border-green-300 rounded-md transition-all duration-300 text-xs font-medium text-green-700"
+                      >
+                        <span>Zutaten</span>
+                        {itemIngredients.length > 0 && (
+                          <span className="bg-green-200 text-green-800 text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold">
+                            {itemIngredients.length}
+                          </span>
+                        )}
+                      </button>
+
+                      {/* Extras selector button */}
+                      <button
+                        type="button"
+                        onClick={() => openExtrasPopup(item.id)}
+                        className="flex items-center gap-1 px-1.5 md:px-2 py-1 md:py-1.5 bg-purple-50 hover:bg-purple-100 border border-purple-200 hover:border-purple-300 rounded-md transition-all duration-300 text-xs font-medium text-purple-700"
+                      >
+                        <span>Extras</span>
+                        {itemExtras.length > 0 && (
+                          <span className="bg-purple-200 text-purple-800 text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold">
+                            {itemExtras.length}
+                          </span>
+                        )}
+                      </button>
+                    </div>
+                  ) : (
+                    /* Regular pizza/item button order */
+                    <div className="flex items-center gap-1 md:gap-1.5">
+                      {/* Size selector button */}
                       {hasSizes && (
                         <button
                           type="button"
@@ -594,71 +641,22 @@ const MenuSection: React.FC<MenuSectionProps> = ({
                         </button>
                       )}
 
-                      {/* Ingredients selector button second for Wunsch Pizza */}
-                      <button
-                        type="button"
-                        onClick={() => openIngredientsPopup(item.id)}
-                        className="flex items-center gap-1 md:gap-1.5 px-1.5 md:px-2 py-1 md:py-1.5 bg-green-50 hover:bg-green-100 border border-green-200 hover:border-green-300 rounded-md transition-all duration-300 text-xs font-medium text-green-700"
-                      >
-                        <span>Zutaten</span>
-                        {itemIngredients.length > 0 && (
-                          <span className="bg-green-200 text-green-800 text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold">
-                            {itemIngredients.length}
-                          </span>
-                        )}
-                      </button>
-
-                      {/* Extras selector button third for Wunsch Pizza, on same line as ingredients */}
-                      <button
-                        type="button"
-                        onClick={() => openExtrasPopup(item.id)}
-                        className="flex items-center gap-1 md:gap-1.5 px-1.5 md:px-2 py-1 md:py-1.5 bg-purple-50 hover:bg-purple-100 border border-purple-200 hover:border-purple-300 rounded-md transition-all duration-300 text-xs font-medium text-purple-700"
-                      >
-                        <span>Extras</span>
-                        {itemExtras.length > 0 && (
-                          <span className="bg-purple-200 text-purple-800 text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold">
-                            {itemExtras.length}
-                          </span>
-                        )}
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      {/* Regular pizza/item button order */}
-                      <div className="flex items-center gap-1 md:gap-1.5">
-                        {/* Size selector button */}
-                        {hasSizes && (
-                          <button
-                            type="button"
-                            onClick={() => openSizePopup(item.id)}
-                            className="flex items-center gap-1 md:gap-1.5 px-1.5 md:px-2 py-1 md:py-1.5 bg-blue-50 hover:bg-blue-100 border border-blue-200 hover:border-blue-300 rounded-md transition-all duration-300 text-xs font-medium text-blue-700"
-                          >
-                            <span>Größe</span>
-                            {selectedSize && (
-                              <span className="bg-blue-200 text-blue-800 text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold">
-                                ✓
-                              </span>
-                            )}
-                          </button>
-                        )}
-
-                        {/* Pizza extras selector button for regular pizzas */}
-                        {isPizza && (
-                          <button
-                            type="button"
-                            onClick={() => openExtrasPopup(item.id)}
-                            className="flex items-center gap-1 md:gap-1.5 px-1.5 md:px-2 py-1 md:py-1.5 bg-purple-50 hover:bg-purple-100 border border-purple-200 hover:border-purple-300 rounded-md transition-all duration-300 text-xs font-medium text-purple-700"
-                          >
-                            <span>Extras</span>
-                            {itemExtras.length > 0 && (
-                              <span className="bg-purple-200 text-purple-800 text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold">
-                                {itemExtras.length}
-                              </span>
-                            )}
-                          </button>
-                        )}
-                      </div>
-                    </>
+                      {/* Pizza extras selector button for regular pizzas */}
+                      {isPizza && (
+                        <button
+                          type="button"
+                          onClick={() => openExtrasPopup(item.id)}
+                          className="flex items-center gap-1 md:gap-1.5 px-1.5 md:px-2 py-1 md:py-1.5 bg-purple-50 hover:bg-purple-100 border border-purple-200 hover:border-purple-300 rounded-md transition-all duration-300 text-xs font-medium text-purple-700"
+                        >
+                          <span>Extras</span>
+                          {itemExtras.length > 0 && (
+                            <span className="bg-purple-200 text-purple-800 text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold">
+                              {itemExtras.length}
+                            </span>
+                          )}
+                        </button>
+                      )}
+                    </div>
                   )}
 
                   {/* Mobile smaller price display box */}
