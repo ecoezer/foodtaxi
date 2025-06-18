@@ -406,7 +406,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ orderItems, onRemoveItem, onUpdat
       phone: '+49 1',
       street: '',
       houseNumber: '',
-      postcode: '3102',
+      postcode: '',
       note: ''
     }
   });
@@ -721,7 +721,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ orderItems, onRemoveItem, onUpdat
             <FormField label="Anmerkungen (optional)" icon={<MessageSquare className="w-4 h-4" />} error={errors.note?.message}>
               <textarea
                 {...field}
-                placeholder="z.B. Funghi-Pizza ohne Zwiebeln, Klingel defekt, etc."
+                placeholder="z.B. Pizza in 8 Stücke schneiden, Klingel defekt, etc."
                 className="w-full rounded-lg border-gray-300 shadow-sm focus:border-orange-500 focus:ring focus:ring-orange-200 transition-colors resize-none text-sm"
                 rows={3}
               />
