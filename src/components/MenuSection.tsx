@@ -115,6 +115,43 @@ const MenuSection: React.FC<MenuSectionProps> = ({
     return basePrice + extrasPrice;
   };
 
+  // Check if item can be added to cart
+  const canAddToCart = (item: MenuItem) => {
+    const hasSizes = item.sizes && item.sizes.length > 0;
+    const selectedSize = selectedSizes[item.id];
+    const itemIngredients = selectedIngredients[item.id] || [];
+    const isWunschPizza = item.isWunschPizza;
+
+    // For items with sizes (pizzas), size must be selected
+    if (hasSizes && !selectedSize) {
+      return false;
+    }
+
+    // For Wunsch Pizza, at least one ingredient must be selected
+    if (isWunschPizza && itemIngredients.length === 0) {
+      return false;
+    }
+
+    return true;
+  };
+
+  const getAddButtonTooltip = (item: MenuItem) => {
+    const hasSizes = item.sizes && item.sizes.length > 0;
+    const selectedSize = selectedSizes[item.id];
+    const itemIngredients = selectedIngredients[item.id] || [];
+    const isWunschPizza = item.isWunschPizza;
+
+    if (hasSizes && !selectedSize) {
+      return 'Bitte wählen Sie eine Größe';
+    }
+
+    if (isWunschPizza && itemIngredients.length === 0) {
+      return 'Bitte wählen Sie mindestens eine Zutat';
+    }
+
+    return 'Zum Warenkorb hinzufügen';
+  };
+
   const openSizePopup = (itemId: number) => {
     setShowSizePopup(itemId);
   };
@@ -425,6 +462,8 @@ const MenuSection: React.FC<MenuSectionProps> = ({
           const itemExtras = selectedExtras[item.id] || [];
           const isWunschPizza = item.isWunschPizza;
           const isPizza = item.isPizza || item.isWunschPizza;
+          const canAdd = canAddToCart(item);
+          const buttonTooltip = getAddButtonTooltip(item);
 
           return (
             <div
@@ -536,26 +575,40 @@ const MenuSection: React.FC<MenuSectionProps> = ({
 
                 {/* Right side - Price and controls - Mobile smaller gaps */}
                 <div className="flex flex-col items-end gap-1.5 md:gap-2 flex-shrink-0 relative z-10">
-                  {/* Size and Extras buttons on the same line */}
-                  <div className="flex items-center gap-1 md:gap-1.5">
-                    {/* Size selector button - positioned slightly to the left */}
-                    {hasSizes && (
+                  {/* Button order for Wunsch Pizza: Größe, then Zutaten, then Extras on same line */}
+                  {isWunschPizza ? (
+                    <>
+                      {/* Size selector button first for Wunsch Pizza */}
+                      {hasSizes && (
+                        <button
+                          type="button"
+                          onClick={() => openSizePopup(item.id)}
+                          className="flex items-center gap-1 md:gap-1.5 px-1.5 md:px-2 py-1 md:py-1.5 bg-blue-50 hover:bg-blue-100 border border-blue-200 hover:border-blue-300 rounded-md transition-all duration-300 text-xs font-medium text-blue-700"
+                        >
+                          <span>Größe</span>
+                          {selectedSize && (
+                            <span className="bg-blue-200 text-blue-800 text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold">
+                              ✓
+                            </span>
+                          )}
+                        </button>
+                      )}
+
+                      {/* Ingredients selector button second for Wunsch Pizza */}
                       <button
                         type="button"
-                        onClick={() => openSizePopup(item.id)}
-                        className="flex items-center gap-1 md:gap-1.5 px-1.5 md:px-2 py-1 md:py-1.5 bg-blue-50 hover:bg-blue-100 border border-blue-200 hover:border-blue-300 rounded-md transition-all duration-300 text-xs font-medium text-blue-700"
+                        onClick={() => openIngredientsPopup(item.id)}
+                        className="flex items-center gap-1 md:gap-1.5 px-1.5 md:px-2 py-1 md:py-1.5 bg-green-50 hover:bg-green-100 border border-green-200 hover:border-green-300 rounded-md transition-all duration-300 text-xs font-medium text-green-700"
                       >
-                        <span>Größe</span>
-                        {selectedSize && (
-                          <span className="bg-blue-200 text-blue-800 text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold">
-                            ✓
+                        <span>Zutaten</span>
+                        {itemIngredients.length > 0 && (
+                          <span className="bg-green-200 text-green-800 text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold">
+                            {itemIngredients.length}
                           </span>
                         )}
                       </button>
-                    )}
 
-                    {/* Pizza extras selector button for all pizzas */}
-                    {isPizza && (
+                      {/* Extras selector button third for Wunsch Pizza, on same line as ingredients */}
                       <button
                         type="button"
                         onClick={() => openExtrasPopup(item.id)}
@@ -568,23 +621,44 @@ const MenuSection: React.FC<MenuSectionProps> = ({
                           </span>
                         )}
                       </button>
-                    )}
-                  </div>
+                    </>
+                  ) : (
+                    <>
+                      {/* Regular pizza/item button order */}
+                      <div className="flex items-center gap-1 md:gap-1.5">
+                        {/* Size selector button */}
+                        {hasSizes && (
+                          <button
+                            type="button"
+                            onClick={() => openSizePopup(item.id)}
+                            className="flex items-center gap-1 md:gap-1.5 px-1.5 md:px-2 py-1 md:py-1.5 bg-blue-50 hover:bg-blue-100 border border-blue-200 hover:border-blue-300 rounded-md transition-all duration-300 text-xs font-medium text-blue-700"
+                          >
+                            <span>Größe</span>
+                            {selectedSize && (
+                              <span className="bg-blue-200 text-blue-800 text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold">
+                                ✓
+                              </span>
+                            )}
+                          </button>
+                        )}
 
-                  {/* Wunsch Pizza ingredient selector button */}
-                  {isWunschPizza && (
-                    <button
-                      type="button"
-                      onClick={() => openIngredientsPopup(item.id)}
-                      className="flex items-center gap-1 md:gap-1.5 px-1.5 md:px-2 py-1 md:py-1.5 bg-green-50 hover:bg-green-100 border border-green-200 hover:border-green-300 rounded-md transition-all duration-300 text-xs font-medium text-green-700"
-                    >
-                      <span>Zutaten</span>
-                      {itemIngredients.length > 0 && (
-                        <span className="bg-green-200 text-green-800 text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold">
-                          {itemIngredients.length}
-                        </span>
-                      )}
-                    </button>
+                        {/* Pizza extras selector button for regular pizzas */}
+                        {isPizza && (
+                          <button
+                            type="button"
+                            onClick={() => openExtrasPopup(item.id)}
+                            className="flex items-center gap-1 md:gap-1.5 px-1.5 md:px-2 py-1 md:py-1.5 bg-purple-50 hover:bg-purple-100 border border-purple-200 hover:border-purple-300 rounded-md transition-all duration-300 text-xs font-medium text-purple-700"
+                          >
+                            <span>Extras</span>
+                            {itemExtras.length > 0 && (
+                              <span className="bg-purple-200 text-purple-800 text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold">
+                                {itemExtras.length}
+                              </span>
+                            )}
+                          </button>
+                        )}
+                      </div>
+                    </>
                   )}
 
                   {/* Mobile smaller price display box */}
@@ -610,17 +684,13 @@ const MenuSection: React.FC<MenuSectionProps> = ({
                   <button
                     type="button"
                     onClick={() => handleAddToOrder(item)}
-                    disabled={isWunschPizza && itemIngredients.length === 0}
+                    disabled={!canAdd}
                     className={`w-8 h-8 md:w-9 md:h-9 rounded-md md:rounded-lg text-white transition-all duration-300 flex items-center justify-center shadow-md hover:shadow-lg transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 group-hover:rotate-3 ${
-                      isWunschPizza && itemIngredients.length === 0
+                      !canAdd
                         ? 'bg-gray-400 cursor-not-allowed'
                         : 'bg-gradient-to-br from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700'
                     }`}
-                    title={
-                      isWunschPizza && itemIngredients.length === 0
-                        ? 'Bitte wählen Sie mindestens eine Zutat'
-                        : 'Zum Warenkorb hinzufügen'
-                    }
+                    title={buttonTooltip}
                   >
                     <Plus className="w-4 h-4" />
                   </button>
