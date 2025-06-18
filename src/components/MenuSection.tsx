@@ -21,10 +21,13 @@ const MenuSection: React.FC<MenuSectionProps> = ({
   bgColor,
   onAddToOrder
 }) => {
+  // Debug logging
+  console.log(`MenuSection ${title}:`, { itemsCount: items.length, items });
+
   const { ref, inView } = useInView({
     threshold: 0.1,
-    triggerOnce: true,
-    rootMargin: '50px 0px' // Add margin to trigger earlier
+    triggerOnce: false, // Changed to false to ensure it triggers
+    rootMargin: '50px 0px'
   });
 
   const [expandedItems, setExpandedItems] = useState<Set<number>>(new Set());
@@ -120,12 +123,37 @@ const MenuSection: React.FC<MenuSectionProps> = ({
     return basePrice + extrasPrice;
   };
 
+  // Early return if no items
+  if (!items || items.length === 0) {
+    console.warn(`MenuSection ${title}: No items provided`);
+    return (
+      <section className="mb-4">
+        <div className="mb-3">
+          <h2 className="text-xl md:text-xl font-bold text-gray-900 mb-1">
+            {title}
+          </h2>
+          {subTitle && (
+            <h3 className="text-sm md:text-xs text-gray-600 mb-1 font-medium">
+              {subTitle}
+            </h3>
+          )}
+          {description && (
+            <p className="text-sm md:text-xs text-gray-600 leading-relaxed">
+              {description}
+            </p>
+          )}
+        </div>
+        <div className="text-center py-8 text-gray-500">
+          Keine Artikel verfügbar
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section
       ref={ref}
-      className={`mb-4 transform transition-all duration-700 ${
-        inView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-      }`}
+      className="mb-4"
     >
       {/* Category header - Desktop compact, mobile same text size */}
       <div className="mb-3">
@@ -144,7 +172,7 @@ const MenuSection: React.FC<MenuSectionProps> = ({
         )}
       </div>
 
-      {/* Menu items container - Mobile smaller spacing */}
+      {/* Menu items container - Always show items, animation is optional */}
       <div className="space-y-2 md:space-y-2">
         {items.map((item, index) => {
           const isExpanded = expandedItems.has(item.id);
@@ -159,8 +187,8 @@ const MenuSection: React.FC<MenuSectionProps> = ({
           return (
             <div
               key={item.id}
-              className={`bg-white rounded-lg border border-gray-200 hover:border-orange-200 hover:shadow-md transition-all duration-300 cursor-pointer overflow-hidden group ${
-                inView ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-[-20px]'
+              className={`bg-white rounded-lg border border-gray-200 hover:border-orange-200 hover:shadow-md transition-all duration-300 cursor-pointer overflow-hidden group transform ${
+                inView ? 'opacity-100 translate-x-0' : 'opacity-100 translate-x-0'
               }`}
               style={{
                 animationDelay: inView ? `${index * 50}ms` : '0ms',

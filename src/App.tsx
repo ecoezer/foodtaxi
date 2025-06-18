@@ -102,6 +102,22 @@ function App() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Debug logging for menu items
+  useEffect(() => {
+    console.log('App: Menu items loaded:', {
+      pizzas: pizzas.length,
+      donerDishes: donerDishes.length,
+      burgers: burgers.length,
+      pasta: pasta.length,
+      schnitzel: schnitzel.length,
+      fingerFood: fingerFood.length,
+      salads: salads.length,
+      desserts: desserts.length,
+      dips: dips.length,
+      drinks: drinks.length
+    });
+  }, []);
+
   // =================== MEMOIZED VALUES ===================
   const totalItemsCount = useMemo(() => 
     items.reduce((sum, item) => sum + item.quantity, 0), 
@@ -419,18 +435,22 @@ function App() {
     )
   );
 
-  const renderMenuSection = useCallback((id, title, description, items, subTitle) => (
-    <div key={id} id={id} className='scroll-mt-[6.5rem]'>
-      <MenuSection
-        title={title}
-        description={description}
-        subTitle={subTitle}
-        items={items}
-        bgColor='bg-orange-500'
-        onAddToOrder={memoizedAddItem}
-      />
-    </div>
-  ), [memoizedAddItem]);
+  const renderMenuSection = useCallback((id, title, description, items, subTitle) => {
+    console.log(`Rendering section ${id}:`, { title, itemsCount: items?.length || 0 });
+    
+    return (
+      <div key={id} id={id} className='scroll-mt-[6.5rem]'>
+        <MenuSection
+          title={title}
+          description={description}
+          subTitle={subTitle}
+          items={items || []}
+          bgColor='bg-orange-500'
+          onAddToOrder={memoizedAddItem}
+        />
+      </div>
+    );
+  }, [memoizedAddItem]);
 
   // =================== MAIN RENDER ===================
   return (
