@@ -472,7 +472,7 @@ function App() {
               {renderMenuSection(
                 MENU_SECTIONS.DOENER,
                 'Spezialitäten', 
-                'Alle Dönergerichte werden mit Eisbergsalat, Tomaten, Gurken, Zwiebeln und einer Soße Ihrer Wahl zubereitet.',
+                'Alle Spezialitäten werden mit Eisbergsalat, Tomaten, Gurken, Zwiebeln und einer Soße Ihrer Wahl zubereitet.',
                 donerDishes
               )}
 

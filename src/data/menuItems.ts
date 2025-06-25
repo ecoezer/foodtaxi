@@ -74,7 +74,7 @@ const createBurgerSizes = (basePrice: number) => [
   { name: '250g', price: basePrice + 2.00, description: 'Doppel Patty (+2€)' }
 ];
 
-// Dönergerichte (Updated with new items)
+// Spezialitäten (Updated with new items)
 export const donerDishes: MenuItem[] = [
   {
     id: 80,
@@ -123,6 +123,22 @@ export const donerDishes: MenuItem[] = [
     description: "mit Curry Sauce und Pommes",
     price: 9.90,
     allergens: "1,2,3,4/A,C,F"
+  },
+  {
+    id: 86,
+    number: 86,
+    name: "Döner Box",
+    description: "",
+    price: 6.50,
+    allergens: "1,2,3,4/A,C,F,G"
+  },
+  {
+    id: 87,
+    number: 87,
+    name: "Döner Teller",
+    description: "",
+    price: 13.00,
+    allergens: "1,2,3,4/A,C,F,G"
   }
 ];
 
