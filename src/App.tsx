@@ -471,10 +471,9 @@ function App() {
             <div className='lg:col-span-8 xl:col-span-9 space-y-4'>
               {renderMenuSection(
                 MENU_SECTIONS.DOENER,
-                'Dönergerichte', 
+                'Spezialitäten', 
                 'Alle Dönergerichte werden mit Eisbergsalat, Tomaten, Gurken, Zwiebeln und einer Soße Ihrer Wahl zubereitet.',
-                donerDishes,
-                'Drehspieß nach Döner-Art aus Puten- und Rindfleisch'
+                donerDishes
               )}
 
               {renderMenuSection(
