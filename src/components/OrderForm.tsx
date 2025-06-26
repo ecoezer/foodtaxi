@@ -3,7 +3,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { AsYouType } from 'libphonenumber-js';
-import { Phone, ShoppingCart, X, Minus, Plus, Clock, MapPin, User, MessageSquare, AlertTriangle } from 'lucide-react';
+import { Phone, ShoppingCart, X, Minus, Plus, Clock, MapPin, User, MessageSquare, AlertTriangle, ChevronUp, ChevronDown } from 'lucide-react';
 import { PizzaSize } from '../types';
 
 // Types
@@ -26,31 +26,31 @@ interface OrderFormProps {
   onUpdateQuantity: (id: number, quantity: number, selectedSize?: PizzaSize, selectedIngredients?: string[], selectedExtras?: string[]) => void;
 }
 
-// Constants - Updated delivery zones with minimum order limits
+// Constants - Delivery zones sorted alphabetically
 const DELIVERY_ZONES = {
+  'banteln': { label: 'Banteln', minOrder: 25, fee: 2.5 },
+  'barfelde': { label: 'Barfelde', minOrder: 20, fee: 2.5 },
+  'betheln': { label: 'Betheln', minOrder: 25, fee: 3 },
+  'brueggen': { label: 'Brüggen', minOrder: 35, fee: 3 },
+  'deinsen': { label: 'Deinsen', minOrder: 35, fee: 4 },
+  'duingen': { label: 'Duingen', minOrder: 40, fee: 4 },
+  'dunsen-gime': { label: 'Dunsen (Gime)', minOrder: 30, fee: 3 },
+  'eime': { label: 'Eime', minOrder: 25, fee: 3 },
+  'eitzum': { label: 'Eitzum', minOrder: 25, fee: 3 },
+  'elze': { label: 'Elze', minOrder: 35, fee: 4 },
   'gronau': { label: 'Gronau', minOrder: 15, fee: 1.5 },
   'gronau-doetzum': { label: 'Gronau Dötzum', minOrder: 20, fee: 2 },
   'gronau-eddighausen': { label: 'Gronau Eddighausen', minOrder: 20, fee: 2.5 },
-  'banteln': { label: 'Banteln', minOrder: 25, fee: 2.5 },
-  'eime': { label: 'Eime', minOrder: 25, fee: 3 },
-  'kolonie-godenau': { label: 'Kolonie Godenau', minOrder: 40, fee: 4 },
-  'eitzum': { label: 'Eitzum', minOrder: 25, fee: 3 },
-  'dunsen-gime': { label: 'Dunsen (Gime)', minOrder: 30, fee: 3 },
-  'barfelde': { label: 'Barfelde', minOrder: 20, fee: 2.5 },
-  'wallensted': { label: 'Wallensted', minOrder: 25, fee: 3 },
-  'rheden-elze': { label: 'Rheden (Elze)', minOrder: 25, fee: 3 },
-  'elze': { label: 'Elze', minOrder: 35, fee: 4 },
-  'mehle-elze': { label: 'Mehle (Elze)', minOrder: 35, fee: 4 },
-  'sorsum-elze': { label: 'Sorsum (Elze)', minOrder: 35, fee: 4 },
-  'nordstemmen': { label: 'Nordstemmen', minOrder: 35, fee: 4 },
-  'betheln': { label: 'Betheln', minOrder: 25, fee: 3 },
-  'brueggen': { label: 'Brüggen', minOrder: 35, fee: 3 },
-  'duingen': { label: 'Duingen', minOrder: 40, fee: 4 },
   'haus-escherde': { label: 'Haus Escherde', minOrder: 25, fee: 3 },
   'heinum': { label: 'Heinum', minOrder: 25, fee: 3 },
+  'kolonie-godenau': { label: 'Kolonie Godenau', minOrder: 40, fee: 4 },
+  'mehle-elze': { label: 'Mehle (Elze)', minOrder: 35, fee: 4 },
   'nienstedt': { label: 'Nienstedt', minOrder: 35, fee: 4 },
+  'nordstemmen': { label: 'Nordstemmen', minOrder: 35, fee: 4 },
+  'rheden-elze': { label: 'Rheden (Elze)', minOrder: 25, fee: 3 },
   'sibesse': { label: 'Sibesse', minOrder: 40, fee: 4 },
-  'deinsen': { label: 'Deinsen', minOrder: 35, fee: 4 }
+  'sorsum-elze': { label: 'Sorsum (Elze)', minOrder: 35, fee: 4 },
+  'wallensted': { label: 'Wallensted', minOrder: 25, fee: 3 }
 } as const;
 
 const AVAILABLE_MINUTES = ['00', '15', '30', '45'];
@@ -122,18 +122,18 @@ const useOrderCalculation = (orderItems: OrderItem[], orderType: 'pickup' | 'del
   }, [orderItems, orderType, deliveryZone]);
 };
 
-// Validation Schema - Updated to include new delivery zones
+// Validation Schema - Updated to include new delivery zones in alphabetical order
 const orderFormSchema = z
   .object({
     orderType: z.enum(['pickup', 'delivery'], {
       errorMap: () => ({ message: 'Bitte wählen Sie Abholung oder Lieferung' })
     }),
     deliveryZone: z.enum([
-      'gronau', 'gronau-doetzum', 'gronau-eddighausen', 'banteln', 'eime', 
-      'kolonie-godenau', 'eitzum', 'dunsen-gime', 'barfelde', 'wallensted', 
-      'rheden-elze', 'elze', 'mehle-elze', 'sorsum-elze', 'nordstemmen', 
-      'betheln', 'brueggen', 'duingen', 'haus-escherde', 'heinum', 
-      'nienstedt', 'sibesse', 'deinsen'
+      'banteln', 'barfelde', 'betheln', 'brueggen', 'deinsen', 'duingen', 
+      'dunsen-gime', 'eime', 'eitzum', 'elze', 'gronau', 'gronau-doetzum', 
+      'gronau-eddighausen', 'haus-escherde', 'heinum', 'kolonie-godenau', 
+      'mehle-elze', 'nienstedt', 'nordstemmen', 'rheden-elze', 'sibesse', 
+      'sorsum-elze', 'wallensted'
     ]).optional(),
     deliveryTime: z.enum(['asap', 'specific'], {
       errorMap: () => ({ message: 'Bitte wählen Sie eine Lieferzeit' })
@@ -435,6 +435,89 @@ const EmptyCart = memo(() => (
   </div>
 ));
 
+// Enhanced Delivery Zone Selector with scroll indicators
+const DeliveryZoneSelector = memo<{
+  value: string;
+  onChange: (value: string) => void;
+  error?: string;
+}>(({ value, onChange, error }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [canScrollUp, setCanScrollUp] = useState(false);
+  const [canScrollDown, setCanScrollDown] = useState(false);
+  const selectRef = React.useRef<HTMLSelectElement>(null);
+
+  const checkScrollability = useCallback(() => {
+    const select = selectRef.current;
+    if (!select) return;
+
+    const { scrollTop, scrollHeight, clientHeight } = select;
+    setCanScrollUp(scrollTop > 0);
+    setCanScrollDown(scrollTop < scrollHeight - clientHeight);
+  }, []);
+
+  useEffect(() => {
+    const select = selectRef.current;
+    if (!select) return;
+
+    const handleScroll = () => checkScrollability();
+    select.addEventListener('scroll', handleScroll);
+    
+    // Initial check
+    setTimeout(checkScrollability, 100);
+
+    return () => select.removeEventListener('scroll', handleScroll);
+  }, [checkScrollability]);
+
+  return (
+    <div className="relative">
+      <div className="relative">
+        <select
+          ref={selectRef}
+          value={value}
+          onChange={e => onChange(e.target.value)}
+          onFocus={() => {
+            setIsOpen(true);
+            setTimeout(checkScrollability, 100);
+          }}
+          onBlur={() => setIsOpen(false)}
+          className={`w-full rounded-lg border-gray-300 shadow-sm focus:border-orange-500 focus:ring focus:ring-orange-200 transition-colors text-sm appearance-none pr-10 ${
+            error ? 'border-red-500' : ''
+          }`}
+          style={{ maxHeight: '200px' }}
+        >
+          <option value="">Bitte wählen Sie Ihr Liefergebiet</option>
+          {Object.entries(DELIVERY_ZONES).map(([key, zone]) => (
+            <option key={key} value={key}>
+              {zone.label} - Min. {zone.minOrder.toFixed(2).replace('.', ',')}€ - Lieferung {zone.fee.toFixed(2).replace('.', ',')}€
+            </option>
+          ))}
+        </select>
+        
+        {/* Custom dropdown arrow */}
+        <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+          <ChevronDown className="w-4 h-4 text-gray-400" />
+        </div>
+      </div>
+
+      {/* Scroll indicators - only show when dropdown is focused and scrollable */}
+      {isOpen && (canScrollUp || canScrollDown) && (
+        <div className="absolute right-8 top-1/2 transform -translate-y-1/2 flex flex-col gap-1 pointer-events-none z-10">
+          {canScrollUp && (
+            <div className="bg-orange-500 text-white rounded-full p-1 shadow-lg animate-bounce">
+              <ChevronUp className="w-3 h-3" />
+            </div>
+          )}
+          {canScrollDown && (
+            <div className="bg-orange-500 text-white rounded-full p-1 shadow-lg animate-bounce" style={{ animationDelay: '0.5s' }}>
+              <ChevronDown className="w-3 h-3" />
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+});
+
 // Main Component
 const OrderForm: React.FC<OrderFormProps> = ({ orderItems, onRemoveItem, onUpdateQuantity }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -647,19 +730,11 @@ const OrderForm: React.FC<OrderFormProps> = ({ orderItems, onRemoveItem, onUpdat
             control={control}
             render={({ field }) => (
               <FormField label="Liefergebiet *" error={errors.deliveryZone?.message}>
-                <select
-                  {...field}
-                  className={`w-full rounded-lg border-gray-300 shadow-sm focus:border-orange-500 focus:ring focus:ring-orange-200 transition-colors text-sm ${
-                    errors.deliveryZone ? 'border-red-500' : ''
-                  }`}
-                >
-                  <option value="">Bitte wählen Sie Ihr Liefergebiet</option>
-                  {Object.entries(DELIVERY_ZONES).map(([key, zone]) => (
-                    <option key={key} value={key}>
-                      {zone.label} - Min. {zone.minOrder.toFixed(2).replace('.', ',')}€ - Lieferung {zone.fee.toFixed(2).replace('.', ',')}€
-                    </option>
-                  ))}
-                </select>
+                <DeliveryZoneSelector
+                  value={field.value || ''}
+                  onChange={field.onChange}
+                  error={errors.deliveryZone?.message}
+                />
               </FormField>
             )}
           />
