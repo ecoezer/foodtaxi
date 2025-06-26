@@ -8,21 +8,26 @@ const pizzaSizes = [
   { name: 'Mega', price: 26.90, description: 'Ø ca. 50 cm' }
 ];
 
-// Wunsch Pizza ingredients
+// Wunsch Pizza ingredients - Updated with new items and removed "Ei"
 export const wunschPizzaIngredients: WunschPizzaIngredient[] = [
   { name: 'Ananas' },
   { name: 'Artischocken' },
   { name: 'Barbecuesauce' },
+  { name: 'Brokkoli' },
   { name: 'Champignons frisch' },
+  { name: 'Chili-Cheese-Soße' },
+  { name: 'Döner' },
   { name: 'Edamer' },
-  { name: 'Ei' },
   { name: 'Formfleisch-Vorderschinken' },
   { name: 'Gewürzgurken' },
   { name: 'Gorgonzola' },
+  { name: 'Gyros' },
   { name: 'Hirtenkäse' },
   { name: 'Hähnchenbrust' },
+  { name: 'Jalapeños' },
   { name: 'Knoblauchwurst' },
   { name: 'Mais' },
+  { name: 'Milde Peperoni' },
   { name: 'Mozzarella' },
   { name: 'Oliven' },
   { name: 'Paprika' },
@@ -35,6 +40,7 @@ export const wunschPizzaIngredients: WunschPizzaIngredient[] = [
   { name: 'Röstzwiebeln' },
   { name: 'Sauce Hollandaise' },
   { name: 'Spiegelei' },
+  { name: 'Spinat' },
   { name: 'Tomaten' },
   { name: 'Tzatziki' },
   { name: 'Würstchen' },
@@ -74,7 +80,7 @@ const createBurgerSizes = (basePrice: number) => [
   { name: '250g', price: basePrice + 2.00, description: 'Doppel Patty (+2€)' }
 ];
 
-// Spezialitäten (Updated with new items)
+// Spezialitäten (Updated with Dönertasche and renumbered Döner Teller)
 export const donerDishes: MenuItem[] = [
   {
     id: 80,
@@ -135,6 +141,14 @@ export const donerDishes: MenuItem[] = [
   {
     id: 87,
     number: 87,
+    name: "Dönertasche",
+    description: "",
+    price: 7.00,
+    allergens: "1,2,3,4/A,C,F,G"
+  },
+  {
+    id: 88,
+    number: 88,
     name: "Döner Teller",
     description: "",
     price: 13.00,
@@ -618,7 +632,7 @@ const createPizzaSizes = (prices: { medium: number; large: number; family: numbe
   { name: 'Mega', price: prices.mega, description: 'Ø ca. 50 cm' }
 ];
 
-// Pizza - Completely updated with new structure and extras support
+// Pizza - Updated with new Döner Pizza and updated Wunsch Pizza ingredients
 export const pizzas: MenuItem[] = [
   {
     id: 501,
@@ -897,6 +911,16 @@ export const pizzas: MenuItem[] = [
     description: "mit Broccoli, Spinat, Milden Peperoni²,³",
     price: 9.90,
     allergens: "1,2,3/A,C",
+    isPizza: true,
+    sizes: createPizzaSizes({ medium: 9.90, large: 11.90, family: 18.90, mega: 28.90 })
+  },
+  {
+    id: 529,
+    number: 28,
+    name: "Döner",
+    description: "mit Döner und Zwiebeln",
+    price: 9.90,
+    allergens: "1,2,3,4/A,C,G",
     isPizza: true,
     sizes: createPizzaSizes({ medium: 9.90, large: 11.90, family: 18.90, mega: 28.90 })
   }
