@@ -3,7 +3,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { AsYouType } from 'libphonenumber-js';
-import { Phone, ShoppingCart, X, Minus, Plus, Clock, MapPin, User, MessageSquare } from 'lucide-react';
+import { Phone, ShoppingCart, X, Minus, Plus, Clock, MapPin, User, MessageSquare, AlertTriangle } from 'lucide-react';
 import { PizzaSize } from '../types';
 
 // Types
@@ -26,11 +26,31 @@ interface OrderFormProps {
   onUpdateQuantity: (id: number, quantity: number, selectedSize?: PizzaSize, selectedIngredients?: string[], selectedExtras?: string[]) => void;
 }
 
-// Constants
+// Constants - Updated delivery zones with minimum order limits
 const DELIVERY_ZONES = {
-  'zone1': { label: '0-2km', fee: 2 },
-  'zone2': { label: '2-4km', fee: 3 },
-  'zone3': { label: '4-6km', fee: 3.5 }
+  'gronau': { label: 'Gronau', minOrder: 15, fee: 1.5 },
+  'gronau-doetzum': { label: 'Gronau Dötzum', minOrder: 20, fee: 2 },
+  'gronau-eddighausen': { label: 'Gronau Eddighausen', minOrder: 20, fee: 2.5 },
+  'banteln': { label: 'Banteln', minOrder: 25, fee: 2.5 },
+  'eime': { label: 'Eime', minOrder: 25, fee: 3 },
+  'kolonie-godenau': { label: 'Kolonie Godenau', minOrder: 40, fee: 4 },
+  'eitzum': { label: 'Eitzum', minOrder: 25, fee: 3 },
+  'dunsen-gime': { label: 'Dunsen (Gime)', minOrder: 30, fee: 3 },
+  'barfelde': { label: 'Barfelde', minOrder: 20, fee: 2.5 },
+  'wallensted': { label: 'Wallensted', minOrder: 25, fee: 3 },
+  'rheden-elze': { label: 'Rheden (Elze)', minOrder: 25, fee: 3 },
+  'elze': { label: 'Elze', minOrder: 35, fee: 4 },
+  'mehle-elze': { label: 'Mehle (Elze)', minOrder: 35, fee: 4 },
+  'sorsum-elze': { label: 'Sorsum (Elze)', minOrder: 35, fee: 4 },
+  'nordstemmen': { label: 'Nordstemmen', minOrder: 35, fee: 4 },
+  'betheln': { label: 'Betheln', minOrder: 25, fee: 3 },
+  'brueggen': { label: 'Brüggen', minOrder: 35, fee: 3 },
+  'duingen': { label: 'Duingen', minOrder: 40, fee: 4 },
+  'haus-escherde': { label: 'Haus Escherde', minOrder: 25, fee: 3 },
+  'heinum': { label: 'Heinum', minOrder: 25, fee: 3 },
+  'nienstedt': { label: 'Nienstedt', minOrder: 35, fee: 4 },
+  'sibesse': { label: 'Sibesse', minOrder: 40, fee: 4 },
+  'deinsen': { label: 'Deinsen', minOrder: 35, fee: 4 }
 } as const;
 
 const AVAILABLE_MINUTES = ['00', '15', '30', '45'];
@@ -93,17 +113,28 @@ const useOrderCalculation = (orderItems: OrderItem[], orderType: 'pickup' | 'del
     const deliveryFee = orderType === 'delivery' && deliveryZone ? DELIVERY_ZONES[deliveryZone].fee : 0;
     const total = subtotal + deliveryFee;
 
-    return { subtotal, deliveryFee, total };
+    // Check minimum order requirement for delivery
+    const minOrderMet = orderType === 'pickup' || !deliveryZone || subtotal >= DELIVERY_ZONES[deliveryZone].minOrder;
+    const minOrderRequired = orderType === 'delivery' && deliveryZone ? DELIVERY_ZONES[deliveryZone].minOrder : 0;
+    const missingAmount = minOrderRequired > subtotal ? minOrderRequired - subtotal : 0;
+
+    return { subtotal, deliveryFee, total, minOrderMet, minOrderRequired, missingAmount };
   }, [orderItems, orderType, deliveryZone]);
 };
 
-// Validation Schema
+// Validation Schema - Updated to include new delivery zones
 const orderFormSchema = z
   .object({
     orderType: z.enum(['pickup', 'delivery'], {
       errorMap: () => ({ message: 'Bitte wählen Sie Abholung oder Lieferung' })
     }),
-    deliveryZone: z.enum(['zone1', 'zone2', 'zone3']).optional(),
+    deliveryZone: z.enum([
+      'gronau', 'gronau-doetzum', 'gronau-eddighausen', 'banteln', 'eime', 
+      'kolonie-godenau', 'eitzum', 'dunsen-gime', 'barfelde', 'wallensted', 
+      'rheden-elze', 'elze', 'mehle-elze', 'sorsum-elze', 'nordstemmen', 
+      'betheln', 'brueggen', 'duingen', 'haus-escherde', 'heinum', 
+      'nienstedt', 'sibesse', 'deinsen'
+    ]).optional(),
     deliveryTime: z.enum(['asap', 'specific'], {
       errorMap: () => ({ message: 'Bitte wählen Sie eine Lieferzeit' })
     }),
@@ -133,7 +164,7 @@ const orderFormSchema = z
   )
   .refine(
     data => data.orderType !== 'delivery' || !!data.deliveryZone,
-    { message: 'Bitte wählen Sie eine Lieferzone', path: ['deliveryZone'] }
+    { message: 'Bitte wählen Sie ein Liefergebiet', path: ['deliveryZone'] }
   )
   .refine(
     data => data.orderType !== 'delivery' || (data.street && data.street.length >= 3),
@@ -343,7 +374,10 @@ const OrderSummary = memo<{
   deliveryFee: number;
   total: number;
   orderType: 'pickup' | 'delivery';
-}>(({ subtotal, deliveryFee, total, orderType }) => (
+  minOrderMet: boolean;
+  minOrderRequired: number;
+  missingAmount: number;
+}>(({ subtotal, deliveryFee, total, orderType, minOrderMet, minOrderRequired, missingAmount }) => (
   <div className="flex flex-col space-y-2 py-3 sm:py-4 border-t border-b border-gray-100 bg-gray-50 px-3 sm:px-4 rounded-lg">
     <div className="flex items-center justify-between">
       <span className="font-medium text-gray-900 text-sm sm:text-base">Zwischensumme:</span>
@@ -353,12 +387,35 @@ const OrderSummary = memo<{
     </div>
 
     {orderType === 'delivery' && (
-      <div className="flex items-center justify-between">
-        <span className="font-medium text-gray-900 text-sm sm:text-base">Liefergebühr:</span>
-        <span className="font-medium text-gray-900 text-sm sm:text-base">
-          {deliveryFee.toFixed(2).replace('.', ',')} €
-        </span>
-      </div>
+      <>
+        <div className="flex items-center justify-between">
+          <span className="font-medium text-gray-900 text-sm sm:text-base">Liefergebühr:</span>
+          <span className="font-medium text-gray-900 text-sm sm:text-base">
+            {deliveryFee.toFixed(2).replace('.', ',')} €
+          </span>
+        </div>
+        
+        {minOrderRequired > 0 && (
+          <div className="flex items-center justify-between">
+            <span className="font-medium text-gray-700 text-sm">Mindestbestellwert:</span>
+            <span className="font-medium text-gray-700 text-sm">
+              {minOrderRequired.toFixed(2).replace('.', ',')} €
+            </span>
+          </div>
+        )}
+        
+        {!minOrderMet && missingAmount > 0 && (
+          <div className="flex items-center justify-between bg-red-50 border border-red-200 rounded-lg p-2">
+            <span className="font-medium text-red-700 text-sm flex items-center gap-1">
+              <AlertTriangle className="w-4 h-4" />
+              Noch benötigt:
+            </span>
+            <span className="font-bold text-red-700 text-sm">
+              {missingAmount.toFixed(2).replace('.', ',')} €
+            </span>
+          </div>
+        )}
+      </>
     )}
 
     <div className="flex items-center justify-between pt-2 border-t border-gray-200">
@@ -415,7 +472,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ orderItems, onRemoveItem, onUpdat
   const deliveryZone = watch('deliveryZone');
   const deliveryTime = watch('deliveryTime');
   
-  const { subtotal, deliveryFee, total } = useOrderCalculation(orderItems, orderType, deliveryZone);
+  const { subtotal, deliveryFee, total, minOrderMet, minOrderRequired, missingAmount } = useOrderCalculation(orderItems, orderType, deliveryZone);
 
   const formatPhone = useCallback((value: string): string => {
     let input = value;
@@ -431,6 +488,11 @@ const OrderForm: React.FC<OrderFormProps> = ({ orderItems, onRemoveItem, onUpdat
 
   const onSubmit = useCallback(async (data: OrderFormData) => {
     if (isSubmitting) return;
+    
+    // Check minimum order requirement for delivery
+    if (data.orderType === 'delivery' && !minOrderMet) {
+      return; // Don't submit if minimum order not met
+    }
     
     setIsSubmitting(true);
     
@@ -461,9 +523,11 @@ const OrderForm: React.FC<OrderFormProps> = ({ orderItems, onRemoveItem, onUpdat
       messageText += `⏰ Lieferzeit: ${timeInfo}\n\n`;
 
       if (data.orderType === 'delivery') {
+        const zone = DELIVERY_ZONES[data.deliveryZone!];
         messageText += `📍 Lieferadresse:\n`;
         messageText += `   ${data.street} ${data.houseNumber}\n`;
-        messageText += `   ${data.postcode}\n\n`;
+        messageText += `   ${data.postcode}\n`;
+        messageText += `   Liefergebiet: ${zone.label}\n\n`;
       }
 
       messageText += `🛒 Bestellung:\n${orderDetails}\n\n`;
@@ -488,7 +552,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ orderItems, onRemoveItem, onUpdat
     } finally {
       setIsSubmitting(false);
     }
-  }, [orderItems, subtotal, total, isSubmitting]);
+  }, [orderItems, subtotal, total, isSubmitting, minOrderMet]);
 
   if (orderItems.length === 0) {
     return <EmptyCart />;
@@ -582,17 +646,17 @@ const OrderForm: React.FC<OrderFormProps> = ({ orderItems, onRemoveItem, onUpdat
             name="deliveryZone"
             control={control}
             render={({ field }) => (
-              <FormField label="Lieferzone *" error={errors.deliveryZone?.message}>
+              <FormField label="Liefergebiet *" error={errors.deliveryZone?.message}>
                 <select
                   {...field}
                   className={`w-full rounded-lg border-gray-300 shadow-sm focus:border-orange-500 focus:ring focus:ring-orange-200 transition-colors text-sm ${
                     errors.deliveryZone ? 'border-red-500' : ''
                   }`}
                 >
-                  <option value="">Bitte wählen Sie Ihre Entfernung</option>
+                  <option value="">Bitte wählen Sie Ihr Liefergebiet</option>
                   {Object.entries(DELIVERY_ZONES).map(([key, zone]) => (
                     <option key={key} value={key}>
-                      {zone.label} - {zone.fee.toFixed(2).replace('.', ',')} €
+                      {zone.label} - Min. {zone.minOrder.toFixed(2).replace('.', ',')}€ - Lieferung {zone.fee.toFixed(2).replace('.', ',')}€
                     </option>
                   ))}
                 </select>
@@ -734,13 +798,16 @@ const OrderForm: React.FC<OrderFormProps> = ({ orderItems, onRemoveItem, onUpdat
           deliveryFee={deliveryFee}
           total={total}
           orderType={orderType}
+          minOrderMet={minOrderMet}
+          minOrderRequired={minOrderRequired}
+          missingAmount={missingAmount}
         />
 
         <button
           type="submit"
-          disabled={!isValid || isSubmitting}
+          disabled={!isValid || isSubmitting || (orderType === 'delivery' && !minOrderMet)}
           className={`w-full flex items-center justify-center gap-2 sm:gap-3 py-3 sm:py-4 px-4 sm:px-6 rounded-xl font-bold transition-all duration-300 transform text-sm sm:text-base ${
-            isValid && !isSubmitting
+            isValid && !isSubmitting && (orderType === 'pickup' || minOrderMet)
               ? 'bg-green-500 text-white hover:bg-green-600 hover:scale-[1.02] shadow-lg hover:shadow-xl'
               : 'bg-gray-300 text-gray-500 cursor-not-allowed'
           }`}
@@ -749,6 +816,11 @@ const OrderForm: React.FC<OrderFormProps> = ({ orderItems, onRemoveItem, onUpdat
             <>
               <div className="animate-spin rounded-full h-4 w-4 sm:h-5 sm:w-5 border-b-2 border-white"></div>
               Wird gesendet...
+            </>
+          ) : orderType === 'delivery' && !minOrderMet ? (
+            <>
+              <AlertTriangle className="w-5 h-5 sm:w-6 sm:h-6" />
+              Mindestbestellwert nicht erreicht
             </>
           ) : (
             <>
