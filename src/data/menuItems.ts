@@ -8,7 +8,7 @@ const pizzaSizes = [
   { name: 'Mega', price: 26.90, description: 'Ø ca. 50 cm' }
 ];
 
-// Wunsch Pizza ingredients - Updated with new items and removed "Ei"
+// Wunsch Pizza ingredients - Updated with new items and removed "Ei", Rindersalami now available
 export const wunschPizzaIngredients: WunschPizzaIngredient[] = [
   { name: 'Ananas' },
   { name: 'Artischocken' },
@@ -35,7 +35,7 @@ export const wunschPizzaIngredients: WunschPizzaIngredient[] = [
   { name: 'Peperoni, scharf' },
   { name: 'Remoulade' },
   { name: 'Rindermett' },
-  { name: 'Rindersalami', disabled: true },
+  { name: 'Rindersalami' },
   { name: 'Rucola' },
   { name: 'Röstzwiebeln' },
   { name: 'Sauce Hollandaise' },
