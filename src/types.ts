@@ -9,6 +9,7 @@ export interface MenuItem {
   isWunschPizza?: boolean;
   isPizza?: boolean;
   isPasta?: boolean;
+  isSpezialitaet?: boolean;
 }
 
 export interface PizzaSize {
@@ -26,6 +27,10 @@ export interface PastaType {
   name: string;
 }
 
+export interface SauceType {
+  name: string;
+}
+
 export interface OrderItem {
   menuItem: MenuItem;
   quantity: number;
@@ -33,6 +38,7 @@ export interface OrderItem {
   selectedIngredients?: string[];
   selectedExtras?: string[];
   selectedPastaType?: string;
+  selectedSauce?: string;
 }
 
 export interface CustomerInfo {

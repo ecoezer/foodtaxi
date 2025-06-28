@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { MenuItem, PizzaSize } from '../types';
 import { useInView } from 'react-intersection-observer';
 import { Plus, X, AlertCircle } from 'lucide-react';
-import { wunschPizzaIngredients, pizzaExtras, pastaTypes } from '../data/menuItems';
+import { wunschPizzaIngredients, pizzaExtras, pastaTypes, sauceTypes } from '../data/menuItems';
 
 interface MenuSectionProps {
   title: string;
@@ -10,7 +10,7 @@ interface MenuSectionProps {
   description?: string;
   subTitle?: string;
   bgColor: string;
-  onAddToOrder: (item: MenuItem, selectedSize?: PizzaSize, selectedIngredients?: string[], selectedExtras?: string[], selectedPastaType?: string) => void;
+  onAddToOrder: (item: MenuItem, selectedSize?: PizzaSize, selectedIngredients?: string[], selectedExtras?: string[], selectedPastaType?: string, selectedSauce?: string) => void;
 }
 
 const MenuSection: React.FC<MenuSectionProps> = ({
@@ -34,12 +34,15 @@ const MenuSection: React.FC<MenuSectionProps> = ({
   const [selectedIngredients, setSelectedIngredients] = useState<Record<number, string[]>>({});
   const [selectedExtras, setSelectedExtras] = useState<Record<number, string[]>>({});
   const [selectedPastaTypes, setSelectedPastaTypes] = useState<Record<number, string>>({});
+  const [selectedSauces, setSelectedSauces] = useState<Record<number, string>>({});
   const [showExtrasPopup, setShowExtrasPopup] = useState<number | null>(null);
   const [showIngredientsPopup, setShowIngredientsPopup] = useState<number | null>(null);
   const [showSizePopup, setShowSizePopup] = useState<number | null>(null);
   const [showPastaTypePopup, setShowPastaTypePopup] = useState<number | null>(null);
+  const [showSaucePopup, setShowSaucePopup] = useState<number | null>(null);
   const [showSizeRequiredPopup, setShowSizeRequiredPopup] = useState<number | null>(null);
   const [showPastaTypeRequiredPopup, setShowPastaTypeRequiredPopup] = useState<number | null>(null);
+  const [showSauceRequiredPopup, setShowSauceRequiredPopup] = useState<number | null>(null);
 
   const handleSizeSelect = (itemId: number, size: PizzaSize) => {
     setSelectedSizes(prev => ({
@@ -52,6 +55,13 @@ const MenuSection: React.FC<MenuSectionProps> = ({
     setSelectedPastaTypes(prev => ({
       ...prev,
       [itemId]: pastaType
+    }));
+  };
+
+  const handleSauceSelect = (itemId: number, sauce: string) => {
+    setSelectedSauces(prev => ({
+      ...prev,
+      [itemId]: sauce
     }));
   };
 
@@ -105,9 +115,11 @@ const MenuSection: React.FC<MenuSectionProps> = ({
     const ingredients = selectedIngredients[item.id] || [];
     const extras = selectedExtras[item.id] || [];
     const selectedPastaType = selectedPastaTypes[item.id];
+    const selectedSauce = selectedSauces[item.id];
     const hasSizes = item.sizes && item.sizes.length > 0;
     const isWunschPizza = item.isWunschPizza;
     const isPasta = item.isPasta;
+    const isSpezialitaet = item.isSpezialitaet;
 
     // Check if size is required but not selected
     if (hasSizes && !selectedSize) {
@@ -121,6 +133,12 @@ const MenuSection: React.FC<MenuSectionProps> = ({
       return;
     }
 
+    // Check if sauce is required but not selected for Spezialitäten
+    if (isSpezialitaet && !selectedSauce) {
+      setShowSauceRequiredPopup(item.id);
+      return;
+    }
+
     // Check if Wunsch Pizza needs ingredients
     if (isWunschPizza && ingredients.length === 0) {
       // For Wunsch Pizza, we could show a different popup or just open ingredients popup
@@ -128,7 +146,7 @@ const MenuSection: React.FC<MenuSectionProps> = ({
       return;
     }
 
-    onAddToOrder(item, selectedSize, ingredients, extras, selectedPastaType);
+    onAddToOrder(item, selectedSize, ingredients, extras, selectedPastaType, selectedSauce);
   };
 
   const getDisplayPrice = (item: MenuItem) => {
@@ -158,6 +176,8 @@ const MenuSection: React.FC<MenuSectionProps> = ({
     const isWunschPizza = item.isWunschPizza;
     const isPasta = item.isPasta;
     const selectedPastaType = selectedPastaTypes[item.id];
+    const isSpezialitaet = item.isSpezialitaet;
+    const selectedSauce = selectedSauces[item.id];
 
     // For items with sizes (pizzas), size must be selected
     if (hasSizes && !selectedSize) {
@@ -166,6 +186,11 @@ const MenuSection: React.FC<MenuSectionProps> = ({
 
     // For pasta items, pasta type must be selected
     if (isPasta && !selectedPastaType) {
+      return false;
+    }
+
+    // For Spezialitäten, sauce must be selected
+    if (isSpezialitaet && !selectedSauce) {
       return false;
     }
 
@@ -184,6 +209,8 @@ const MenuSection: React.FC<MenuSectionProps> = ({
     const isWunschPizza = item.isWunschPizza;
     const isPasta = item.isPasta;
     const selectedPastaType = selectedPastaTypes[item.id];
+    const isSpezialitaet = item.isSpezialitaet;
+    const selectedSauce = selectedSauces[item.id];
 
     if (hasSizes && !selectedSize) {
       return 'Bitte wählen Sie eine Größe';
@@ -191,6 +218,10 @@ const MenuSection: React.FC<MenuSectionProps> = ({
 
     if (isPasta && !selectedPastaType) {
       return 'Bitte wählen Sie eine Nudelsorte';
+    }
+
+    if (isSpezialitaet && !selectedSauce) {
+      return 'Bitte wählen Sie eine Soße';
     }
 
     if (isWunschPizza && itemIngredients.length === 0) {
@@ -214,6 +245,14 @@ const MenuSection: React.FC<MenuSectionProps> = ({
 
   const closePastaTypePopup = () => {
     setShowPastaTypePopup(null);
+  };
+
+  const openSaucePopup = (itemId: number) => {
+    setShowSaucePopup(itemId);
+  };
+
+  const closeSaucePopup = () => {
+    setShowSaucePopup(null);
   };
 
   const openExtrasPopup = (itemId: number) => {
@@ -240,6 +279,10 @@ const MenuSection: React.FC<MenuSectionProps> = ({
     setShowPastaTypeRequiredPopup(null);
   };
 
+  const closeSauceRequiredPopup = () => {
+    setShowSauceRequiredPopup(null);
+  };
+
   const handleSizeRequiredAndOpenSizePopup = (itemId: number) => {
     setShowSizeRequiredPopup(null);
     setShowSizePopup(itemId);
@@ -248,6 +291,11 @@ const MenuSection: React.FC<MenuSectionProps> = ({
   const handlePastaTypeRequiredAndOpenPastaTypePopup = (itemId: number) => {
     setShowPastaTypeRequiredPopup(null);
     setShowPastaTypePopup(itemId);
+  };
+
+  const handleSauceRequiredAndOpenSaucePopup = (itemId: number) => {
+    setShowSauceRequiredPopup(null);
+    setShowSaucePopup(itemId);
   };
 
   // Early return if no items
@@ -364,6 +412,42 @@ const MenuSection: React.FC<MenuSectionProps> = ({
                   className="px-4 py-2 text-sm font-medium text-white bg-orange-500 hover:bg-orange-600 rounded-lg transition-colors"
                 >
                   Nudelsorte wählen
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Sauce Required Popup */}
+      {showSauceRequiredPopup && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full">
+            <div className="p-6 text-center">
+              <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-orange-100 mb-4">
+                <AlertCircle className="h-6 w-6 text-orange-600" />
+              </div>
+              
+              <h3 className="text-lg font-bold text-gray-900 mb-2">
+                Soße auswählen
+              </h3>
+              
+              <p className="text-sm text-gray-600 mb-6">
+                Bitte wählen Sie zuerst eine Soße für dieses Gericht aus, bevor Sie es zum Warenkorb hinzufügen.
+              </p>
+              
+              <div className="flex gap-3 justify-center">
+                <button
+                  onClick={closeSauceRequiredPopup}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+                >
+                  Abbrechen
+                </button>
+                <button
+                  onClick={() => handleSauceRequiredAndOpenSaucePopup(showSauceRequiredPopup)}
+                  className="px-4 py-2 text-sm font-medium text-white bg-orange-500 hover:bg-orange-600 rounded-lg transition-colors"
+                >
+                  Soße wählen
                 </button>
               </div>
             </div>
@@ -515,6 +599,77 @@ const MenuSection: React.FC<MenuSectionProps> = ({
                 className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg transition-colors"
               >
                 Nudelsorte bestätigen
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Sauce Selection Popup */}
+      {showSaucePopup && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full max-h-[80vh] overflow-y-auto">
+            <div className="sticky top-0 bg-white border-b border-gray-200 p-4 rounded-t-xl">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-bold text-gray-900">Soße wählen</h3>
+                <button
+                  onClick={closeSaucePopup}
+                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                >
+                  <X className="w-5 h-5 text-gray-500" />
+                </button>
+              </div>
+              <p className="text-sm text-gray-600 mt-1">
+                Wählen Sie Ihre gewünschte Soße
+              </p>
+            </div>
+            
+            <div className="p-4 space-y-3">
+              {sauceTypes.map((sauce) => {
+                const isSelected = selectedSauces[showSaucePopup] === sauce.name;
+                
+                return (
+                  <label
+                    key={sauce.name}
+                    className={`flex items-center justify-between p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 ${
+                      isSelected
+                        ? 'border-red-500 bg-red-50'
+                        : 'border-gray-200 hover:border-red-300 hover:bg-red-50'
+                    }`}
+                  >
+                    <div className="flex items-center">
+                      <input
+                        type="radio"
+                        name={`sauce-${showSaucePopup}`}
+                        checked={isSelected}
+                        onChange={() => handleSauceSelect(showSaucePopup, sauce.name)}
+                        className="w-4 h-4 text-red-600 border-gray-300 focus:ring-red-500 focus:ring-2"
+                      />
+                      <div className="ml-3">
+                        <div className="font-bold text-gray-900 text-lg">
+                          {sauce.name}
+                        </div>
+                      </div>
+                    </div>
+                  </label>
+                );
+              })}
+            </div>
+            
+            <div className="sticky bottom-0 bg-white border-t border-gray-200 p-4 rounded-b-xl">
+              <div className="flex items-center justify-between mb-3">
+                <span className="font-medium text-gray-900">
+                  Gewählte Soße:
+                </span>
+                <span className="font-bold text-red-600">
+                  {selectedSauces[showSaucePopup] || 'Keine ausgewählt'}
+                </span>
+              </div>
+              <button
+                onClick={closeSaucePopup}
+                className="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-4 rounded-lg transition-colors"
+              >
+                Soße bestätigen
               </button>
             </div>
           </div>
@@ -678,9 +833,11 @@ const MenuSection: React.FC<MenuSectionProps> = ({
           const itemIngredients = selectedIngredients[item.id] || [];
           const itemExtras = selectedExtras[item.id] || [];
           const selectedPastaType = selectedPastaTypes[item.id];
+          const selectedSauce = selectedSauces[item.id];
           const isWunschPizza = item.isWunschPizza;
           const isPizza = item.isPizza || item.isWunschPizza;
           const isPasta = item.isPasta;
+          const isSpezialitaet = item.isSpezialitaet;
           const canAdd = canAddToCart(item);
           const buttonTooltip = getAddButtonTooltip(item);
 
@@ -750,6 +907,33 @@ const MenuSection: React.FC<MenuSectionProps> = ({
                                   }));
                                 }}
                                 className="ml-1 text-blue-500 hover:text-blue-700"
+                              >
+                                <X className="w-3 h-3" />
+                              </button>
+                            </span>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Show selected sauce for Spezialitäten */}
+                      {isSpezialitaet && selectedSauce && (
+                        <div className="mt-2 p-2 bg-red-50 rounded-md border border-red-200">
+                          <div className="text-xs font-medium text-red-700 mb-1">
+                            Gewählte Soße:
+                          </div>
+                          <div className="flex flex-wrap gap-1">
+                            <span className="inline-flex items-center text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-full">
+                              {selectedSauce}
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectedSauces(prev => ({
+                                    ...prev,
+                                    [item.id]: ''
+                                  }));
+                                }}
+                                className="ml-1 text-red-500 hover:text-red-700"
                               >
                                 <X className="w-3 h-3" />
                               </button>
@@ -895,8 +1079,24 @@ const MenuSection: React.FC<MenuSectionProps> = ({
                           className="flex items-center gap-1 md:gap-1.5 px-1.5 md:px-2 py-1 md:py-1.5 bg-yellow-50 hover:bg-yellow-100 border border-yellow-200 hover:border-yellow-300 rounded-md transition-all duration-300 text-xs font-medium text-yellow-700"
                         >
                           <span>Nudeln</span>
-                          {selectedPastaType && (
+                          {selectedPastaType &&  (
                             <span className="bg-yellow-200 text-yellow-800 text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold">
+                              ✓
+                            </span>
+                          )}
+                        </button>
+                      )}
+
+                      {/* Sauce selector button for Spezialitäten */}
+                      {isSpezialitaet && (
+                        <button
+                          type="button"
+                          onClick={() => openSaucePopup(item.id)}
+                          className="flex items-center gap-1 md:gap-1.5 px-1.5 md:px-2 py-1 md:py-1.5 bg-red-50 hover:bg-red-100 border border-red-200 hover:border-red-300 rounded-md transition-all duration-300 text-xs font-medium text-red-700"
+                        >
+                          <span>Soße</span>
+                          {selectedSauce && (
+                            <span className="bg-red-200 text-red-800 text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold">
                               ✓
                             </span>
                           )}
@@ -935,6 +1135,11 @@ const MenuSection: React.FC<MenuSectionProps> = ({
                       {selectedPastaType && (
                         <div className="text-xs text-yellow-600 mt-0.5">
                           {selectedPastaType}
+                        </div>
+                      )}
+                      {selectedSauce && (
+                        <div className="text-xs text-red-600 mt-0.5">
+                          {selectedSauce}
                         </div>
                       )}
                       {itemExtras.length > 0 && (

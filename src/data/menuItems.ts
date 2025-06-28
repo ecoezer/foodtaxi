@@ -1,4 +1,4 @@
-import { MenuItem, WunschPizzaIngredient, PizzaExtra, PastaType } from '../types';
+import { MenuItem, WunschPizzaIngredient, PizzaExtra, PastaType, SauceType } from '../types';
 
 // Pizza sizes configuration with new structure
 const pizzaSizes = [
@@ -12,6 +12,13 @@ const pizzaSizes = [
 export const pastaTypes: PastaType[] = [
   { name: 'Spaghetti' },
   { name: 'Maccheroni' }
+];
+
+// Sauce types for Spezialitäten
+export const sauceTypes: SauceType[] = [
+  { name: 'Tzatziki' },
+  { name: 'Chilli' },
+  { name: 'ohne Soße' }
 ];
 
 // Wunsch Pizza ingredients - Updated with new items and removed "Ei", Rindersalami now available
@@ -86,7 +93,7 @@ const createBurgerSizes = (basePrice: number) => [
   { name: '250g', price: basePrice + 2.00, description: 'Doppel Patty (+2€)' }
 ];
 
-// Spezialitäten (Updated with Dönertasche and renumbered Döner Teller)
+// Spezialitäten (Updated with sauce selection requirement)
 export const donerDishes: MenuItem[] = [
   {
     id: 80,
@@ -94,7 +101,8 @@ export const donerDishes: MenuItem[] = [
     name: "Gyros Teller",
     description: "mit Zaziki und Krautsalat, dazu Pommes",
     price: 13.00,
-    allergens: "1,2,3,4/A,C,F,G"
+    allergens: "1,2,3,4/A,C,F,G",
+    isSpezialitaet: true
   },
   {
     id: 81,
@@ -102,7 +110,8 @@ export const donerDishes: MenuItem[] = [
     name: "Gyros Hollandaise",
     description: "in Sauce Hollandaise mit Käse überbacken",
     price: 14.00,
-    allergens: "1,2,3,4/A,C,F,G"
+    allergens: "1,2,3,4/A,C,F,G",
+    isSpezialitaet: true
   },
   {
     id: 82,
@@ -110,7 +119,8 @@ export const donerDishes: MenuItem[] = [
     name: "Gyros Topf",
     description: "mit fr. Champignons in Sauce Hollandaise mit Käse überbacken",
     price: 14.00,
-    allergens: "1,2,3,4/A,C,F,G"
+    allergens: "1,2,3,4/A,C,F,G",
+    isSpezialitaet: true
   },
   {
     id: 83,
@@ -118,7 +128,8 @@ export const donerDishes: MenuItem[] = [
     name: "Gyros Box",
     description: "mit Gyros, Pommes, Zaziki und Salat",
     price: 7.90,
-    allergens: "1,2,3,4/A,C,F,G"
+    allergens: "1,2,3,4/A,C,F,G",
+    isSpezialitaet: true
   },
   {
     id: 84,
@@ -142,7 +153,8 @@ export const donerDishes: MenuItem[] = [
     name: "Döner Box",
     description: "",
     price: 6.50,
-    allergens: "1,2,3,4/A,C,F,G"
+    allergens: "1,2,3,4/A,C,F,G",
+    isSpezialitaet: true
   },
   {
     id: 87,
@@ -150,7 +162,8 @@ export const donerDishes: MenuItem[] = [
     name: "Dönertasche",
     description: "",
     price: 7.00,
-    allergens: "1,2,3,4/A,C,F,G"
+    allergens: "1,2,3,4/A,C,F,G",
+    isSpezialitaet: true
   },
   {
     id: 88,
@@ -158,7 +171,8 @@ export const donerDishes: MenuItem[] = [
     name: "Döner Teller",
     description: "",
     price: 13.00,
-    allergens: "1,2,3,4/A,C,F,G"
+    allergens: "1,2,3,4/A,C,F,G",
+    isSpezialitaet: true
   }
 ];
 

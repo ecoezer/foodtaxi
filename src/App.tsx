@@ -296,16 +296,16 @@ function App() {
   }, [findCartElement, calculateScrollPosition, animateCartHighlight, performFallbackScroll]);
 
   // =================== MEMOIZED CALLBACKS ===================
-  const memoizedAddItem = useCallback((menuItem: MenuItem, selectedSize?: PizzaSize, selectedIngredients?: string[], selectedExtras?: string[], selectedPastaType?: string) => {
-    addItem(menuItem, selectedSize, selectedIngredients, selectedExtras, selectedPastaType);
+  const memoizedAddItem = useCallback((menuItem: MenuItem, selectedSize?: PizzaSize, selectedIngredients?: string[], selectedExtras?: string[], selectedPastaType?: string, selectedSauce?: string) => {
+    addItem(menuItem, selectedSize, selectedIngredients, selectedExtras, selectedPastaType, selectedSauce);
   }, [addItem]);
 
-  const memoizedRemoveItem = useCallback((id: number, selectedSize?: PizzaSize, selectedIngredients?: string[], selectedExtras?: string[], selectedPastaType?: string) => {
-    removeItem(id, selectedSize, selectedIngredients, selectedExtras, selectedPastaType);
+  const memoizedRemoveItem = useCallback((id: number, selectedSize?: PizzaSize, selectedIngredients?: string[], selectedExtras?: string[], selectedPastaType?: string, selectedSauce?: string) => {
+    removeItem(id, selectedSize, selectedIngredients, selectedExtras, selectedPastaType, selectedSauce);
   }, [removeItem]);
 
-  const memoizedUpdateQuantity = useCallback((id: number, quantity: number, selectedSize?: PizzaSize, selectedIngredients?: string[], selectedExtras?: string[], selectedPastaType?: string) => {
-    updateQuantity(id, quantity, selectedSize, selectedIngredients, selectedExtras, selectedPastaType);
+  const memoizedUpdateQuantity = useCallback((id: number, quantity: number, selectedSize?: PizzaSize, selectedIngredients?: string[], selectedExtras?: string[], selectedPastaType?: string, selectedSauce?: string) => {
+    updateQuantity(id, quantity, selectedSize, selectedIngredients, selectedExtras, selectedPastaType, selectedSauce);
   }, [updateQuantity]);
 
   // =================== RENDER HELPER FUNCTIONS ===================

@@ -19,12 +19,13 @@ interface OrderItem {
   selectedIngredients?: string[];
   selectedExtras?: string[];
   selectedPastaType?: string;
+  selectedSauce?: string;
 }
 
 interface OrderFormProps {
   orderItems: OrderItem[];
-  onRemoveItem: (id: number, selectedSize?: PizzaSize, selectedIngredients?: string[], selectedExtras?: string[], selectedPastaType?: string) => void;
-  onUpdateQuantity: (id: number, quantity: number, selectedSize?: PizzaSize, selectedIngredients?: string[], selectedExtras?: string[], selectedPastaType?: string) => void;
+  onRemoveItem: (id: number, selectedSize?: PizzaSize, selectedIngredients?: string[], selectedExtras?: string[], selectedPastaType?: string, selectedSauce?: string) => void;
+  onUpdateQuantity: (id: number, quantity: number, selectedSize?: PizzaSize, selectedIngredients?: string[], selectedExtras?: string[], selectedPastaType?: string, selectedSauce?: string) => void;
 }
 
 // Constants - Delivery zones sorted alphabetically
@@ -185,8 +186,8 @@ type OrderFormData = z.infer<typeof orderFormSchema>;
 // Sub-components
 const OrderItemComponent = memo<{
   item: OrderItem;
-  onRemove: (id: number, selectedSize?: PizzaSize, selectedIngredients?: string[], selectedExtras?: string[], selectedPastaType?: string) => void;
-  onUpdateQuantity: (id: number, quantity: number, selectedSize?: PizzaSize, selectedIngredients?: string[], selectedExtras?: string[], selectedPastaType?: string) => void;
+  onRemove: (id: number, selectedSize?: PizzaSize, selectedIngredients?: string[], selectedExtras?: string[], selectedPastaType?: string, selectedSauce?: string) => void;
+  onUpdateQuantity: (id: number, quantity: number, selectedSize?: PizzaSize, selectedIngredients?: string[], selectedExtras?: string[], selectedPastaType?: string, selectedSauce?: string) => void;
 }>(({ item, onRemove, onUpdateQuantity }) => (
   <div className="flex items-start justify-between bg-gray-50 p-2 sm:p-3 md:p-4 rounded-lg group hover:bg-gray-100 transition-all duration-200">
     <div className="flex-1 min-w-0">
@@ -200,6 +201,11 @@ const OrderItemComponent = memo<{
         {item.selectedPastaType && (
           <span className="text-xs text-yellow-600 ml-1 sm:ml-2 block">
             Nudelsorte: {item.selectedPastaType}
+          </span>
+        )}
+        {item.selectedSauce && (
+          <span className="text-xs text-red-600 ml-1 sm:ml-2 block">
+            Soße: {item.selectedSauce}
           </span>
         )}
         {item.selectedIngredients && item.selectedIngredients.length > 0 && (
@@ -221,7 +227,7 @@ const OrderItemComponent = memo<{
       <div className="flex items-center gap-1 sm:gap-2 bg-white rounded-lg shadow-sm border border-gray-200">
         <button
           type="button"
-          onClick={() => onUpdateQuantity(item.menuItem.id, Math.max(0, item.quantity - 1), item.selectedSize, item.selectedIngredients, item.selectedExtras, item.selectedPastaType)}
+          onClick={() => onUpdateQuantity(item.menuItem.id, Math.max(0, item.quantity - 1), item.selectedSize, item.selectedIngredients, item.selectedExtras, item.selectedPastaType, item.selectedSauce)}
           className="p-1 hover:bg-gray-100 rounded-l-lg transition-colors"
           aria-label="Menge verringern"
         >
@@ -232,7 +238,7 @@ const OrderItemComponent = memo<{
         </span>
         <button
           type="button"
-          onClick={() => onUpdateQuantity(item.menuItem.id, item.quantity + 1, item.selectedSize, item.selectedIngredients, item.selectedExtras, item.selectedPastaType)}
+          onClick={() => onUpdateQuantity(item.menuItem.id, item.quantity + 1, item.selectedSize, item.selectedIngredients, item.selectedExtras, item.selectedPastaType, item.selectedSauce)}
           className="p-1 hover:bg-gray-100 rounded-r-lg transition-colors"
           aria-label="Menge erhöhen"
         >
@@ -241,7 +247,7 @@ const OrderItemComponent = memo<{
       </div>
       <button
         type="button"
-        onClick={() => onRemove(item.menuItem.id, item.selectedSize, item.selectedIngredients, item.selectedExtras, item.selectedPastaType)}
+        onClick={() => onRemove(item.menuItem.id, item.selectedSize, item.selectedIngredients, item.selectedExtras, item.selectedPastaType, item.selectedSauce)}
         className="text-red-500 hover:text-red-700 transition-colors p-1 hover:bg-red-50 rounded-full"
         aria-label="Artikel entfernen"
       >
@@ -595,6 +601,9 @@ const OrderForm: React.FC<OrderFormProps> = ({ orderItems, onRemoveItem, onUpdat
           if (item.selectedPastaType) {
             itemText += ` - Nudelsorte: ${item.selectedPastaType}`;
           }
+          if (item.selectedSauce) {
+            itemText += ` - Soße: ${item.selectedSauce}`;
+          }
           if (item.selectedIngredients && item.selectedIngredients.length > 0) {
             itemText += ` - Zutaten: ${item.selectedIngredients.join(', ')}`;
           }
@@ -686,7 +695,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ orderItems, onRemoveItem, onUpdat
       <div className="space-y-2 sm:space-y-3 max-h-48 sm:max-h-64 overflow-y-auto">
         {orderItems.map((item, index) => (
           <OrderItemComponent
-            key={`${item.menuItem.id}-${item.selectedSize?.name || 'default'}-${item.selectedIngredients?.join(',') || 'none'}-${item.selectedExtras?.join(',') || 'none'}-${item.selectedPastaType || 'none'}-${index}`}
+            key={`${item.menuItem.id}-${item.selectedSize?.name || 'default'}-${item.selectedIngredients?.join(',') || 'none'}-${item.selectedExtras?.join(',') || 'none'}-${item.selectedPastaType || 'none'}-${item.selectedSauce || 'none'}-${index}`}
             item={item}
             onRemove={onRemoveItem}
             onUpdateQuantity={onUpdateQuantity}
