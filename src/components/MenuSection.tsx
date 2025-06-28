@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { MenuItem, PizzaSize } from '../types';
 import { useInView } from 'react-intersection-observer';
 import { Plus, X, AlertCircle } from 'lucide-react';
-import { wunschPizzaIngredients, pizzaExtras } from '../data/menuItems';
+import { wunschPizzaIngredients, pizzaExtras, pastaTypes } from '../data/menuItems';
 
 interface MenuSectionProps {
   title: string;
@@ -10,7 +10,7 @@ interface MenuSectionProps {
   description?: string;
   subTitle?: string;
   bgColor: string;
-  onAddToOrder: (item: MenuItem, selectedSize?: PizzaSize, selectedIngredients?: string[], selectedExtras?: string[]) => void;
+  onAddToOrder: (item: MenuItem, selectedSize?: PizzaSize, selectedIngredients?: string[], selectedExtras?: string[], selectedPastaType?: string) => void;
 }
 
 const MenuSection: React.FC<MenuSectionProps> = ({
@@ -33,15 +33,25 @@ const MenuSection: React.FC<MenuSectionProps> = ({
   const [selectedSizes, setSelectedSizes] = useState<Record<number, PizzaSize>>({});
   const [selectedIngredients, setSelectedIngredients] = useState<Record<number, string[]>>({});
   const [selectedExtras, setSelectedExtras] = useState<Record<number, string[]>>({});
+  const [selectedPastaTypes, setSelectedPastaTypes] = useState<Record<number, string>>({});
   const [showExtrasPopup, setShowExtrasPopup] = useState<number | null>(null);
   const [showIngredientsPopup, setShowIngredientsPopup] = useState<number | null>(null);
   const [showSizePopup, setShowSizePopup] = useState<number | null>(null);
+  const [showPastaTypePopup, setShowPastaTypePopup] = useState<number | null>(null);
   const [showSizeRequiredPopup, setShowSizeRequiredPopup] = useState<number | null>(null);
+  const [showPastaTypeRequiredPopup, setShowPastaTypeRequiredPopup] = useState<number | null>(null);
 
   const handleSizeSelect = (itemId: number, size: PizzaSize) => {
     setSelectedSizes(prev => ({
       ...prev,
       [itemId]: size
+    }));
+  };
+
+  const handlePastaTypeSelect = (itemId: number, pastaType: string) => {
+    setSelectedPastaTypes(prev => ({
+      ...prev,
+      [itemId]: pastaType
     }));
   };
 
@@ -94,12 +104,20 @@ const MenuSection: React.FC<MenuSectionProps> = ({
     const selectedSize = selectedSizes[item.id];
     const ingredients = selectedIngredients[item.id] || [];
     const extras = selectedExtras[item.id] || [];
+    const selectedPastaType = selectedPastaTypes[item.id];
     const hasSizes = item.sizes && item.sizes.length > 0;
     const isWunschPizza = item.isWunschPizza;
+    const isPasta = item.isPasta;
 
     // Check if size is required but not selected
     if (hasSizes && !selectedSize) {
       setShowSizeRequiredPopup(item.id);
+      return;
+    }
+
+    // Check if pasta type is required but not selected
+    if (isPasta && !selectedPastaType) {
+      setShowPastaTypeRequiredPopup(item.id);
       return;
     }
 
@@ -110,7 +128,7 @@ const MenuSection: React.FC<MenuSectionProps> = ({
       return;
     }
 
-    onAddToOrder(item, selectedSize, ingredients, extras);
+    onAddToOrder(item, selectedSize, ingredients, extras, selectedPastaType);
   };
 
   const getDisplayPrice = (item: MenuItem) => {
@@ -138,9 +156,16 @@ const MenuSection: React.FC<MenuSectionProps> = ({
     const selectedSize = selectedSizes[item.id];
     const itemIngredients = selectedIngredients[item.id] || [];
     const isWunschPizza = item.isWunschPizza;
+    const isPasta = item.isPasta;
+    const selectedPastaType = selectedPastaTypes[item.id];
 
     // For items with sizes (pizzas), size must be selected
     if (hasSizes && !selectedSize) {
+      return false;
+    }
+
+    // For pasta items, pasta type must be selected
+    if (isPasta && !selectedPastaType) {
       return false;
     }
 
@@ -157,9 +182,15 @@ const MenuSection: React.FC<MenuSectionProps> = ({
     const selectedSize = selectedSizes[item.id];
     const itemIngredients = selectedIngredients[item.id] || [];
     const isWunschPizza = item.isWunschPizza;
+    const isPasta = item.isPasta;
+    const selectedPastaType = selectedPastaTypes[item.id];
 
     if (hasSizes && !selectedSize) {
       return 'Bitte wählen Sie eine Größe';
+    }
+
+    if (isPasta && !selectedPastaType) {
+      return 'Bitte wählen Sie eine Nudelsorte';
     }
 
     if (isWunschPizza && itemIngredients.length === 0) {
@@ -175,6 +206,14 @@ const MenuSection: React.FC<MenuSectionProps> = ({
 
   const closeSizePopup = () => {
     setShowSizePopup(null);
+  };
+
+  const openPastaTypePopup = (itemId: number) => {
+    setShowPastaTypePopup(itemId);
+  };
+
+  const closePastaTypePopup = () => {
+    setShowPastaTypePopup(null);
   };
 
   const openExtrasPopup = (itemId: number) => {
@@ -197,9 +236,18 @@ const MenuSection: React.FC<MenuSectionProps> = ({
     setShowSizeRequiredPopup(null);
   };
 
+  const closePastaTypeRequiredPopup = () => {
+    setShowPastaTypeRequiredPopup(null);
+  };
+
   const handleSizeRequiredAndOpenSizePopup = (itemId: number) => {
     setShowSizeRequiredPopup(null);
     setShowSizePopup(itemId);
+  };
+
+  const handlePastaTypeRequiredAndOpenPastaTypePopup = (itemId: number) => {
+    setShowPastaTypeRequiredPopup(null);
+    setShowPastaTypePopup(itemId);
   };
 
   // Early return if no items
@@ -287,6 +335,42 @@ const MenuSection: React.FC<MenuSectionProps> = ({
         </div>
       )}
 
+      {/* Pasta Type Required Popup */}
+      {showPastaTypeRequiredPopup && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full">
+            <div className="p-6 text-center">
+              <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-orange-100 mb-4">
+                <AlertCircle className="h-6 w-6 text-orange-600" />
+              </div>
+              
+              <h3 className="text-lg font-bold text-gray-900 mb-2">
+                Nudelsorte auswählen
+              </h3>
+              
+              <p className="text-sm text-gray-600 mb-6">
+                Bitte wählen Sie zuerst eine Nudelsorte für dieses Gericht aus, bevor Sie es zum Warenkorb hinzufügen.
+              </p>
+              
+              <div className="flex gap-3 justify-center">
+                <button
+                  onClick={closePastaTypeRequiredPopup}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+                >
+                  Abbrechen
+                </button>
+                <button
+                  onClick={() => handlePastaTypeRequiredAndOpenPastaTypePopup(showPastaTypeRequiredPopup)}
+                  className="px-4 py-2 text-sm font-medium text-white bg-orange-500 hover:bg-orange-600 rounded-lg transition-colors"
+                >
+                  Nudelsorte wählen
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Size Selection Popup */}
       {showSizePopup && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -360,6 +444,77 @@ const MenuSection: React.FC<MenuSectionProps> = ({
                 className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg transition-colors"
               >
                 Größe bestätigen
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Pasta Type Selection Popup */}
+      {showPastaTypePopup && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full max-h-[80vh] overflow-y-auto">
+            <div className="sticky top-0 bg-white border-b border-gray-200 p-4 rounded-t-xl">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-bold text-gray-900">Nudelsorte wählen</h3>
+                <button
+                  onClick={closePastaTypePopup}
+                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                >
+                  <X className="w-5 h-5 text-gray-500" />
+                </button>
+              </div>
+              <p className="text-sm text-gray-600 mt-1">
+                Wählen Sie Ihre gewünschte Nudelsorte
+              </p>
+            </div>
+            
+            <div className="p-4 space-y-3">
+              {pastaTypes.map((pastaType) => {
+                const isSelected = selectedPastaTypes[showPastaTypePopup] === pastaType.name;
+                
+                return (
+                  <label
+                    key={pastaType.name}
+                    className={`flex items-center justify-between p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 ${
+                      isSelected
+                        ? 'border-blue-500 bg-blue-50'
+                        : 'border-gray-200 hover:border-blue-300 hover:bg-blue-50'
+                    }`}
+                  >
+                    <div className="flex items-center">
+                      <input
+                        type="radio"
+                        name={`pasta-type-${showPastaTypePopup}`}
+                        checked={isSelected}
+                        onChange={() => handlePastaTypeSelect(showPastaTypePopup, pastaType.name)}
+                        className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500 focus:ring-2"
+                      />
+                      <div className="ml-3">
+                        <div className="font-bold text-gray-900 text-lg">
+                          {pastaType.name}
+                        </div>
+                      </div>
+                    </div>
+                  </label>
+                );
+              })}
+            </div>
+            
+            <div className="sticky bottom-0 bg-white border-t border-gray-200 p-4 rounded-b-xl">
+              <div className="flex items-center justify-between mb-3">
+                <span className="font-medium text-gray-900">
+                  Gewählte Nudelsorte:
+                </span>
+                <span className="font-bold text-blue-600">
+                  {selectedPastaTypes[showPastaTypePopup] || 'Keine ausgewählt'}
+                </span>
+              </div>
+              <button
+                onClick={closePastaTypePopup}
+                className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg transition-colors"
+              >
+                Nudelsorte bestätigen
               </button>
             </div>
           </div>
@@ -522,8 +677,10 @@ const MenuSection: React.FC<MenuSectionProps> = ({
           const displayPrice = getDisplayPrice(item);
           const itemIngredients = selectedIngredients[item.id] || [];
           const itemExtras = selectedExtras[item.id] || [];
+          const selectedPastaType = selectedPastaTypes[item.id];
           const isWunschPizza = item.isWunschPizza;
           const isPizza = item.isPizza || item.isWunschPizza;
+          const isPasta = item.isPasta;
           const canAdd = canAddToCart(item);
           const buttonTooltip = getAddButtonTooltip(item);
 
@@ -572,6 +729,33 @@ const MenuSection: React.FC<MenuSectionProps> = ({
                         <p className="text-sm md:text-xs text-gray-600 leading-relaxed group-hover:text-gray-700 transition-colors duration-300 max-w-lg">
                           {item.description}
                         </p>
+                      )}
+
+                      {/* Show selected pasta type */}
+                      {isPasta && selectedPastaType && (
+                        <div className="mt-2 p-2 bg-blue-50 rounded-md border border-blue-200">
+                          <div className="text-xs font-medium text-blue-700 mb-1">
+                            Gewählte Nudelsorte:
+                          </div>
+                          <div className="flex flex-wrap gap-1">
+                            <span className="inline-flex items-center text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">
+                              {selectedPastaType}
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectedPastaTypes(prev => ({
+                                    ...prev,
+                                    [item.id]: ''
+                                  }));
+                                }}
+                                className="ml-1 text-blue-500 hover:text-blue-700"
+                              >
+                                <X className="w-3 h-3" />
+                              </button>
+                            </span>
+                          </div>
+                        </div>
                       )}
 
                       {/* Show selected ingredients for Wunsch Pizza */}
@@ -685,7 +869,7 @@ const MenuSection: React.FC<MenuSectionProps> = ({
                       </button>
                     </div>
                   ) : (
-                    /* Regular pizza/item button order */
+                    /* Regular item button order */
                     <div className="flex items-center gap-1 md:gap-1.5">
                       {/* Size selector button */}
                       {hasSizes && (
@@ -697,6 +881,22 @@ const MenuSection: React.FC<MenuSectionProps> = ({
                           <span>Größe</span>
                           {selectedSize && (
                             <span className="bg-blue-200 text-blue-800 text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold">
+                              ✓
+                            </span>
+                          )}
+                        </button>
+                      )}
+
+                      {/* Pasta type selector button for pasta items */}
+                      {isPasta && (
+                        <button
+                          type="button"
+                          onClick={() => openPastaTypePopup(item.id)}
+                          className="flex items-center gap-1 md:gap-1.5 px-1.5 md:px-2 py-1 md:py-1.5 bg-yellow-50 hover:bg-yellow-100 border border-yellow-200 hover:border-yellow-300 rounded-md transition-all duration-300 text-xs font-medium text-yellow-700"
+                        >
+                          <span>Nudeln</span>
+                          {selectedPastaType && (
+                            <span className="bg-yellow-200 text-yellow-800 text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold">
                               ✓
                             </span>
                           )}
@@ -730,6 +930,11 @@ const MenuSection: React.FC<MenuSectionProps> = ({
                       {selectedSize && (
                         <div className="text-xs text-gray-600 mt-0.5">
                           {selectedSize.name} {selectedSize.description && `(${selectedSize.description})`}
+                        </div>
+                      )}
+                      {selectedPastaType && (
+                        <div className="text-xs text-yellow-600 mt-0.5">
+                          {selectedPastaType}
                         </div>
                       )}
                       {itemExtras.length > 0 && (

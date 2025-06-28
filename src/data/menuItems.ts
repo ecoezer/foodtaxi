@@ -1,4 +1,4 @@
-import { MenuItem, WunschPizzaIngredient, PizzaExtra } from '../types';
+import { MenuItem, WunschPizzaIngredient, PizzaExtra, PastaType } from '../types';
 
 // Pizza sizes configuration with new structure
 const pizzaSizes = [
@@ -6,6 +6,12 @@ const pizzaSizes = [
   { name: 'Large', price: 9.90, description: 'Ø ca. 30 cm' },
   { name: 'Family', price: 17.90, description: 'Ø ca. 40 cm' },
   { name: 'Mega', price: 26.90, description: 'Ø ca. 50 cm' }
+];
+
+// Pasta types for pasta dishes
+export const pastaTypes: PastaType[] = [
+  { name: 'Spaghetti' },
+  { name: 'Maccheroni' }
 ];
 
 // Wunsch Pizza ingredients - Updated with new items and removed "Ei", Rindersalami now available
@@ -156,7 +162,7 @@ export const donerDishes: MenuItem[] = [
   }
 ];
 
-// Pasta & Al Forno (New section)
+// Pasta & Al Forno (Updated with pasta type selection requirement)
 export const pasta: MenuItem[] = [
   // Regular Pasta
   {
@@ -164,28 +170,32 @@ export const pasta: MenuItem[] = [
     number: 50,
     name: "Pasta Schinken-Sahnesauce",
     description: "Pasta Schinken-Sahnesauce",
-    price: 12.00
+    price: 12.00,
+    isPasta: true
   },
   {
     id: 535,
     number: 51,
     name: "Pasta Carbonara",
     description: "in Schinken-Sahnesauce mit Eigelb",
-    price: 12.00
+    price: 12.00,
+    isPasta: true
   },
   {
     id: 536,
     number: 52,
     name: "Pasta Spinat",
     description: "in Gorgonzolasauce",
-    price: 12.00
+    price: 12.00,
+    isPasta: true
   },
   {
     id: 537,
     number: 53,
     name: "Pasta Hähnchen-Brust",
     description: "in Sahnesauce, Milde Peperoni und Zwiebeln",
-    price: 13.00
+    price: 13.00,
+    isPasta: true
   },
   // Al Forno
   {
@@ -193,14 +203,16 @@ export const pasta: MenuItem[] = [
     number: 54,
     name: "Al Quattro Formaggi",
     description: "mit Vier Käsesorten, Sahnesauce und Nudelsorte nach Wahl",
-    price: 13.00
+    price: 13.00,
+    isPasta: true
   },
   {
     id: 539,
     number: 55,
     name: "Maccheroni Gyros",
     description: "in Sauce Hollandaise",
-    price: 13.00
+    price: 13.00,
+    isPasta: true
   },
   {
     id: 540,
