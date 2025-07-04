@@ -61,24 +61,43 @@ export const wunschPizzaIngredients: WunschPizzaIngredient[] = [
   { name: 'ohne Zutat' }
 ];
 
-// Pizza extras for all pizzas (each extra costs +€1.50)
+// Pizza extras for all pizzas (each extra costs +€1.50) - Updated to match Wunsch Pizza ingredients
 export const pizzaExtras: PizzaExtra[] = [
   { name: 'Ananas', price: 1.50 },
   { name: 'Artischocken', price: 1.50 },
   { name: 'Barbecuesauce', price: 1.50 },
+  { name: 'Brokkoli', price: 1.50 },
   { name: 'Champignons frisch', price: 1.50 },
+  { name: 'Chili-Cheese-Soße', price: 1.50 },
+  { name: 'Döner', price: 1.50 },
   { name: 'Edamer', price: 1.50 },
-  { name: 'Ei', price: 1.50 },
   { name: 'Formfleisch-Vorderschinken', price: 1.50 },
   { name: 'Gewürzgurken', price: 1.50 },
   { name: 'Gorgonzola', price: 1.50 },
+  { name: 'Gyros', price: 1.50 },
   { name: 'Hirtenkäse', price: 1.50 },
   { name: 'Hähnchenbrust', price: 1.50 },
+  { name: 'Jalapeños', price: 1.50 },
   { name: 'Knoblauchwurst', price: 1.50 },
   { name: 'Mais', price: 1.50 },
+  { name: 'Milde Peperoni', price: 1.50 },
   { name: 'Mozzarella', price: 1.50 },
   { name: 'Oliven', price: 1.50 },
-  { name: 'Paprika', price: 1.50 }
+  { name: 'Paprika', price: 1.50 },
+  { name: 'Parmaschinken', price: 1.50 },
+  { name: 'Peperoni, scharf', price: 1.50 },
+  { name: 'Remoulade', price: 1.50 },
+  { name: 'Rindermett', price: 1.50 },
+  { name: 'Rindersalami', price: 1.50 },
+  { name: 'Rucola', price: 1.50 },
+  { name: 'Röstzwiebeln', price: 1.50 },
+  { name: 'Sauce Hollandaise', price: 1.50 },
+  { name: 'Spiegelei', price: 1.50 },
+  { name: 'Spinat', price: 1.50 },
+  { name: 'Tomaten', price: 1.50 },
+  { name: 'Tzatziki', price: 1.50 },
+  { name: 'Würstchen', price: 1.50 },
+  { name: 'Zwiebeln', price: 1.50 }
 ];
 
 // Helper function to create drink sizes for soft drinks
