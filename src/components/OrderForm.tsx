@@ -124,7 +124,7 @@ const useOrderCalculation = (orderItems: OrderItem[], orderType: 'pickup' | 'del
   }, [orderItems, orderType, deliveryZone]);
 };
 
-// Validation Schema - Updated to include new delivery zones in alphabetical order
+// Validation Schema - Updated postcode validation to be more flexible
 const orderFormSchema = z
   .object({
     orderType: z.enum(['pickup', 'delivery'], {
@@ -177,8 +177,8 @@ const orderFormSchema = z
     { message: 'Gültige Hausnummer eingeben (z.B. 123 oder 123a)', path: ['houseNumber'] }
   )
   .refine(
-    data => data.orderType !== 'delivery' || (data.postcode && /^3102[0-9]$/.test(data.postcode)),
-    { message: 'Postleitzahl muss mit 3102 beginnen', path: ['postcode'] }
+    data => data.orderType !== 'delivery' || (data.postcode && /^3\d{4}$/.test(data.postcode)),
+    { message: 'Postleitzahl muss 5 Ziffern haben und mit 3 beginnen', path: ['postcode'] }
   );
 
 type OrderFormData = z.infer<typeof orderFormSchema>;
@@ -859,7 +859,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ orderItems, onRemoveItem, onUpdat
                   <input
                     {...field}
                     type="text"
-                    placeholder="Postleitzahl (3102X) *"
+                    placeholder="Postleitzahl (5 Ziffern, beginnt mit 3) *"
                     maxLength={5}
                     className={`w-full max-w-xs rounded-lg border-gray-300 shadow-sm focus:border-orange-500 focus:ring focus:ring-orange-200 transition-colors text-sm ${
                       errors.postcode ? 'border-red-500' : ''
