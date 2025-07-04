@@ -645,7 +645,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ orderItems, onRemoveItem, onUpdat
         messageText += `📝 Anmerkung: ${data.note}\n`;
       }
 
-      const whatsappURL = `https://wa.me/+4915256094733?text=${encodeURIComponent(messageText)}`;
+      const whatsappURL = `https://wa.me/+4915259630500?text=${encodeURIComponent(messageText)}`;
       window.open(whatsappURL, '_blank');
       
     } catch (error) {

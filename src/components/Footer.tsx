@@ -3,7 +3,7 @@ import { MapPin, Phone, Heart } from 'lucide-react';
 
 const Footer = () => {
   const [copied, setCopied] = useState(false);
-  const phoneNumber = '+4915256094733';
+  const phoneNumber = '+4915259630500';
 
   const handleWhatsApp = async (e) => {
     e.preventDefault();
@@ -45,7 +45,7 @@ const Footer = () => {
             </div>
             <div>
               <div className="text-xs font-medium">💬 WhatsApp & Anrufen</div>
-              <div className="font-bold text-lg">01525 6094733</div>
+              <div className="font-bold text-lg">01525 9630500</div>
             </div>
           </a>
           {copied && (

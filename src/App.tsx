@@ -31,7 +31,7 @@ const SCROLL_CONFIG = {
 };
 
 const CONTACT_INFO = {
-  PHONE: '01525 6094733',
+  PHONE: '01525 9630500',
   WHATSAPP_URL: '#doener'
 };
 
