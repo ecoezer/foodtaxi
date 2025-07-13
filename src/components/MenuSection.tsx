@@ -461,13 +461,13 @@ const MenuSection: React.FC<MenuSectionProps> = ({ title, description, subTitle,
                   </div>
 
                   <button
-                    className="flex items-center gap-2 bg-orange-500 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-orange-600 transition-all transform hover:scale-105 text-sm sm:text-base font-medium shadow-md hover:shadow-lg"
+                    className="flex items-center gap-1.5 bg-orange-500 text-white px-2 sm:px-3 py-1.5 rounded-lg hover:bg-orange-600 transition-all transform hover:scale-105 text-xs sm:text-sm font-medium shadow-md hover:shadow-lg"
                     onClick={(e) => {
                       e.stopPropagation();
                       handleItemClick(item);
                     }}
                   >
-                    <Plus className="w-4 h-4" />
+                    <Plus className="w-3 h-3" />
                     <span className="hidden sm:inline">Hinzufügen</span>
                     <span className="sm:hidden">+</span>
                   </button>
