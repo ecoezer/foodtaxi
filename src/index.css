@@ -145,6 +145,31 @@ html {
   scrollbar-width: none;
 }
 
+/* Custom scrollbar for ingredients selection */
+.ingredients-scroll::-webkit-scrollbar {
+  width: 12px;
+}
+
+.ingredients-scroll::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 6px;
+}
+
+.ingredients-scroll::-webkit-scrollbar-thumb {
+  background: #000000;
+  border-radius: 6px;
+}
+
+.ingredients-scroll::-webkit-scrollbar-thumb:hover {
+  background: #333333;
+}
+
+/* Firefox scrollbar styling */
+.ingredients-scroll {
+  scrollbar-width: thick;
+  scrollbar-color: #000000 #f1f1f1;
+}
+
 .menu-item-enter {
   opacity: 0;
   transform: translateY(20px);

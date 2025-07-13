@@ -233,7 +233,7 @@ const ItemModal: React.FC<ItemModalProps> = memo(({ item, isOpen, onClose, onAdd
                 <h4 className="font-semibold text-gray-900 text-lg">
                   4 Zutaten wählen * (genau 4 Zutaten oder "ohne Zutat")
                 </h4>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-80 overflow-y-auto">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-80 overflow-y-auto ingredients-scroll">
                   {wunschPizzaIngredients.map((ingredient) => (
                     <button
                       key={ingredient.name}
