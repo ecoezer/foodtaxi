@@ -401,7 +401,7 @@ const MenuSection: React.FC<MenuSectionProps> = ({ title, description, subTitle,
           {items.map((item, index) => (
             <div
               key={`${item.id}-${index}`}
-              className="p-4 sm:p-6 hover:bg-gradient-to-r hover:from-gray-50 hover:to-orange-50/30 transition-all duration-200 group relative"
+              className="p-3 sm:p-4 hover:bg-gradient-to-r hover:from-gray-50 hover:to-orange-50/30 transition-all duration-200 group relative"
             >
               {/* Subtle shaded background for alternating items */}
               {index % 2 === 1 && (
