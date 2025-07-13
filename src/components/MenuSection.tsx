@@ -394,7 +394,7 @@ const MenuSection: React.FC<MenuSectionProps> = ({ title, description, subTitle,
 
   return (
     <section className="mb-8">
-      <div className={`${bgColor} text-white p-4 sm:p-6 rounded-t-xl`}>
+      <div className={`${bgColor} text-white p-3 sm:p-4 rounded-t-xl`}>
         <div className="flex items-center gap-3 mb-2">
           <ChefHat className="w-6 h-6 sm:w-8 sm:h-8" />
           <h2 className="text-xl sm:text-2xl md:text-3xl font-bold">{title}</h2>
