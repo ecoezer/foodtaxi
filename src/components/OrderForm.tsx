@@ -696,7 +696,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ orderItems, onRemoveItem, onUpdat
         <div className="flex items-center gap-2 sm:gap-3">
           <ShoppingCart className="w-5 h-5 sm:w-6 sm:h-6 text-orange-600" />
           <h3 className="text-lg sm:text-xl font-bold text-gray-900">Ihre Bestellung</h3>
-          <span className="bg-orange-100 text-orange-800 text-xs sm:text-sm font-medium px-2 sm:px-2.5 py-0.5 rounded-full">
+          <span className="bg-orange-100 text-orange-800 text-xs sm:text-sm font-medium px-2 sm:px-2.5 py-0.5 rounded-full text-center">
             {orderItems.length} Artikel
           </span>
         </div>
