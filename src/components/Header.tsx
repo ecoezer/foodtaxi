@@ -177,7 +177,7 @@ const Header: React.FC = memo(() => {
   }
 
   return (
-    <header className='bg-white pt-6 border-b'>
+    <header className='bg-white pt-12 border-b'>
       <div className='container mx-auto px-3 sm:px-4 py-3 sm:py-6 flex flex-col items-center max-w-5xl'>
         <h1 className='text-2xl sm:text-3xl font-bold tracking-tighter mb-4 text-gray-900 relative animate-fade-in text-center'>
           <span className='relative'>
