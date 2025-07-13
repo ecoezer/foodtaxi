@@ -447,11 +447,14 @@ const MenuSection: React.FC<MenuSectionProps> = ({
               </div>
               
               <h3 className="text-lg font-bold text-gray-900 mb-2">
-                Soße auswählen
+                {items.find(item => item.id === showSauceRequiredPopup)?.isBeerSelection ? 'Biersorte auswählen' : 'Soße auswählen'}
               </h3>
               
               <p className="text-sm text-gray-600 mb-6">
-                Bitte wählen Sie zuerst eine Soße für dieses Gericht aus, bevor Sie es zum Warenkorb hinzufügen.
+                {items.find(item => item.id === showSauceRequiredPopup)?.isBeerSelection 
+                  ? 'Bitte wählen Sie zuerst eine Biersorte für dieses Getränk aus, bevor Sie es zum Warenkorb hinzufügen.'
+                  : 'Bitte wählen Sie zuerst eine Soße für dieses Gericht aus, bevor Sie es zum Warenkorb hinzufügen.'
+                }
               </p>
               
               <div className="flex gap-3 justify-center">
@@ -465,7 +468,7 @@ const MenuSection: React.FC<MenuSectionProps> = ({
                   onClick={() => handleSauceRequiredAndOpenSaucePopup(showSauceRequiredPopup)}
                   className="px-4 py-2 text-sm font-medium text-white bg-orange-500 hover:bg-orange-600 rounded-lg transition-colors"
                 >
-                  Soße wählen
+                  {items.find(item => item.id === showSauceRequiredPopup)?.isBeerSelection ? 'Biersorte wählen' : 'Soße wählen'}
                 </button>
               </div>
             </div>
