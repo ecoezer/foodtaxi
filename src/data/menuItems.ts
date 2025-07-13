@@ -603,7 +603,7 @@ export const drinks: MenuItem[] = [
     number: 102,
     name: "Becks oder Herrenhäuser",
     description: "0,3 L",
-    price: 2.40
+    price: 2.40,
     isBeerSelection: true
   },
   {
