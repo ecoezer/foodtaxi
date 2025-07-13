@@ -76,6 +76,7 @@ function App() {
   const addItem = useCartStore(state => state.addItem);
   const removeItem = useCartStore(state => state.removeItem);
   const updateQuantity = useCartStore(state => state.updateQuantity);
+  const clearCart = useCartStore(state => state.clearCart);
 
   // =================== LOCAL STATE ===================
   const [isMobile, setIsMobile] = useState(window.innerWidth < SCROLL_CONFIG.MOBILE_BREAKPOINT);
@@ -308,6 +309,9 @@ function App() {
     updateQuantity(id, quantity, selectedSize, selectedIngredients, selectedExtras, selectedPastaType, selectedSauce);
   }, [updateQuantity]);
 
+  const memoizedClearCart = useCallback(() => {
+    clearCart();
+  }, [clearCart]);
   // =================== RENDER HELPER FUNCTIONS ===================
   const renderAnimatedBackground = () => (
     <div className='absolute inset-0 opacity-30'>
@@ -553,6 +557,7 @@ function App() {
                 orderItems={items}
                 onRemoveItem={memoizedRemoveItem}
                 onUpdateQuantity={memoizedUpdateQuantity}
+                onClearCart={memoizedClearCart}
               />
             </div>
           </div>

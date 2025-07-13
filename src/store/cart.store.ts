@@ -18,6 +18,7 @@ interface CartState {
   addItem: (menuItem: MenuItem, selectedSize?: PizzaSize, selectedIngredients?: string[], selectedExtras?: string[], selectedPastaType?: string, selectedSauce?: string) => void;
   removeItem: (id: number, selectedSize?: PizzaSize, selectedIngredients?: string[], selectedExtras?: string[], selectedPastaType?: string, selectedSauce?: string) => void;
   updateQuantity: (id: number, quantity: number, selectedSize?: PizzaSize, selectedIngredients?: string[], selectedExtras?: string[], selectedPastaType?: string, selectedSauce?: string) => void;
+  clearCart: () => void;
 }
 
 // Helper function to create a unique key for cart items
@@ -114,6 +115,8 @@ export const useCartStore = create<CartState>()(
           };
         }),
 
+      clearCart: () => set({ items: [] }),
+      
       resetStore: () => set({ items: [] })
     }),
     { name: 'cart-storage' }

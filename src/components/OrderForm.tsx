@@ -3,7 +3,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { AsYouType } from 'libphonenumber-js';
-import { Phone, ShoppingCart, X, Minus, Plus, Clock, MapPin, User, MessageSquare, AlertTriangle, ChevronUp, ChevronDown } from 'lucide-react';
+import { Phone, ShoppingCart, X, Minus, Plus, Clock, MapPin, User, MessageSquare, AlertTriangle, ChevronUp, ChevronDown, Trash2 } from 'lucide-react';
 import { PizzaSize } from '../types';
 
 // Types
@@ -26,6 +26,7 @@ interface OrderFormProps {
   orderItems: OrderItem[];
   onRemoveItem: (id: number, selectedSize?: PizzaSize, selectedIngredients?: string[], selectedExtras?: string[], selectedPastaType?: string, selectedSauce?: string) => void;
   onUpdateQuantity: (id: number, quantity: number, selectedSize?: PizzaSize, selectedIngredients?: string[], selectedExtras?: string[], selectedPastaType?: string, selectedSauce?: string) => void;
+  onClearCart?: () => void;
 }
 
 // Constants - Delivery zones sorted alphabetically
@@ -531,8 +532,9 @@ const DeliveryZoneSelector = memo<{
 });
 
 // Main Component
-const OrderForm: React.FC<OrderFormProps> = ({ orderItems, onRemoveItem, onUpdateQuantity }) => {
+const OrderForm: React.FC<OrderFormProps> = ({ orderItems, onRemoveItem, onUpdateQuantity, onClearCart }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showClearConfirm, setShowClearConfirm] = useState(false);
   const { availableHours, getAvailableMinutes } = useTimeSlots();
 
   // Check if today is Tuesday (closed)
@@ -580,6 +582,12 @@ const OrderForm: React.FC<OrderFormProps> = ({ orderItems, onRemoveItem, onUpdat
   const handleTimeChange = useCallback((time: string) => {
     setValue('specificTime', time, { shouldValidate: true });
   }, [setValue]);
+  const handleClearCart = useCallback(() => {
+    if (onClearCart) {
+      onClearCart();
+      setShowClearConfirm(false);
+    }
+  }, [onClearCart]);
 
   const onSubmit = useCallback(async (data: OrderFormData) => {
     if (isSubmitting) return;
@@ -684,12 +692,52 @@ const OrderForm: React.FC<OrderFormProps> = ({ orderItems, onRemoveItem, onUpdat
 
   return (
     <div className="bg-white w-full max-w-full flex flex-col gap-4 sm:gap-6 rounded-xl shadow-lg p-3 sm:p-4 md:p-6">
-      <div className="flex items-center gap-2 sm:gap-3">
-        <ShoppingCart className="w-5 h-5 sm:w-6 sm:h-6 text-orange-600" />
-        <h3 className="text-lg sm:text-xl font-bold text-gray-900">Ihre Bestellung</h3>
-        <span className="bg-orange-100 text-orange-800 text-xs sm:text-sm font-medium px-2 sm:px-2.5 py-0.5 rounded-full">
-          {orderItems.length} Artikel
-        </span>
+      <div className="flex items-center justify-between gap-2 sm:gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <ShoppingCart className="w-5 h-5 sm:w-6 sm:h-6 text-orange-600" />
+          <h3 className="text-lg sm:text-xl font-bold text-gray-900">Ihre Bestellung</h3>
+          <span className="bg-orange-100 text-orange-800 text-xs sm:text-sm font-medium px-2 sm:px-2.5 py-0.5 rounded-full">
+            {orderItems.length} Artikel
+          </span>
+        </div>
+        
+        {/* Clear Cart Button */}
+        <div className="relative">
+          <button
+            type="button"
+            onClick={() => setShowClearConfirm(true)}
+            className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 sm:py-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-all text-xs sm:text-sm font-medium border border-red-200 hover:border-red-300"
+            title="Warenkorb leeren"
+          >
+            <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
+            <span className="hidden sm:inline">Alles löschen</span>
+          </button>
+          
+          {/* Confirmation Dialog */}
+          {showClearConfirm && (
+            <div className="absolute top-full right-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg p-3 sm:p-4 z-50 min-w-[200px] sm:min-w-[250px]">
+              <p className="text-sm text-gray-700 mb-3">
+                Möchten Sie wirklich alle Artikel aus dem Warenkorb entfernen?
+              </p>
+              <div className="flex gap-2 justify-end">
+                <button
+                  type="button"
+                  onClick={() => setShowClearConfirm(false)}
+                  className="px-3 py-1 text-sm text-gray-600 hover:text-gray-800 border border-gray-300 rounded hover:bg-gray-50 transition-colors"
+                >
+                  Abbrechen
+                </button>
+                <button
+                  type="button"
+                  onClick={handleClearCart}
+                  className="px-3 py-1 text-sm text-white bg-red-600 hover:bg-red-700 rounded transition-colors"
+                >
+                  Ja, löschen
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="space-y-2 sm:space-y-3 max-h-48 sm:max-h-64 overflow-y-auto">
