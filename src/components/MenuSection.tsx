@@ -858,6 +858,7 @@ const MenuSection: React.FC<MenuSectionProps> = ({
           const isSpezialitaet = item.isSpezialitaet;
           const canAdd = canAddToCart(item);
           const buttonTooltip = getAddButtonTooltip(item);
+          const isBeerSelection = item.isBeerSelection;
 
           return (
             <div
