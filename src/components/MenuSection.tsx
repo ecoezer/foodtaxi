@@ -401,8 +401,7 @@ const MenuSection: React.FC<MenuSectionProps> = ({ title, description, subTitle,
           {items.map((item, index) => (
             <div
               key={`${item.id}-${index}`}
-              className="p-4 sm:p-6 hover:bg-gradient-to-r hover:from-gray-50 hover:to-orange-50/30 transition-all duration-200 group cursor-pointer relative"
-              onClick={() => handleItemClick(item)}
+              className="p-4 sm:p-6 hover:bg-gradient-to-r hover:from-gray-50 hover:to-orange-50/30 transition-all duration-200 group relative"
             >
               {/* Subtle shaded background for alternating items */}
               {index % 2 === 1 && (
@@ -451,10 +450,7 @@ const MenuSection: React.FC<MenuSectionProps> = ({ title, description, subTitle,
 
                   <button
                     className="flex items-center gap-1.5 bg-orange-500 text-white px-2 sm:px-3 py-1.5 rounded-lg hover:bg-orange-600 transition-all transform hover:scale-105 text-xs sm:text-sm font-medium shadow-md hover:shadow-lg"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleItemClick(item);
-                    }}
+                    onClick={() => handleItemClick(item)}
                   >
                     <Plus className="w-3 h-3" />
                     <span className="hidden sm:inline">Hinzufügen</span>
