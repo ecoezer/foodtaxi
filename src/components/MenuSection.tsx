@@ -1,1289 +1,532 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, memo } from 'react';
+import { Plus, Minus, ShoppingCart, ChefHat, Clock, Star } from 'lucide-react';
 import { MenuItem, PizzaSize } from '../types';
-import { useInView } from 'react-intersection-observer';
-import { Plus, X, AlertCircle } from 'lucide-react';
-import { wunschPizzaIngredients, pizzaExtras, pastaTypes, sauceTypes, saladSauceTypes, beerTypes } from '../data/menuItems';
+import { 
+  wunschPizzaIngredients, 
+  pizzaExtras, 
+  pastaTypes, 
+  sauceTypes, 
+  saladSauceTypes,
+  beerTypes 
+} from '../data/menuItems';
 
 interface MenuSectionProps {
   title: string;
-  items: MenuItem[];
   description?: string;
   subTitle?: string;
-  bgColor: string;
-  onAddToOrder: (item: MenuItem, selectedSize?: PizzaSize, selectedIngredients?: string[], selectedExtras?: string[], selectedPastaType?: string, selectedSauce?: string) => void;
+  items: MenuItem[];
+  bgColor?: string;
+  onAddToOrder: (
+    menuItem: MenuItem, 
+    selectedSize?: PizzaSize, 
+    selectedIngredients?: string[], 
+    selectedExtras?: string[],
+    selectedPastaType?: string,
+    selectedSauce?: string
+  ) => void;
 }
 
-const MenuSection: React.FC<MenuSectionProps> = ({
-  title,
-  items,
-  description,
-  subTitle,
-  bgColor,
-  onAddToOrder
-}) => {
-  // Debug logging
-  console.log(`MenuSection ${title}:`, { itemsCount: items.length, items });
+interface ItemModalProps {
+  item: MenuItem;
+  isOpen: boolean;
+  onClose: () => void;
+  onAddToOrder: (
+    menuItem: MenuItem, 
+    selectedSize?: PizzaSize, 
+    selectedIngredients?: string[], 
+    selectedExtras?: string[],
+    selectedPastaType?: string,
+    selectedSauce?: string
+  ) => void;
+}
 
-  const { ref, inView } = useInView({
-    threshold: 0.1,
-    triggerOnce: false, // Changed to false to ensure it triggers
-    rootMargin: '50px 0px'
-  });
+const ItemModal: React.FC<ItemModalProps> = memo(({ item, isOpen, onClose, onAddToOrder }) => {
+  const [selectedSize, setSelectedSize] = useState<PizzaSize | undefined>(
+    item.sizes ? item.sizes[0] : undefined
+  );
+  const [selectedIngredients, setSelectedIngredients] = useState<string[]>([]);
+  const [selectedExtras, setSelectedExtras] = useState<string[]>([]);
+  const [selectedPastaType, setSelectedPastaType] = useState<string>('');
+  const [selectedSauce, setSelectedSauce] = useState<string>('');
 
-  const [selectedSizes, setSelectedSizes] = useState<Record<number, PizzaSize>>({});
-  const [selectedIngredients, setSelectedIngredients] = useState<Record<number, string[]>>({});
-  const [selectedExtras, setSelectedExtras] = useState<Record<number, string[]>>({});
-  const [selectedPastaTypes, setSelectedPastaTypes] = useState<Record<number, string>>({});
-  const [selectedSauces, setSelectedSauces] = useState<Record<number, string>>({});
-  const [showExtrasPopup, setShowExtrasPopup] = useState<number | null>(null);
-  const [showIngredientsPopup, setShowIngredientsPopup] = useState<number | null>(null);
-  const [showSizePopup, setShowSizePopup] = useState<number | null>(null);
-  const [showPastaTypePopup, setShowPastaTypePopup] = useState<number | null>(null);
-  const [showSaucePopup, setShowSaucePopup] = useState<number | null>(null);
-  const [showSizeRequiredPopup, setShowSizeRequiredPopup] = useState<number | null>(null);
-  const [showPastaTypeRequiredPopup, setShowPastaTypeRequiredPopup] = useState<number | null>(null);
-  const [showSauceRequiredPopup, setShowSauceRequiredPopup] = useState<number | null>(null);
+  const resetSelections = useCallback(() => {
+    setSelectedSize(item.sizes ? item.sizes[0] : undefined);
+    setSelectedIngredients([]);
+    setSelectedExtras([]);
+    setSelectedPastaType('');
+    setSelectedSauce('');
+  }, [item.sizes]);
 
-  const handleSizeSelect = (itemId: number, size: PizzaSize) => {
-    setSelectedSizes(prev => ({
-      ...prev,
-      [itemId]: size
-    }));
-  };
+  React.useEffect(() => {
+    if (isOpen) {
+      resetSelections();
+    }
+  }, [isOpen, resetSelections]);
 
-  const handlePastaTypeSelect = (itemId: number, pastaType: string) => {
-    setSelectedPastaTypes(prev => ({
-      ...prev,
-      [itemId]: pastaType
-    }));
-  };
-
-  const handleSauceSelect = (itemId: number, sauce: string) => {
-    setSelectedSauces(prev => ({
-      ...prev,
-      [itemId]: sauce
-    }));
-  };
-
-  const handleIngredientToggle = (itemId: number, ingredient: string) => {
+  const handleIngredientToggle = useCallback((ingredient: string) => {
     setSelectedIngredients(prev => {
-      const currentIngredients = prev[itemId] || [];
-      const isSelected = currentIngredients.includes(ingredient);
-      
-      if (isSelected) {
-        // Remove ingredient
-        return {
-          ...prev,
-          [itemId]: currentIngredients.filter(ing => ing !== ingredient)
-        };
-      } else {
-        // Add ingredient (max 4)
-        if (currentIngredients.length < 4) {
-          return {
-            ...prev,
-            [itemId]: [...currentIngredients, ingredient]
-          };
-        }
-        return prev;
+      if (ingredient === 'ohne Zutat') {
+        return prev.includes(ingredient) ? [] : [ingredient];
       }
-    });
-  };
-
-  const handleExtraToggle = (itemId: number, extra: string) => {
-    setSelectedExtras(prev => {
-      const currentExtras = prev[itemId] || [];
-      const isSelected = currentExtras.includes(extra);
       
-      if (isSelected) {
-        // Remove extra
-        return {
-          ...prev,
-          [itemId]: currentExtras.filter(ext => ext !== extra)
-        };
-      } else {
-        // Add extra
-        return {
-          ...prev,
-          [itemId]: [...currentExtras, extra]
-        };
-      }
+      const filtered = prev.filter(ing => ing !== 'ohne Zutat');
+      return filtered.includes(ingredient)
+        ? filtered.filter(ing => ing !== ingredient)
+        : [...filtered, ingredient];
     });
-  };
+  }, []);
 
-  const handleAddToOrder = (item: MenuItem) => {
-    const selectedSize = selectedSizes[item.id];
-    const ingredients = selectedIngredients[item.id] || [];
-    const extras = selectedExtras[item.id] || [];
-    const selectedPastaType = selectedPastaTypes[item.id];
-    const selectedSauce = selectedSauces[item.id];
-    const hasSizes = item.sizes && item.sizes.length > 0;
-    const isWunschPizza = item.isWunschPizza;
-    const isPasta = item.isPasta;
-    const isSpezialitaet = item.isSpezialitaet;
-    const isBeerSelection = item.isBeerSelection;
+  const handleExtraToggle = useCallback((extra: string) => {
+    setSelectedExtras(prev =>
+      prev.includes(extra)
+        ? prev.filter(e => e !== extra)
+        : [...prev, extra]
+    );
+  }, []);
 
-    // Check if size is required but not selected
-    if (hasSizes && !selectedSize) {
-      setShowSizeRequiredPopup(item.id);
-      return;
-    }
+  const handleAddToOrder = useCallback(() => {
+    onAddToOrder(item, selectedSize, selectedIngredients, selectedExtras, selectedPastaType, selectedSauce);
+    onClose();
+  }, [item, selectedSize, selectedIngredients, selectedExtras, selectedPastaType, selectedSauce, onAddToOrder, onClose]);
 
-    // Check if pasta type is required but not selected
-    if (isPasta && !selectedPastaType) {
-      setShowPastaTypeRequiredPopup(item.id);
-      return;
-    }
+  const getCurrentPrice = useCallback(() => {
+    let price = selectedSize ? selectedSize.price : item.price;
+    price += selectedExtras.length * 1.50;
+    return price;
+  }, [selectedSize, selectedExtras, item.price]);
 
-    // Check if sauce is required but not selected for Spezialitäten
-    if (isSpezialitaet && !selectedSauce) {
-      setShowSauceRequiredPopup(item.id);
-      return;
-    }
-
-    // Check if beer type is required but not selected for beer selection
-    if (isBeerSelection && !selectedSauce) {
-      setShowSauceRequiredPopup(item.id);
-      return;
-    }
-
-    // Check if Wunsch Pizza needs ingredients
-    if (isWunschPizza && ingredients.length === 0) {
-      // For Wunsch Pizza, we could show a different popup or just open ingredients popup
-      setShowIngredientsPopup(item.id);
-      return;
-    }
-
-    onAddToOrder(item, selectedSize, ingredients, extras, selectedPastaType, selectedSauce);
-  };
-
-  const getDisplayPrice = (item: MenuItem) => {
-    const selectedSize = selectedSizes[item.id];
-    const extras = selectedExtras[item.id] || [];
+  const isFormValid = useCallback(() => {
+    // Check if sauce selection is required and not selected
+    const needsSauceSelection = item.isSpezialitaet && 
+      ![81, 82].includes(item.id); // Exclude Gyros Hollandaise (81) and Gyros Topf (82)
     
-    let basePrice: number;
-    if (selectedSize) {
-      basePrice = selectedSize.price;
-    } else if (item.sizes && item.sizes.length > 0) {
-      basePrice = item.sizes[0].price; // Default to first size (Medium)
-    } else {
-      basePrice = item.price;
-    }
-    
-    // Add extras cost (each extra is €1.50)
-    const extrasPrice = extras.length * 1.50;
-    
-    return basePrice + extrasPrice;
-  };
-
-  // Check if item can be added to cart
-  const canAddToCart = (item: MenuItem) => {
-    const hasSizes = item.sizes && item.sizes.length > 0;
-    const selectedSize = selectedSizes[item.id];
-    const itemIngredients = selectedIngredients[item.id] || [];
-    const isWunschPizza = item.isWunschPizza;
-    const isPasta = item.isPasta;
-    const selectedPastaType = selectedPastaTypes[item.id];
-    const isSpezialitaet = item.isSpezialitaet;
-    const selectedSauce = selectedSauces[item.id];
-    const isBeerSelection = item.isBeerSelection;
-
-    // For items with sizes (pizzas), size must be selected
-    if (hasSizes && !selectedSize) {
+    if (needsSauceSelection && !selectedSauce) {
       return false;
     }
 
-    // For pasta items, pasta type must be selected
-    if (isPasta && !selectedPastaType) {
+    // Check if salad dressing selection is required
+    const needsDressingSelection = item.id >= 568 && item.id <= 573 && item.isSpezialitaet;
+    if (needsDressingSelection && !selectedSauce) {
       return false;
     }
 
-    // For Spezialitäten, sauce must be selected
-    if (isSpezialitaet && !selectedSauce) {
+    // Check if beer selection is required
+    if (item.isBeerSelection && !selectedSauce) {
       return false;
     }
 
-    // For beer selection, sauce (beer type) must be selected
-    if (isBeerSelection && !selectedSauce) {
+    // Check if pasta type selection is required
+    if (item.isPasta && !selectedPastaType) {
       return false;
     }
 
-    // For Wunsch Pizza, at least one ingredient must be selected
-    if (isWunschPizza && itemIngredients.length === 0) {
-      return false;
+    // Check if Wunsch Pizza has exactly 4 ingredients
+    if (item.isWunschPizza) {
+      const validIngredients = selectedIngredients.filter(ing => ing !== 'ohne Zutat');
+      if (selectedIngredients.includes('ohne Zutat')) {
+        return validIngredients.length === 0;
+      }
+      return validIngredients.length === 4;
     }
 
     return true;
-  };
+  }, [item, selectedSauce, selectedPastaType, selectedIngredients]);
 
-  const getAddButtonTooltip = (item: MenuItem) => {
-    const hasSizes = item.sizes && item.sizes.length > 0;
-    const selectedSize = selectedSizes[item.id];
-    const itemIngredients = selectedIngredients[item.id] || [];
-    const isWunschPizza = item.isWunschPizza;
-    const isPasta = item.isPasta;
-    const selectedPastaType = selectedPastaTypes[item.id];
-    const isSpezialitaet = item.isSpezialitaet;
-    const selectedSauce = selectedSauces[item.id];
-    const isBeerSelection = item.isBeerSelection;
+  if (!isOpen) return null;
 
-    if (hasSizes && !selectedSize) {
-      return 'Bitte wählen Sie eine Größe';
-    }
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+      <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="p-6">
+          <div className="flex justify-between items-start mb-4">
+            <div>
+              <h3 className="text-xl font-bold text-gray-900">{item.name}</h3>
+              {item.description && (
+                <p className="text-gray-600 mt-1">{item.description}</p>
+              )}
+            </div>
+            <button
+              onClick={onClose}
+              className="text-gray-400 hover:text-gray-600 text-2xl font-bold"
+            >
+              ×
+            </button>
+          </div>
 
-    if (isPasta && !selectedPastaType) {
-      return 'Bitte wählen Sie eine Nudelsorte';
-    }
-
-    if (isSpezialitaet && !selectedSauce) {
-      return 'Bitte wählen Sie eine Soße';
-    }
-
-    if (isBeerSelection && !selectedSauce) {
-      return 'Bitte wählen Sie eine Biersorte';
-    }
-
-    if (isWunschPizza && itemIngredients.length === 0) {
-      return 'Bitte wählen Sie mindestens eine Zutat';
-    }
-
-    return 'Zum Warenkorb hinzufügen';
-  };
-
-  const openSizePopup = (itemId: number) => {
-    setShowSizePopup(itemId);
-  };
-
-  const closeSizePopup = () => {
-    setShowSizePopup(null);
-  };
-
-  const openPastaTypePopup = (itemId: number) => {
-    setShowPastaTypePopup(itemId);
-  };
-
-  const closePastaTypePopup = () => {
-    setShowPastaTypePopup(null);
-  };
-
-  const openSaucePopup = (itemId: number) => {
-    setShowSaucePopup(itemId);
-  };
-
-  const closeSaucePopup = () => {
-    setShowSaucePopup(null);
-  };
-
-  const openExtrasPopup = (itemId: number) => {
-    setShowExtrasPopup(itemId);
-  };
-
-  const closeExtrasPopup = () => {
-    setShowExtrasPopup(null);
-  };
-
-  const openIngredientsPopup = (itemId: number) => {
-    setShowIngredientsPopup(itemId);
-  };
-
-  const closeIngredientsPopup = () => {
-    setShowIngredientsPopup(null);
-  };
-
-  const closeSizeRequiredPopup = () => {
-    setShowSizeRequiredPopup(null);
-  };
-
-  const closePastaTypeRequiredPopup = () => {
-    setShowPastaTypeRequiredPopup(null);
-  };
-
-  const closeSauceRequiredPopup = () => {
-    setShowSauceRequiredPopup(null);
-  };
-
-  const handleSizeRequiredAndOpenSizePopup = (itemId: number) => {
-    setShowSizeRequiredPopup(null);
-    setShowSizePopup(itemId);
-  };
-
-  const handlePastaTypeRequiredAndOpenPastaTypePopup = (itemId: number) => {
-    setShowPastaTypeRequiredPopup(null);
-    setShowPastaTypePopup(itemId);
-  };
-
-  const handleSauceRequiredAndOpenSaucePopup = (itemId: number) => {
-    setShowSauceRequiredPopup(null);
-    setShowSaucePopup(itemId);
-  };
-
-  // Early return if no items
-  if (!items || items.length === 0) {
-    console.warn(`MenuSection ${title}: No items provided`);
-    return (
-      <section className="mb-4">
-        <div className="mb-3">
-          <h2 className="text-xl md:text-xl font-bold text-gray-900 mb-1">
-            {title}
-          </h2>
-          {subTitle && (
-            <h3 className="text-sm md:text-xs text-gray-600 mb-1 font-medium">
-              {subTitle}
-            </h3>
+          {/* Size Selection for Pizzas and Drinks */}
+          {item.sizes && item.sizes.length > 0 && (
+            <div className="mb-6">
+              <h4 className="font-semibold text-gray-900 mb-3">
+                {item.isPizza ? 'Größe wählen *' : 'Größe wählen *'}
+              </h4>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {item.sizes.map((size) => (
+                  <button
+                    key={size.name}
+                    onClick={() => setSelectedSize(size)}
+                    className={`p-3 rounded-lg border-2 transition-all ${
+                      selectedSize?.name === size.name
+                        ? 'border-orange-500 bg-orange-50'
+                        : 'border-gray-200 hover:border-orange-300'
+                    }`}
+                  >
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <span className="font-medium">{size.name}</span>
+                        {size.description && (
+                          <span className="text-sm text-gray-600 block">{size.description}</span>
+                        )}
+                      </div>
+                      <span className="font-bold text-orange-600">
+                        {size.price.toFixed(2).replace('.', ',')} €
+                      </span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
           )}
-          {description && (
-            <p className="text-sm md:text-xs text-gray-600 leading-relaxed">
-              {description}
-            </p>
+
+          {/* Pasta Type Selection */}
+          {item.isPasta && (
+            <div className="mb-6">
+              <h4 className="font-semibold text-gray-900 mb-3">Nudelsorte wählen *</h4>
+              <div className="grid grid-cols-2 gap-3">
+                {pastaTypes.map((pastaType) => (
+                  <button
+                    key={pastaType.name}
+                    onClick={() => setSelectedPastaType(pastaType.name)}
+                    className={`p-3 rounded-lg border-2 transition-all ${
+                      selectedPastaType === pastaType.name
+                        ? 'border-orange-500 bg-orange-50'
+                        : 'border-gray-200 hover:border-orange-300'
+                    }`}
+                  >
+                    <span className="font-medium">{pastaType.name}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
           )}
+
+          {/* Sauce Selection for Spezialitäten (excluding Gyros Hollandaise and Gyros Topf) */}
+          {item.isSpezialitaet && ![81, 82].includes(item.id) && (
+            <div className="mb-6">
+              <h4 className="font-semibold text-gray-900 mb-3">Soße wählen *</h4>
+              <div className="grid grid-cols-1 gap-3">
+                {sauceTypes.map((sauce) => (
+                  <button
+                    key={sauce.name}
+                    onClick={() => setSelectedSauce(sauce.name)}
+                    className={`p-3 rounded-lg border-2 transition-all text-left ${
+                      selectedSauce === sauce.name
+                        ? 'border-orange-500 bg-orange-50'
+                        : 'border-gray-200 hover:border-orange-300'
+                    }`}
+                  >
+                    <span className="font-medium">{sauce.name}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Dressing Selection for Salads */}
+          {item.id >= 568 && item.id <= 573 && item.isSpezialitaet && (
+            <div className="mb-6">
+              <h4 className="font-semibold text-gray-900 mb-3">Dressing wählen *</h4>
+              <div className="grid grid-cols-1 gap-3">
+                {saladSauceTypes.map((sauce) => (
+                  <button
+                    key={sauce.name}
+                    onClick={() => setSelectedSauce(sauce.name)}
+                    className={`p-3 rounded-lg border-2 transition-all text-left ${
+                      selectedSauce === sauce.name
+                        ? 'border-orange-500 bg-orange-50'
+                        : 'border-gray-200 hover:border-orange-300'
+                    }`}
+                  >
+                    <span className="font-medium">{sauce.name}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Beer Selection */}
+          {item.isBeerSelection && (
+            <div className="mb-6">
+              <h4 className="font-semibold text-gray-900 mb-3">Bier wählen *</h4>
+              <div className="grid grid-cols-1 gap-3">
+                {beerTypes.map((beer) => (
+                  <button
+                    key={beer.name}
+                    onClick={() => setSelectedSauce(beer.name)}
+                    className={`p-3 rounded-lg border-2 transition-all text-left ${
+                      selectedSauce === beer.name
+                        ? 'border-orange-500 bg-orange-50'
+                        : 'border-gray-200 hover:border-orange-300'
+                    }`}
+                  >
+                    <span className="font-medium">{beer.name}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Wunsch Pizza Ingredients */}
+          {item.isWunschPizza && (
+            <div className="mb-6">
+              <h4 className="font-semibold text-gray-900 mb-3">
+                Zutaten wählen * (genau 4 Zutaten oder "ohne Zutat")
+              </h4>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-60 overflow-y-auto">
+                {wunschPizzaIngredients.map((ingredient) => (
+                  <button
+                    key={ingredient.name}
+                    onClick={() => handleIngredientToggle(ingredient.name)}
+                    disabled={ingredient.disabled}
+                    className={`p-2 rounded-lg border-2 transition-all text-sm ${
+                      selectedIngredients.includes(ingredient.name)
+                        ? 'border-orange-500 bg-orange-50'
+                        : ingredient.disabled
+                        ? 'border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed'
+                        : 'border-gray-200 hover:border-orange-300'
+                    }`}
+                  >
+                    {ingredient.name}
+                  </button>
+                ))}
+              </div>
+              <p className="text-sm text-gray-600 mt-2">
+                Ausgewählt: {selectedIngredients.length} / {selectedIngredients.includes('ohne Zutat') ? '0' : '4'}
+              </p>
+            </div>
+          )}
+
+          {/* Pizza Extras */}
+          {item.isPizza && !item.isWunschPizza && (
+            <div className="mb-6">
+              <h4 className="font-semibold text-gray-900 mb-3">
+                Extras hinzufügen (je +1,50€)
+              </h4>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-60 overflow-y-auto">
+                {pizzaExtras.map((extra) => (
+                  <button
+                    key={extra.name}
+                    onClick={() => handleExtraToggle(extra.name)}
+                    className={`p-2 rounded-lg border-2 transition-all text-sm ${
+                      selectedExtras.includes(extra.name)
+                        ? 'border-orange-500 bg-orange-50'
+                        : 'border-gray-200 hover:border-orange-300'
+                    }`}
+                  >
+                    {extra.name}
+                  </button>
+                ))}
+              </div>
+              {selectedExtras.length > 0 && (
+                <p className="text-sm text-gray-600 mt-2">
+                  Extras: +{(selectedExtras.length * 1.50).toFixed(2).replace('.', ',')} €
+                </p>
+              )}
+            </div>
+          )}
+
+          {/* Add to Order Button */}
+          <div className="flex items-center justify-between pt-4 border-t">
+            <div className="text-xl font-bold text-orange-600">
+              {getCurrentPrice().toFixed(2).replace('.', ',')} €
+            </div>
+            <button
+              onClick={handleAddToOrder}
+              disabled={!isFormValid()}
+              className={`flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all ${
+                isFormValid()
+                  ? 'bg-orange-500 text-white hover:bg-orange-600'
+                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+              }`}
+            >
+              <ShoppingCart className="w-5 h-5" />
+              In den Warenkorb
+            </button>
+          </div>
         </div>
-        <div className="text-center py-8 text-gray-500">
-          Keine Artikel verfügbar
+      </div>
+    </div>
+  );
+});
+
+const MenuSection: React.FC<MenuSectionProps> = ({ title, description, subTitle, items, bgColor = 'bg-orange-500', onAddToOrder }) => {
+  const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
+
+  const handleItemClick = useCallback((item: MenuItem) => {
+    // Items that need configuration
+    const needsConfiguration = item.sizes || 
+                              item.isWunschPizza || 
+                              item.isPizza || 
+                              item.isPasta ||
+                              item.isBeerSelection ||
+                              (item.isSpezialitaet && ![81, 82].includes(item.id)) || // Exclude Gyros Hollandaise and Gyros Topf
+                              (item.id >= 568 && item.id <= 573 && item.isSpezialitaet); // Salads
+
+    if (needsConfiguration) {
+      setSelectedItem(item);
+    } else {
+      onAddToOrder(item);
+    }
+  }, [onAddToOrder]);
+
+  const closeModal = useCallback(() => {
+    setSelectedItem(null);
+  }, []);
+
+  if (!items || items.length === 0) {
+    return (
+      <section className="mb-8">
+        <div className="text-center py-8">
+          <p className="text-gray-500">Keine Artikel in dieser Kategorie verfügbar.</p>
         </div>
       </section>
     );
   }
 
   return (
-    <section
-      ref={ref}
-      className="mb-4"
-    >
-      {/* Category header - Desktop compact, mobile same text size */}
-      <div className="mb-3">
-        <h2 className="text-xl md:text-xl font-bold text-gray-900 mb-1">
-          {title}
-        </h2>
-        {subTitle && (
-          <h3 className="text-sm md:text-xs text-gray-600 mb-1 font-medium">
-            {subTitle}
-          </h3>
-        )}
+    <section className="mb-8">
+      <div className={`${bgColor} text-white p-4 sm:p-6 rounded-t-xl`}>
+        <div className="flex items-center gap-3 mb-2">
+          <ChefHat className="w-6 h-6 sm:w-8 sm:h-8" />
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-bold">{title}</h2>
+        </div>
         {description && (
-          <p className="text-sm md:text-xs text-gray-600 leading-relaxed">
-            {description}
-          </p>
+          <p className="text-sm sm:text-base opacity-90 leading-relaxed">{description}</p>
+        )}
+        {subTitle && (
+          <p className="text-sm sm:text-base opacity-80 mt-2 italic">{subTitle}</p>
         )}
       </div>
 
-      {/* Size Required Popup */}
-      {showSizeRequiredPopup && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full">
-            <div className="p-6 text-center">
-              <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-orange-100 mb-4">
-                <AlertCircle className="h-6 w-6 text-orange-600" />
-              </div>
-              
-              <h3 className="text-lg font-bold text-gray-900 mb-2">
-                Größe auswählen
-              </h3>
-              
-              <p className="text-sm text-gray-600 mb-6">
-                Bitte wählen Sie zuerst eine Größe für dieses Produkt aus, bevor Sie es zum Warenkorb hinzufügen.
-              </p>
-              
-              <div className="flex gap-3 justify-center">
-                <button
-                  onClick={closeSizeRequiredPopup}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
-                >
-                  Abbrechen
-                </button>
-                <button
-                  onClick={() => handleSizeRequiredAndOpenSizePopup(showSizeRequiredPopup)}
-                  className="px-4 py-2 text-sm font-medium text-white bg-orange-500 hover:bg-orange-600 rounded-lg transition-colors"
-                >
-                  Größe wählen
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Pasta Type Required Popup */}
-      {showPastaTypeRequiredPopup && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full">
-            <div className="p-6 text-center">
-              <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-orange-100 mb-4">
-                <AlertCircle className="h-6 w-6 text-orange-600" />
-              </div>
-              
-              <h3 className="text-lg font-bold text-gray-900 mb-2">
-                Nudelsorte auswählen
-              </h3>
-              
-              <p className="text-sm text-gray-600 mb-6">
-                Bitte wählen Sie zuerst eine Nudelsorte für dieses Gericht aus, bevor Sie es zum Warenkorb hinzufügen.
-              </p>
-              
-              <div className="flex gap-3 justify-center">
-                <button
-                  onClick={closePastaTypeRequiredPopup}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
-                >
-                  Abbrechen
-                </button>
-                <button
-                  onClick={() => handlePastaTypeRequiredAndOpenPastaTypePopup(showPastaTypeRequiredPopup)}
-                  className="px-4 py-2 text-sm font-medium text-white bg-orange-500 hover:bg-orange-600 rounded-lg transition-colors"
-                >
-                  Nudelsorte wählen
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Sauce Required Popup */}
-      {showSauceRequiredPopup && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full">
-            <div className="p-6 text-center">
-              <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-orange-100 mb-4">
-                <AlertCircle className="h-6 w-6 text-orange-600" />
-              </div>
-              
-              <h3 className="text-lg font-bold text-gray-900 mb-2">
-                {items.find(item => item.id === showSauceRequiredPopup)?.isBeerSelection ? 'Biersorte auswählen' : 'Soße auswählen'}
-              </h3>
-              
-              <p className="text-sm text-gray-600 mb-6">
-                {items.find(item => item.id === showSauceRequiredPopup)?.isBeerSelection 
-                  ? 'Bitte wählen Sie zuerst eine Biersorte für dieses Getränk aus, bevor Sie es zum Warenkorb hinzufügen.'
-                  : 'Bitte wählen Sie zuerst eine Soße für dieses Gericht aus, bevor Sie es zum Warenkorb hinzufügen.'
-                }
-              </p>
-              
-              <div className="flex gap-3 justify-center">
-                <button
-                  onClick={closeSauceRequiredPopup}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
-                >
-                  Abbrechen
-                </button>
-                <button
-                  onClick={() => handleSauceRequiredAndOpenSaucePopup(showSauceRequiredPopup)}
-                  className="px-4 py-2 text-sm font-medium text-white bg-orange-500 hover:bg-orange-600 rounded-lg transition-colors"
-                >
-                  {items.find(item => item.id === showSauceRequiredPopup)?.isBeerSelection ? 'Biersorte wählen' : 'Soße wählen'}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Size Selection Popup */}
-      {showSizePopup && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full max-h-[80vh] overflow-y-auto">
-            <div className="sticky top-0 bg-white border-b border-gray-200 p-4 rounded-t-xl">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-bold text-gray-900">Größe wählen</h3>
-                <button
-                  onClick={closeSizePopup}
-                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-                >
-                  <X className="w-5 h-5 text-gray-500" />
-                </button>
-              </div>
-              <p className="text-sm text-gray-600 mt-1">
-                Wählen Sie Ihre gewünschte Pizza-Größe
-              </p>
-            </div>
-            
-            <div className="p-4 space-y-3">
-              {items.find(item => item.id === showSizePopup)?.sizes?.map((size) => {
-                const isSelected = selectedSizes[showSizePopup]?.name === size.name;
-                
-                return (
-                  <label
-                    key={size.name}
-                    className={`flex items-center justify-between p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 ${
-                      isSelected
-                        ? 'border-blue-500 bg-blue-50'
-                        : 'border-gray-200 hover:border-blue-300 hover:bg-blue-50'
-                    }`}
-                  >
-                    <div className="flex items-center">
-                      <input
-                        type="radio"
-                        name={`size-${showSizePopup}`}
-                        checked={isSelected}
-                        onChange={() => handleSizeSelect(showSizePopup, size)}
-                        className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500 focus:ring-2"
-                      />
-                      <div className="ml-3">
-                        <div className="font-bold text-gray-900 text-lg">
-                          {size.name}
-                        </div>
-                        {size.description && (
-                          <div className="text-sm text-gray-600">
-                            {size.description}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                    <div className="font-bold text-blue-600 text-lg">
-                      {size.price.toFixed(2).replace('.', ',')}€
-                    </div>
-                  </label>
-                );
-              })}
-            </div>
-            
-            <div className="sticky bottom-0 bg-white border-t border-gray-200 p-4 rounded-b-xl">
-              <div className="flex items-center justify-between mb-3">
-                <span className="font-medium text-gray-900">
-                  Gewählte Größe:
-                </span>
-                <span className="font-bold text-blue-600">
-                  {selectedSizes[showSizePopup]?.name || 'Keine ausgewählt'}
-                </span>
-              </div>
-              <button
-                onClick={closeSizePopup}
-                className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg transition-colors"
-              >
-                Größe bestätigen
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Pasta Type Selection Popup */}
-      {showPastaTypePopup && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full max-h-[80vh] overflow-y-auto">
-            <div className="sticky top-0 bg-white border-b border-gray-200 p-4 rounded-t-xl">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-bold text-gray-900">Nudelsorte wählen</h3>
-                <button
-                  onClick={closePastaTypePopup}
-                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-                >
-                  <X className="w-5 h-5 text-gray-500" />
-                </button>
-              </div>
-              <p className="text-sm text-gray-600 mt-1">
-                Wählen Sie Ihre gewünschte Nudelsorte
-              </p>
-            </div>
-            
-            <div className="p-4 space-y-3">
-              {pastaTypes.map((pastaType) => {
-                const isSelected = selectedPastaTypes[showPastaTypePopup] === pastaType.name;
-                
-                return (
-                  <label
-                    key={pastaType.name}
-                    className={`flex items-center justify-between p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 ${
-                      isSelected
-                        ? 'border-blue-500 bg-blue-50'
-                        : 'border-gray-200 hover:border-blue-300 hover:bg-blue-50'
-                    }`}
-                  >
-                    <div className="flex items-center">
-                      <input
-                        type="radio"
-                        name={`pasta-type-${showPastaTypePopup}`}
-                        checked={isSelected}
-                        onChange={() => handlePastaTypeSelect(showPastaTypePopup, pastaType.name)}
-                        className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500 focus:ring-2"
-                      />
-                      <div className="ml-3">
-                        <div className="font-bold text-gray-900 text-lg">
-                          {pastaType.name}
-                        </div>
-                      </div>
-                    </div>
-                  </label>
-                );
-              })}
-            </div>
-            
-            <div className="sticky bottom-0 bg-white border-t border-gray-200 p-4 rounded-b-xl">
-              <div className="flex items-center justify-between mb-3">
-                <span className="font-medium text-gray-900">
-                  Gewählte Nudelsorte:
-                </span>
-                <span className="font-bold text-blue-600">
-                  {selectedPastaTypes[showPastaTypePopup] || 'Keine ausgewählt'}
-                </span>
-              </div>
-              <button
-                onClick={closePastaTypePopup}
-                className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg transition-colors"
-              >
-                Nudelsorte bestätigen
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Sauce Selection Popup */}
-      {showSaucePopup && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full max-h-[80vh] overflow-y-auto">
-            <div className="sticky top-0 bg-white border-b border-gray-200 p-4 rounded-t-xl">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-bold text-gray-900">Soße wählen</h3>
-                <button
-                  onClick={closeSaucePopup}
-                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-                >
-                  <X className="w-5 h-5 text-gray-500" />
-                </button>
-              </div>
-              <p className="text-sm text-gray-600 mt-1">
-                Wählen Sie Ihre gewünschte Soße
-              </p>
-            </div>
-            
-            <div className="p-4 space-y-3">
-              {(title === 'Salate' ? saladSauceTypes : title === 'Getränke' ? beerTypes : sauceTypes).map((sauce) => {
-                const isSelected = selectedSauces[showSaucePopup] === sauce.name;
-                
-                return (
-                  <label
-                    key={sauce.name}
-                    className={`flex items-center justify-between p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 ${
-                      isSelected
-                        ? 'border-red-500 bg-red-50'
-                        : 'border-gray-200 hover:border-red-300 hover:bg-red-50'
-                    }`}
-                  >
-                    <div className="flex items-center">
-                      <input
-                        type="radio"
-                        name={`sauce-${showSaucePopup}`}
-                        checked={isSelected}
-                        onChange={() => handleSauceSelect(showSaucePopup, sauce.name)}
-                        className="w-4 h-4 text-red-600 border-gray-300 focus:ring-red-500 focus:ring-2"
-                      />
-                      <div className="ml-3">
-                        <div className="font-bold text-gray-900 text-lg">
-                          {sauce.name}
-                        </div>
-                      </div>
-                    </div>
-                  </label>
-                );
-              })}
-            </div>
-            
-            <div className="sticky bottom-0 bg-white border-t border-gray-200 p-4 rounded-b-xl">
-              <div className="flex items-center justify-between mb-3">
-                <span className="font-medium text-gray-900">
-                  Gewählte Soße:
-                </span>
-                <span className="font-bold text-red-600">
-                  {selectedSauces[showSaucePopup] || 'Keine ausgewählt'}
-                </span>
-              </div>
-              <button
-                onClick={closeSaucePopup}
-                className="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-4 rounded-lg transition-colors"
-              >
-                {title === 'Getränke' ? 'Biersorte bestätigen' : 'Soße bestätigen'}
-              </button>
-              
-              {/* Add to cart button for beer selection */}
-              {title === 'Getränke' && showSaucePopup && selectedSauces[showSaucePopup] && (
-                <button
-                  onClick={() => {
-                    const item = items.find(item => item.id === showSaucePopup);
-                    if (item) {
-                      handleAddToOrder(item);
-                      closeSaucePopup();
-                    }
-                  }}
-                  className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg transition-colors mt-2"
-                >
-                  In den Warenkorb
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Wunsch Pizza Ingredients Popup */}
-      {showIngredientsPopup && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full max-h-[80vh] overflow-y-auto">
-            <div className="sticky top-0 bg-white border-b border-gray-200 p-4 rounded-t-xl">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-bold text-gray-900">Wunsch Pizza Zutaten</h3>
-                <button
-                  onClick={closeIngredientsPopup}
-                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-                >
-                  <X className="w-5 h-5 text-gray-500" />
-                </button>
-              </div>
-              <p className="text-sm text-gray-600 mt-1">
-                Wählen Sie 4 Zutaten für Ihre Wunsch Pizza ({(selectedIngredients[showIngredientsPopup] || []).length}/4)
-              </p>
-            </div>
-            
-            <div className="p-4 space-y-3">
-              {wunschPizzaIngredients.map((ingredient) => {
-                const itemIngredients = selectedIngredients[showIngredientsPopup] || [];
-                const isSelected = itemIngredients.includes(ingredient.name);
-                const isDisabled = ingredient.disabled || (!isSelected && itemIngredients.length >= 4);
-                
-                return (
-                  <label
-                    key={ingredient.name}
-                    className={`flex items-center p-3 rounded-lg border-2 transition-all duration-200 ${
-                      isSelected
-                        ? 'border-blue-500 bg-blue-50 cursor-pointer'
-                        : isDisabled
-                        ? 'border-gray-200 bg-gray-100 cursor-not-allowed'
-                        : 'border-gray-200 hover:border-blue-300 hover:bg-blue-50 cursor-pointer'
-                    }`}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={isSelected}
-                      disabled={isDisabled}
-                      onChange={() => !isDisabled && handleIngredientToggle(showIngredientsPopup, ingredient.name)}
-                      className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 focus:ring-2 disabled:opacity-50"
-                    />
-                    <div className="ml-3 flex-1">
-                      <div className={`font-medium ${isDisabled ? 'text-gray-400' : 'text-gray-900'}`}>
-                        {ingredient.name}
-                      </div>
-                      {ingredient.disabled && (
-                        <div className="text-xs text-gray-400 mt-0.5">
-                          (nicht verfügbar)
-                        </div>
-                      )}
-                    </div>
-                  </label>
-                );
-              })}
-            </div>
-            
-            <div className="sticky bottom-0 bg-white border-t border-gray-200 p-4 rounded-b-xl">
-              <div className="flex items-center justify-between mb-3">
-                <span className="font-medium text-gray-900">
-                  Gewählte Zutaten: {(selectedIngredients[showIngredientsPopup] || []).length}/4
-                </span>
-                <span className="font-bold text-blue-600">
-                  {(selectedIngredients[showIngredientsPopup] || []).length === 4 ? '✓ Vollständig' : 'Noch auswählen'}
-                </span>
-              </div>
-              <button
-                onClick={closeIngredientsPopup}
-                className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg transition-colors"
-              >
-                Zutaten bestätigen
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Wunsch Pizza Ingredients Popup */}
-      {showIngredientsPopup && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full max-h-[80vh] overflow-y-auto">
-            <div className="sticky top-0 bg-white border-b border-gray-200 p-4 rounded-t-xl">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-bold text-gray-900">Wunsch Pizza Zutaten</h3>
-                <button
-                  onClick={closeIngredientsPopup}
-                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-                >
-                  <X className="w-5 h-5 text-gray-500" />
-                </button>
-              </div>
-              <p className="text-sm text-gray-600 mt-1">
-                Wählen Sie 4 Zutaten für Ihre Wunsch Pizza ({(selectedIngredients[showIngredientsPopup] || []).length}/4)
-              </p>
-            </div>
-            
-            <div className="p-4 space-y-3">
-              {wunschPizzaIngredients.map((ingredient) => {
-                const itemIngredients = selectedIngredients[showIngredientsPopup] || [];
-                const isSelected = itemIngredients.includes(ingredient.name);
-                const isDisabled = ingredient.disabled || (!isSelected && itemIngredients.length >= 4);
-                
-                return (
-                  <label
-                    key={ingredient.name}
-                    className={`flex items-center p-3 rounded-lg border-2 transition-all duration-200 ${
-                      isSelected
-                        ? 'border-blue-500 bg-blue-50 cursor-pointer'
-                        : isDisabled
-                        ? 'border-gray-200 bg-gray-100 cursor-not-allowed'
-                        : 'border-gray-200 hover:border-blue-300 hover:bg-blue-50 cursor-pointer'
-                    }`}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={isSelected}
-                      disabled={isDisabled}
-                      onChange={() => !isDisabled && handleIngredientToggle(showIngredientsPopup, ingredient.name)}
-                      className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 focus:ring-2 disabled:opacity-50"
-                    />
-                    <div className="ml-3 flex-1">
-                      <div className={`font-medium ${isDisabled ? 'text-gray-400' : 'text-gray-900'}`}>
-                        {ingredient.name}
-                      </div>
-                      {ingredient.disabled && (
-                        <div className="text-xs text-gray-400 mt-0.5">
-                          (nicht verfügbar)
-                        </div>
-                      )}
-                    </div>
-                  </label>
-                );
-              })}
-            </div>
-            
-            <div className="sticky bottom-0 bg-white border-t border-gray-200 p-4 rounded-b-xl">
-              <div className="flex items-center justify-between mb-3">
-                <span className="font-medium text-gray-900">
-                  Gewählte Zutaten: {(selectedIngredients[showIngredientsPopup] || []).length}/4
-                </span>
-                <span className="font-bold text-blue-600">
-                  {(selectedIngredients[showIngredientsPopup] || []).length === 4 ? '✓ Vollständig' : 'Noch auswählen'}
-                </span>
-              </div>
-              <button
-                onClick={closeIngredientsPopup}
-                className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg transition-colors"
-              >
-                Zutaten bestätigen
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Pizza Extras Popup */}
-      {showExtrasPopup && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full max-h-[80vh] overflow-y-auto">
-            <div className="sticky top-0 bg-white border-b border-gray-200 p-4 rounded-t-xl">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-bold text-gray-900">Pizza Extras wählen</h3>
-                <button
-                  onClick={closeExtrasPopup}
-                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-                >
-                  <X className="w-5 h-5 text-gray-500" />
-                </button>
-              </div>
-              <p className="text-sm text-gray-600 mt-1">
-                Wählen Sie beliebige Extras für Ihre Pizza (je +1,50€)
-              </p>
-            </div>
-            
-            <div className="p-4 space-y-3">
-              {pizzaExtras.map((extra) => {
-                const itemExtras = selectedExtras[showExtrasPopup] || [];
-                const isSelected = itemExtras.includes(extra.name);
-                
-                return (
-                  <label
-                    key={extra.name}
-                    className={`flex items-center p-3 rounded-lg border-2 cursor-pointer transition-all duration-200 ${
-                      isSelected
-                        ? 'border-green-500 bg-green-50'
-                        : 'border-gray-200 hover:border-green-300 hover:bg-green-50'
-                    }`}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={isSelected}
-                      onChange={() => handleExtraToggle(showExtrasPopup, extra.name)}
-                      className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500 focus:ring-2"
-                    />
-                    <div className="ml-3 flex-1">
-                      <div className="font-medium text-gray-900">{extra.name}</div>
-                      <div className="text-sm text-gray-600">
-                        +{extra.price.toFixed(2).replace('.', ',')}€
-                      </div>
-                    </div>
-                  </label>
-                );
-              })}
-            </div>
-            
-            <div className="sticky bottom-0 bg-white border-t border-gray-200 p-4 rounded-b-xl">
-              <div className="flex items-center justify-between mb-3">
-                <span className="font-medium text-gray-900">
-                  Gewählte Extras: {(selectedExtras[showExtrasPopup] || []).length}
-                </span>
-                <span className="font-bold text-green-600">
-                  +{((selectedExtras[showExtrasPopup] || []).length * 1.50).toFixed(2).replace('.', ',')}€
-                </span>
-              </div>
-              <button
-                onClick={closeExtrasPopup}
-                className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg transition-colors"
-              >
-                Extras bestätigen
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Menu items container - Always show items, animation is optional */}
-      <div className="space-y-2 md:space-y-2">
-        {items.map((item, index) => {
-          const hasSizes = item.sizes && item.sizes.length > 0;
-          const selectedSize = selectedSizes[item.id];
-          const displayPrice = getDisplayPrice(item);
-          const itemIngredients = selectedIngredients[item.id] || [];
-          const itemExtras = selectedExtras[item.id] || [];
-          const selectedPastaType = selectedPastaTypes[item.id];
-          const selectedSauce = selectedSauces[item.id];
-          const isWunschPizza = item.isWunschPizza;
-          const isPizza = item.isPizza || item.isWunschPizza;
-          const isPasta = item.isPasta;
-          const isSpezialitaet = item.isSpezialitaet;
-          const canAdd = canAddToCart(item);
-          const buttonTooltip = getAddButtonTooltip(item);
-          const isBeerSelection = item.isBeerSelection;
-
-          return (
+      <div className="bg-white rounded-b-xl shadow-lg overflow-hidden">
+        <div className="divide-y divide-gray-100">
+          {items.map((item, index) => (
             <div
-              key={item.id}
-              className={`bg-white rounded-lg border border-gray-200 hover:border-orange-200 hover:shadow-md transition-all duration-300 cursor-pointer overflow-hidden group transform ${
-                inView ? 'opacity-100 translate-x-0' : 'opacity-100 translate-x-0'
-              }`}
-              style={{
-                animationDelay: inView ? `${index * 50}ms` : '0ms',
-                transitionDelay: inView ? `${index * 50}ms` : '0ms'
-              }}
+              key={`${item.id}-${index}`}
+              className="p-4 sm:p-6 hover:bg-gray-50 transition-colors group cursor-pointer"
+              onClick={() => handleItemClick(item)}
             >
-              {/* Mobile smaller padding, desktop same */}
-              <div className="p-2.5 md:p-3 flex items-start justify-between gap-2.5 md:gap-3 relative">
-                {/* Subtle background gradient on hover */}
-                <div className="absolute inset-0 bg-gradient-to-r from-orange-50/0 to-orange-50/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                
-                {/* Left side - Item info - Mobile smaller gaps */}
-                <div className="flex-1 min-w-0 relative z-10">
-                  <div className="flex items-start gap-2.5 md:gap-3 mb-1.5 md:mb-2">
-                    {/* Mobile smaller number badge */}
-                    <div className="w-8 h-8 md:w-9 md:h-9 bg-gradient-to-br from-orange-500 to-orange-600 rounded-md md:rounded-lg flex items-center justify-center flex-shrink-0 shadow-md group-hover:shadow-lg transition-all duration-300 group-hover:scale-105">
-                      <span className="text-white font-bold text-sm tracking-tight">
-                        {item.number}
-                      </span>
-                    </div>
-                    
-                    <div className="flex-1 pt-0.5">
-                      {/* Mobile same text size, desktop smaller */}
-                      <h3 className="font-bold text-gray-900 text-base md:text-base leading-tight mb-1 group-hover:text-orange-700 transition-colors duration-300">
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-start gap-3 mb-2">
+                    <span className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center text-sm sm:text-base font-bold">
+                      {item.number}
+                    </span>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-gray-900 text-base sm:text-lg leading-tight group-hover:text-orange-600 transition-colors">
                         {item.name}
                       </h3>
-                      
-                      {/* Mobile same allergen badge size */}
-                      {item.allergens && (
-                        <span className="inline-flex items-center text-xs font-medium text-orange-700 bg-orange-100 border border-orange-200 px-2 py-0.5 rounded-full mb-1.5 md:mb-2 group-hover:bg-orange-200 transition-colors duration-300">
-                          <span className="w-1 h-1 bg-orange-500 rounded-full mr-1.5"></span>
-                          {item.allergens}
-                        </span>
-                      )}
-                      
-                      {/* Mobile same description text size */}
                       {item.description && (
-                        <p className="text-sm md:text-xs text-gray-600 leading-relaxed group-hover:text-gray-700 transition-colors duration-300 max-w-lg">
+                        <p className="text-gray-600 text-sm sm:text-base mt-1 leading-relaxed">
                           {item.description}
                         </p>
                       )}
-
-                      {/* Show selected pasta type */}
-                      {isPasta && selectedPastaType && (
-                        <div className="mt-2 p-2 bg-blue-50 rounded-md border border-blue-200">
-                          <div className="text-xs font-medium text-blue-700 mb-1">
-                            Gewählte Nudelsorte:
-                          </div>
-                          <div className="flex flex-wrap gap-1">
-                            <span className="inline-flex items-center text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">
-                              {selectedPastaType}
-                              <button
-                                type="button"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setSelectedPastaTypes(prev => ({
-                                    ...prev,
-                                    [item.id]: ''
-                                  }));
-                                }}
-                                className="ml-1 text-blue-500 hover:text-blue-700"
-                              >
-                                <X className="w-3 h-3" />
-                              </button>
-                            </span>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Show selected sauce for Spezialitäten */}
-                      {(isSpezialitaet || isBeerSelection) && selectedSauce && (
-                        <div className="mt-2 p-2 bg-red-50 rounded-md border border-red-200">
-                          <div className="text-xs font-medium text-red-700 mb-1">
-                            {isBeerSelection ? 'Gewählte Biersorte:' : 'Gewählte Soße:'}
-                          </div>
-                          <div className="flex flex-wrap gap-1">
-                            <span className="inline-flex items-center text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-full">
-                              {selectedSauce}
-                              <button
-                                type="button"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setSelectedSauces(prev => ({
-                                    ...prev,
-                                    [item.id]: ''
-                                  }));
-                                }}
-                                className="ml-1 text-red-500 hover:text-red-700"
-                              >
-                                <X className="w-3 h-3" />
-                              </button>
-                            </span>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Show selected ingredients for Wunsch Pizza */}
-                      {isWunschPizza && itemIngredients.length > 0 && (
-                        <div className="mt-2 p-2 bg-blue-50 rounded-md border border-blue-200">
-                          <div className="text-xs font-medium text-blue-700 mb-1">
-                            Gewählte Zutaten ({itemIngredients.length}/4):
-                          </div>
-                          <div className="flex flex-wrap gap-1">
-                            {itemIngredients.map((ingredient, idx) => (
-                              <span
-                                key={idx}
-                                className="inline-flex items-center text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full"
-                              >
-                                {ingredient}
-                                <button
-                                  type="button"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleIngredientToggle(item.id, ingredient);
-                                  }}
-                                  className="ml-1 text-blue-500 hover:text-blue-700"
-                                >
-                                  <X className="w-3 h-3" />
-                                </button>
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Show selected extras for all pizzas */}
-                      {isPizza && itemExtras.length > 0 && (
-                        <div className="mt-2 p-2 bg-green-50 rounded-md border border-green-200">
-                          <div className="text-xs font-medium text-green-700 mb-1">
-                            Gewählte Extras (+{itemExtras.length * 1.50}€):
-                          </div>
-                          <div className="flex flex-wrap gap-1">
-                            {itemExtras.map((extra, idx) => (
-                              <span
-                                key={idx}
-                                className="inline-flex items-center text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full"
-                              >
-                                {extra} (+1.50€)
-                                <button
-                                  type="button"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleExtraToggle(item.id, extra);
-                                  }}
-                                  className="ml-1 text-green-500 hover:text-green-700"
-                                >
-                                  <X className="w-3 h-3" />
-                                </button>
-                              </span>
-                            ))}
-                          </div>
-                        </div>
+                      {item.allergens && (
+                        <p className="text-xs text-gray-500 mt-2">
+                          <span className="font-medium">Allergene:</span> {item.allergens}
+                        </p>
                       )}
                     </div>
                   </div>
                 </div>
 
-                {/* Right side - Price and controls - Mobile smaller gaps */}
-                <div className="flex flex-col items-center gap-1.5 md:gap-2 flex-shrink-0 relative z-10">
-                  {/* Wunsch Pizza: All 3 buttons on same line, centered */}
-                  {isWunschPizza ? (
-                    <div className="flex items-center justify-center gap-1 md:gap-1.5">
-                      {/* Size selector button */}
-                      {hasSizes && (
-                        <button
-                          type="button"
-                          onClick={() => openSizePopup(item.id)}
-                          className="flex items-center gap-1 px-1.5 md:px-2 py-1 md:py-1.5 bg-blue-50 hover:bg-blue-100 border border-blue-200 hover:border-blue-300 rounded-md transition-all duration-300 text-xs font-medium text-blue-700"
-                        >
-                          <span>Größe</span>
-                          {selectedSize && (
-                            <span className="bg-blue-200 text-blue-800 text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold">
-                              ✓
-                            </span>
-                          )}
-                        </button>
-                      )}
-
-                      {/* Ingredients selector button */}
-                      <button
-                        type="button"
-                        onClick={() => openIngredientsPopup(item.id)}
-                        className="flex items-center gap-1 px-1.5 md:px-2 py-1 md:py-1.5 bg-green-50 hover:bg-green-100 border border-green-200 hover:border-green-300 rounded-md transition-all duration-300 text-xs font-medium text-green-700"
-                      >
-                        <span>Zutaten</span>
-                        {itemIngredients.length > 0 && (
-                          <span className="bg-green-200 text-green-800 text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold">
-                            {itemIngredients.length}
-                          </span>
-                        )}
-                      </button>
-
-                      {/* Extras selector button */}
-                      <button
-                        type="button"
-                        onClick={() => openExtrasPopup(item.id)}
-                        className="flex items-center gap-1 px-1.5 md:px-2 py-1 md:py-1.5 bg-purple-50 hover:bg-purple-100 border border-purple-200 hover:border-purple-300 rounded-md transition-all duration-300 text-xs font-medium text-purple-700"
-                      >
-                        <span>Extras</span>
-                        {itemExtras.length > 0 && (
-                          <span className="bg-purple-200 text-purple-800 text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold">
-                            {itemExtras.length}
-                          </span>
-                        )}
-                      </button>
-                    </div>
-                  ) : (
-                    /* Regular item button order */
-                    <div className="flex items-center gap-1 md:gap-1.5">
-                      {/* Size selector button */}
-                      {hasSizes && (
-                        <button
-                          type="button"
-                          onClick={() => openSizePopup(item.id)}
-                          className="flex items-center gap-1 md:gap-1.5 px-1.5 md:px-2 py-1 md:py-1.5 bg-blue-50 hover:bg-blue-100 border border-blue-200 hover:border-blue-300 rounded-md transition-all duration-300 text-xs font-medium text-blue-700"
-                        >
-                          <span>Größe</span>
-                          {selectedSize && (
-                            <span className="bg-blue-200 text-blue-800 text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold">
-                              ✓
-                            </span>
-                          )}
-                        </button>
-                      )}
-
-                      {/* Pasta type selector button for pasta items */}
-                      {isPasta && (
-                        <button
-                          type="button"
-                          onClick={() => openPastaTypePopup(item.id)}
-                          className="flex items-center gap-1 md:gap-1.5 px-1.5 md:px-2 py-1 md:py-1.5 bg-yellow-50 hover:bg-yellow-100 border border-yellow-200 hover:border-yellow-300 rounded-md transition-all duration-300 text-xs font-medium text-yellow-700"
-                        >
-                          <span>Nudeln</span>
-                          {selectedPastaType &&  (
-                            <span className="bg-yellow-200 text-yellow-800 text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold">
-                              ✓
-                            </span>
-                          )}
-                        </button>
-                      )}
-
-                      {/* Sauce selector button for Spezialitäten */}
-                      {(isSpezialitaet || isBeerSelection) && (
-                        <button
-                          type="button"
-                          onClick={() => openSaucePopup(item.id)}
-                          className="flex items-center gap-1 md:gap-1.5 px-1.5 md:px-2 py-1 md:py-1.5 bg-red-50 hover:bg-red-100 border border-red-200 hover:border-red-300 rounded-md transition-all duration-300 text-xs font-medium text-red-700"
-                        >
-                          <span>{isBeerSelection ? 'Bier' : 'Soße'}</span>
-                          {selectedSauce && (
-                            <span className="bg-red-200 text-red-800 text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold">
-                              ✓
-                            </span>
-                          )}
-                        </button>
-                      )}
-
-                      {/* Pizza extras selector button for regular pizzas */}
-                      {isPizza && (
-                        <button
-                          type="button"
-                          onClick={() => openExtrasPopup(item.id)}
-                          className="flex items-center gap-1 md:gap-1.5 px-1.5 md:px-2 py-1 md:py-1.5 bg-purple-50 hover:bg-purple-100 border border-purple-200 hover:border-purple-300 rounded-md transition-all duration-300 text-xs font-medium text-purple-700"
-                        >
-                          <span>Extras</span>
-                          {itemExtras.length > 0 && (
-                            <span className="bg-purple-200 text-purple-800 text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold">
-                              {itemExtras.length}
-                            </span>
-                          )}
-                        </button>
-                      )}
-                    </div>
-                  )}
-
-                  {/* Mobile smaller price display box */}
+                <div className="flex flex-col items-end gap-2 flex-shrink-0">
                   <div className="text-right">
-                    <div className="bg-gray-50 rounded-md px-2.5 md:px-3 py-1 md:py-1.5 group-hover:bg-orange-50 transition-colors duration-300 border border-gray-200 group-hover:border-orange-200">
-                      <span className="font-bold text-gray-900 text-base group-hover:text-orange-700 transition-colors duration-300">
-                        {displayPrice.toFixed(2).replace('.', ',')} €
-                      </span>
-                      {selectedSize && (
-                        <div className="text-xs text-gray-600 mt-0.5">
-                          {selectedSize.name} {selectedSize.description && `(${selectedSize.description})`}
+                    {item.sizes && item.sizes.length > 0 ? (
+                      <div className="space-y-1">
+                        <div className="text-sm text-gray-600">ab</div>
+                        <div className="text-lg sm:text-xl font-bold text-orange-600">
+                          {Math.min(...item.sizes.map(s => s.price)).toFixed(2).replace('.', ',')} €
                         </div>
-                      )}
-                      {selectedPastaType && (
-                        <div className="text-xs text-yellow-600 mt-0.5">
-                          {selectedPastaType}
-                        </div>
-                      )}
-                      {selectedSauce && (
-                        <div className="text-xs text-red-600 mt-0.5">
-                          {selectedSauce}
-                        </div>
-                      )}
-                      {itemExtras.length > 0 && (
-                        <div className="text-xs text-green-600 mt-0.5">
-                          +{itemExtras.length} Extra{itemExtras.length > 1 ? 's' : ''}
-                        </div>
-                      )}
-                    </div>
+                      </div>
+                    ) : (
+                      <div className="text-lg sm:text-xl font-bold text-orange-600">
+                        {item.price.toFixed(2).replace('.', ',')} €
+                      </div>
+                    )}
                   </div>
-                  
-                  {/* Mobile smaller add button */}
+
                   <button
-                    type="button"
-                    onClick={() => handleAddToOrder(item)}
-                    className={`w-8 h-8 md:w-9 md:h-9 rounded-md md:rounded-lg text-white transition-all duration-300 flex items-center justify-center shadow-md hover:shadow-lg transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 group-hover:rotate-3 bg-gradient-to-br from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700`}
-                    title={buttonTooltip}
+                    className="flex items-center gap-2 bg-orange-500 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-orange-600 transition-all transform hover:scale-105 text-sm sm:text-base font-medium shadow-md hover:shadow-lg"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleItemClick(item);
+                    }}
                   >
                     <Plus className="w-4 h-4" />
+                    <span className="hidden sm:inline">Hinzufügen</span>
+                    <span className="sm:hidden">+</span>
                   </button>
                 </div>
               </div>
-              
-              {/* Thinner bottom accent line */}
-              <div className="h-0.5 bg-gradient-to-r from-transparent via-orange-200 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+
+              {/* Configuration indicators */}
+              <div className="flex flex-wrap gap-2 mt-3">
+                {item.sizes && (
+                  <span className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
+                    <Star className="w-3 h-3" />
+                    Größen verfügbar
+                  </span>
+                )}
+                {item.isWunschPizza && (
+                  <span className="inline-flex items-center gap-1 px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded-full">
+                    <ChefHat className="w-3 h-3" />
+                    4 Zutaten wählbar
+                  </span>
+                )}
+                {item.isPizza && !item.isWunschPizza && (
+                  <span className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
+                    <Plus className="w-3 h-3" />
+                    Extras verfügbar
+                  </span>
+                )}
+                {item.isPasta && (
+                  <span className="inline-flex items-center gap-1 px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">
+                    <Clock className="w-3 h-3" />
+                    Nudelsorte wählbar
+                  </span>
+                )}
+                {item.isSpezialitaet && ![81, 82].includes(item.id) && (
+                  <span className="inline-flex items-center gap-1 px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full">
+                    <ChefHat className="w-3 h-3" />
+                    Soße wählbar
+                  </span>
+                )}
+                {item.id >= 568 && item.id <= 573 && item.isSpezialitaet && (
+                  <span className="inline-flex items-center gap-1 px-2 py-1 bg-indigo-100 text-indigo-800 text-xs rounded-full">
+                    <ChefHat className="w-3 h-3" />
+                    Dressing wählbar
+                  </span>
+                )}
+                {item.isBeerSelection && (
+                  <span className="inline-flex items-center gap-1 px-2 py-1 bg-amber-100 text-amber-800 text-xs rounded-full">
+                    <ChefHat className="w-3 h-3" />
+                    Bier wählbar
+                  </span>
+                )}
+              </div>
             </div>
-          );
-        })}
+          ))}
+        </div>
       </div>
+
+      {selectedItem && (
+        <ItemModal
+          item={selectedItem}
+          isOpen={!!selectedItem}
+          onClose={closeModal}
+          onAddToOrder={onAddToOrder}
+        />
+      )}
     </section>
   );
 };
