@@ -306,7 +306,7 @@ const ItemModal: React.FC<ItemModalProps> = memo(({ item, isOpen, onClose, onAdd
           )}
 
           {/* Pizza Extras */}
-          {item.isPizza && !item.isWunschPizza && (
+          {(item.isPizza || item.isWunschPizza) && (
             <div className="mb-6">
               <h4 className="font-semibold text-gray-900 mb-3">
                 Extras hinzufügen (je +1,50€)
@@ -483,7 +483,13 @@ const MenuSection: React.FC<MenuSectionProps> = ({ title, description, subTitle,
                     4 Zutaten wählbar
                   </span>
                 )}
-                {item.isPizza && !item.isWunschPizza && (
+                {(item.isPizza && !item.isWunschPizza) && (
+                  <span className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
+                    <Plus className="w-3 h-3" />
+                    Extras verfügbar
+                  </span>
+                )}
+                {item.isWunschPizza && (
                   <span className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
                     <Plus className="w-3 h-3" />
                     Extras verfügbar
