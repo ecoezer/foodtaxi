@@ -472,7 +472,7 @@ function App() {
 
         <main className='container mx-auto px-2 sm:px-3 md:px-4 lg:px-6 py-4 sm:py-6 max-w-7xl'>
           <div className='grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 lg:gap-8'>
-            <div className='lg:col-span-8 xl:col-span-9 space-y-4'>
+            <div className='lg:col-span-7 xl:col-span-8 space-y-4'>
               {renderMenuSection(
                 MENU_SECTIONS.DOENER,
                 'Spezialitäten', 
@@ -551,7 +551,7 @@ function App() {
             <div
               id='cart'
               data-cart-section="true"
-              className='lg:col-span-4 xl:col-span-3 lg:sticky lg:top-[7.5rem] lg:max-h-[calc(100vh-8rem)] w-full max-w-full lg:max-w-none overflow-y-auto overflow-x-hidden flex flex-col justify-start items-center scroll-mt-32 border-2 border-transparent rounded-lg'
+              className='lg:col-span-5 xl:col-span-4 lg:sticky lg:top-[7.5rem] lg:max-h-[calc(100vh-8rem)] w-full max-w-full lg:max-w-none overflow-y-auto overflow-x-hidden flex flex-col justify-start items-center scroll-mt-32 border-2 border-transparent rounded-lg'
             >
               <OrderForm
                 orderItems={items}
