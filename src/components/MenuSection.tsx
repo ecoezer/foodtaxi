@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { MenuItem, PizzaSize } from '../types';
 import { useInView } from 'react-intersection-observer';
 import { Plus, X, AlertCircle } from 'lucide-react';
-import { wunschPizzaIngredients, pizzaExtras, pastaTypes, sauceTypes, saladSauceTypes } from '../data/menuItems';
+import { wunschPizzaIngredients, pizzaExtras, pastaTypes, sauceTypes, saladSauceTypes, beerTypes } from '../data/menuItems';
 
 interface MenuSectionProps {
   title: string;
@@ -120,6 +120,7 @@ const MenuSection: React.FC<MenuSectionProps> = ({
     const isWunschPizza = item.isWunschPizza;
     const isPasta = item.isPasta;
     const isSpezialitaet = item.isSpezialitaet;
+    const isBeerSelection = item.isBeerSelection;
 
     // Check if size is required but not selected
     if (hasSizes && !selectedSize) {
@@ -135,6 +136,12 @@ const MenuSection: React.FC<MenuSectionProps> = ({
 
     // Check if sauce is required but not selected for Spezialitäten
     if (isSpezialitaet && !selectedSauce) {
+      setShowSauceRequiredPopup(item.id);
+      return;
+    }
+
+    // Check if beer type is required but not selected for beer selection
+    if (isBeerSelection && !selectedSauce) {
       setShowSauceRequiredPopup(item.id);
       return;
     }
@@ -178,6 +185,7 @@ const MenuSection: React.FC<MenuSectionProps> = ({
     const selectedPastaType = selectedPastaTypes[item.id];
     const isSpezialitaet = item.isSpezialitaet;
     const selectedSauce = selectedSauces[item.id];
+    const isBeerSelection = item.isBeerSelection;
 
     // For items with sizes (pizzas), size must be selected
     if (hasSizes && !selectedSize) {
@@ -191,6 +199,11 @@ const MenuSection: React.FC<MenuSectionProps> = ({
 
     // For Spezialitäten, sauce must be selected
     if (isSpezialitaet && !selectedSauce) {
+      return false;
+    }
+
+    // For beer selection, sauce (beer type) must be selected
+    if (isBeerSelection && !selectedSauce) {
       return false;
     }
 
@@ -211,6 +224,7 @@ const MenuSection: React.FC<MenuSectionProps> = ({
     const selectedPastaType = selectedPastaTypes[item.id];
     const isSpezialitaet = item.isSpezialitaet;
     const selectedSauce = selectedSauces[item.id];
+    const isBeerSelection = item.isBeerSelection;
 
     if (hasSizes && !selectedSize) {
       return 'Bitte wählen Sie eine Größe';
@@ -222,6 +236,10 @@ const MenuSection: React.FC<MenuSectionProps> = ({
 
     if (isSpezialitaet && !selectedSauce) {
       return 'Bitte wählen Sie eine Soße';
+    }
+
+    if (isBeerSelection && !selectedSauce) {
+      return 'Bitte wählen Sie eine Biersorte';
     }
 
     if (isWunschPizza && itemIngredients.length === 0) {
@@ -625,7 +643,7 @@ const MenuSection: React.FC<MenuSectionProps> = ({
             </div>
             
             <div className="p-4 space-y-3">
-              {(title === 'Salate' ? saladSauceTypes : sauceTypes).map((sauce) => {
+              {(title === 'Salate' ? saladSauceTypes : title === 'Getränke' ? beerTypes : sauceTypes).map((sauce) => {
                 const isSelected = selectedSauces[showSaucePopup] === sauce.name;
                 
                 return (
@@ -916,10 +934,10 @@ const MenuSection: React.FC<MenuSectionProps> = ({
                       )}
 
                       {/* Show selected sauce for Spezialitäten */}
-                      {isSpezialitaet && selectedSauce && (
+                      {(isSpezialitaet || isBeerSelection) && selectedSauce && (
                         <div className="mt-2 p-2 bg-red-50 rounded-md border border-red-200">
                           <div className="text-xs font-medium text-red-700 mb-1">
-                            Gewählte Soße:
+                            {isBeerSelection ? 'Gewählte Biersorte:' : 'Gewählte Soße:'}
                           </div>
                           <div className="flex flex-wrap gap-1">
                             <span className="inline-flex items-center text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-full">
@@ -1088,13 +1106,13 @@ const MenuSection: React.FC<MenuSectionProps> = ({
                       )}
 
                       {/* Sauce selector button for Spezialitäten */}
-                      {isSpezialitaet && (
+                      {(isSpezialitaet || isBeerSelection) && (
                         <button
                           type="button"
                           onClick={() => openSaucePopup(item.id)}
                           className="flex items-center gap-1 md:gap-1.5 px-1.5 md:px-2 py-1 md:py-1.5 bg-red-50 hover:bg-red-100 border border-red-200 hover:border-red-300 rounded-md transition-all duration-300 text-xs font-medium text-red-700"
                         >
-                          <span>Soße</span>
+                          <span>{isBeerSelection ? 'Bier' : 'Soße'}</span>
                           {selectedSauce && (
                             <span className="bg-red-200 text-red-800 text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold">
                               ✓

@@ -29,6 +29,12 @@ export const saladSauceTypes: SauceType[] = [
   { name: 'Knoblauch-Dressing' }
 ];
 
+// Beer types for beer selection
+export const beerTypes: SauceType[] = [
+  { name: 'Becks' },
+  { name: 'Herrenhäuser' }
+];
+
 // Wunsch Pizza ingredients - Updated with new items and removed "Ei", Rindersalami now available
 export const wunschPizzaIngredients: WunschPizzaIngredient[] = [
   { name: 'Ananas' },
@@ -598,6 +604,7 @@ export const drinks: MenuItem[] = [
     name: "Becks oder Herrenhäuser",
     description: "0,3 L",
     price: 2.40
+    isBeerSelection: true
   },
   {
     id: 563,

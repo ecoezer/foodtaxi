@@ -10,6 +10,7 @@ export interface MenuItem {
   isPizza?: boolean;
   isPasta?: boolean;
   isSpezialitaet?: boolean;
+  isBeerSelection?: boolean;
 }
 
 export interface PizzaSize {
