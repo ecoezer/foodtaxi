@@ -1,5 +1,5 @@
 import React, { useState, useCallback, memo } from 'react';
-import { Plus, Minus, ShoppingCart, ChefHat, Clock, Star } from 'lucide-react';
+import { Plus, Minus, ShoppingCart, ChefHat, Clock, Star, ArrowRight, Check } from 'lucide-react';
 import { MenuItem, PizzaSize } from '../types';
 import { 
   wunschPizzaIngredients, 
@@ -40,7 +40,10 @@ interface ItemModalProps {
   ) => void;
 }
 
+type ConfigurationStep = 'size' | 'pasta' | 'sauce' | 'ingredients' | 'extras' | 'summary';
+
 const ItemModal: React.FC<ItemModalProps> = memo(({ item, isOpen, onClose, onAddToOrder }) => {
+  const [currentStep, setCurrentStep] = useState<ConfigurationStep>('size');
   const [selectedSize, setSelectedSize] = useState<PizzaSize | undefined>(
     item.sizes ? item.sizes[0] : undefined
   );
@@ -55,7 +58,26 @@ const ItemModal: React.FC<ItemModalProps> = memo(({ item, isOpen, onClose, onAdd
     setSelectedExtras([]);
     setSelectedPastaType('');
     setSelectedSauce('');
-  }, [item.sizes]);
+    
+    // Determine initial step based on item type
+    if (item.sizes && item.sizes.length > 0) {
+      setCurrentStep('size');
+    } else if (item.isPasta) {
+      setCurrentStep('pasta');
+    } else if (item.isSpezialitaet && ![81, 82].includes(item.id)) {
+      setCurrentStep('sauce');
+    } else if (item.id >= 568 && item.id <= 573 && item.isSpezialitaet) {
+      setCurrentStep('sauce');
+    } else if (item.isBeerSelection) {
+      setCurrentStep('sauce');
+    } else if (item.isWunschPizza) {
+      setCurrentStep('ingredients');
+    } else if (item.isPizza) {
+      setCurrentStep('extras');
+    } else {
+      setCurrentStep('summary');
+    }
+  }, [item]);
 
   React.useEffect(() => {
     if (isOpen) {
@@ -95,48 +117,379 @@ const ItemModal: React.FC<ItemModalProps> = memo(({ item, isOpen, onClose, onAdd
     return price;
   }, [selectedSize, selectedExtras, item.price]);
 
-  const isFormValid = useCallback(() => {
-    // Check if sauce selection is required and not selected
-    const needsSauceSelection = item.isSpezialitaet && 
-      ![81, 82].includes(item.id); // Exclude Gyros Hollandaise (81) and Gyros Topf (82)
+  const getNextStep = useCallback((): ConfigurationStep | null => {
+    switch (currentStep) {
+      case 'size':
+        if (item.isPasta) return 'pasta';
+        if (item.isSpezialitaet && ![81, 82].includes(item.id)) return 'sauce';
+        if (item.id >= 568 && item.id <= 573 && item.isSpezialitaet) return 'sauce';
+        if (item.isBeerSelection) return 'sauce';
+        if (item.isWunschPizza) return 'ingredients';
+        if (item.isPizza) return 'extras';
+        return 'summary';
+      case 'pasta':
+        if (item.isSpezialitaet && ![81, 82].includes(item.id)) return 'sauce';
+        if (item.isWunschPizza) return 'ingredients';
+        if (item.isPizza) return 'extras';
+        return 'summary';
+      case 'sauce':
+        if (item.isWunschPizza) return 'ingredients';
+        if (item.isPizza) return 'extras';
+        return 'summary';
+      case 'ingredients':
+        if (item.isPizza || item.isWunschPizza) return 'extras';
+        return 'summary';
+      case 'extras':
+        return 'summary';
+      default:
+        return null;
+    }
+  }, [currentStep, item]);
+
+  const canProceedToNext = useCallback(() => {
+    switch (currentStep) {
+      case 'size':
+        return !item.sizes || selectedSize !== undefined;
+      case 'pasta':
+        return !item.isPasta || selectedPastaType !== '';
+      case 'sauce':
+        const needsSauceSelection = (item.isSpezialitaet && ![81, 82].includes(item.id)) || 
+                                   (item.id >= 568 && item.id <= 573 && item.isSpezialitaet) ||
+                                   item.isBeerSelection;
+        return !needsSauceSelection || selectedSauce !== '';
+      case 'ingredients':
+        if (!item.isWunschPizza) return true;
+        const validIngredients = selectedIngredients.filter(ing => ing !== 'ohne Zutat');
+        if (selectedIngredients.includes('ohne Zutat')) {
+          return validIngredients.length === 0;
+        }
+        return validIngredients.length === 4;
+      case 'extras':
+        return true; // Extras are optional
+      default:
+        return true;
+    }
+  }, [currentStep, item, selectedSize, selectedPastaType, selectedSauce, selectedIngredients]);
+
+  const handleNext = useCallback(() => {
+    if (!canProceedToNext()) return;
     
-    if (needsSauceSelection && !selectedSauce) {
-      return false;
+    const nextStep = getNextStep();
+    if (nextStep) {
+      setCurrentStep(nextStep);
     }
+  }, [canProceedToNext, getNextStep]);
 
-    // Check if salad dressing selection is required
-    const needsDressingSelection = item.id >= 568 && item.id <= 573 && item.isSpezialitaet;
-    if (needsDressingSelection && !selectedSauce) {
-      return false;
+  const handleBack = useCallback(() => {
+    switch (currentStep) {
+      case 'pasta':
+        if (item.sizes && item.sizes.length > 0) {
+          setCurrentStep('size');
+        }
+        break;
+      case 'sauce':
+        if (item.isPasta) {
+          setCurrentStep('pasta');
+        } else if (item.sizes && item.sizes.length > 0) {
+          setCurrentStep('size');
+        }
+        break;
+      case 'ingredients':
+        if (item.isSpezialitaet && ![81, 82].includes(item.id)) {
+          setCurrentStep('sauce');
+        } else if (item.id >= 568 && item.id <= 573 && item.isSpezialitaet) {
+          setCurrentStep('sauce');
+        } else if (item.isBeerSelection) {
+          setCurrentStep('sauce');
+        } else if (item.isPasta) {
+          setCurrentStep('pasta');
+        } else if (item.sizes && item.sizes.length > 0) {
+          setCurrentStep('size');
+        }
+        break;
+      case 'extras':
+        if (item.isWunschPizza) {
+          setCurrentStep('ingredients');
+        } else if (item.isSpezialitaet && ![81, 82].includes(item.id)) {
+          setCurrentStep('sauce');
+        } else if (item.id >= 568 && item.id <= 573 && item.isSpezialitaet) {
+          setCurrentStep('sauce');
+        } else if (item.isBeerSelection) {
+          setCurrentStep('sauce');
+        } else if (item.isPasta) {
+          setCurrentStep('pasta');
+        } else if (item.sizes && item.sizes.length > 0) {
+          setCurrentStep('size');
+        }
+        break;
+      case 'summary':
+        if (item.isPizza || item.isWunschPizza) {
+          setCurrentStep('extras');
+        } else if (item.isWunschPizza) {
+          setCurrentStep('ingredients');
+        } else if (item.isSpezialitaet && ![81, 82].includes(item.id)) {
+          setCurrentStep('sauce');
+        } else if (item.id >= 568 && item.id <= 573 && item.isSpezialitaet) {
+          setCurrentStep('sauce');
+        } else if (item.isBeerSelection) {
+          setCurrentStep('sauce');
+        } else if (item.isPasta) {
+          setCurrentStep('pasta');
+        } else if (item.sizes && item.sizes.length > 0) {
+          setCurrentStep('size');
+        }
+        break;
     }
+  }, [currentStep, item]);
 
-    // Check if beer selection is required
-    if (item.isBeerSelection && !selectedSauce) {
-      return false;
+  const renderStepIndicator = () => {
+    const steps: { key: ConfigurationStep; label: string; required: boolean }[] = [];
+    
+    if (item.sizes && item.sizes.length > 0) {
+      steps.push({ key: 'size', label: 'Größe', required: true });
     }
-
-    // Check if pasta type selection is required
-    if (item.isPasta && !selectedPastaType) {
-      return false;
+    if (item.isPasta) {
+      steps.push({ key: 'pasta', label: 'Nudelsorte', required: true });
     }
-
-    // Check if Wunsch Pizza has exactly 4 ingredients
+    if (item.isSpezialitaet && ![81, 82].includes(item.id)) {
+      steps.push({ key: 'sauce', label: 'Soße', required: true });
+    }
+    if (item.id >= 568 && item.id <= 573 && item.isSpezialitaet) {
+      steps.push({ key: 'sauce', label: 'Dressing', required: true });
+    }
+    if (item.isBeerSelection) {
+      steps.push({ key: 'sauce', label: 'Bier', required: true });
+    }
     if (item.isWunschPizza) {
-      const validIngredients = selectedIngredients.filter(ing => ing !== 'ohne Zutat');
-      if (selectedIngredients.includes('ohne Zutat')) {
-        return validIngredients.length === 0;
-      }
-      return validIngredients.length === 4;
+      steps.push({ key: 'ingredients', label: '4 Zutaten', required: true });
     }
+    if (item.isPizza || item.isWunschPizza) {
+      steps.push({ key: 'extras', label: 'Extras', required: false });
+    }
+    steps.push({ key: 'summary', label: 'Bestätigung', required: false });
 
-    return true;
-  }, [item, selectedSauce, selectedPastaType, selectedIngredients]);
+    const currentIndex = steps.findIndex(step => step.key === currentStep);
+
+    return (
+      <div className="flex items-center justify-center mb-6 overflow-x-auto">
+        <div className="flex items-center gap-2 min-w-max px-4">
+          {steps.map((step, index) => (
+            <React.Fragment key={step.key}>
+              <div className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                index === currentIndex 
+                  ? 'bg-orange-500 text-white' 
+                  : index < currentIndex
+                  ? 'bg-green-500 text-white'
+                  : 'bg-gray-200 text-gray-600'
+              }`}>
+                {index < currentIndex && <Check className="w-4 h-4" />}
+                <span>{step.label}</span>
+                {step.required && <span className="text-red-300">*</span>}
+              </div>
+              {index < steps.length - 1 && (
+                <ArrowRight className="w-4 h-4 text-gray-400 flex-shrink-0" />
+              )}
+            </React.Fragment>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
+  const renderCurrentStep = () => {
+    switch (currentStep) {
+      case 'size':
+        return (
+          <div className="space-y-4">
+            <h4 className="font-semibold text-gray-900 text-lg text-center">
+              {item.isPizza ? 'Größe wählen *' : 'Größe wählen *'}
+            </h4>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {item.sizes?.map((size) => (
+                <button
+                  key={size.name}
+                  onClick={() => setSelectedSize(size)}
+                  className={`p-4 rounded-lg border-2 transition-all ${
+                    selectedSize?.name === size.name
+                      ? 'border-orange-500 bg-orange-50'
+                      : 'border-gray-200 hover:border-orange-300'
+                  }`}
+                >
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <span className="font-medium text-lg">{size.name}</span>
+                      {size.description && (
+                        <span className="text-sm text-gray-600 block">{size.description}</span>
+                      )}
+                    </div>
+                    <span className="font-bold text-orange-600 text-lg">
+                      {size.price.toFixed(2).replace('.', ',')} €
+                    </span>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        );
+
+      case 'pasta':
+        return (
+          <div className="space-y-4">
+            <h4 className="font-semibold text-gray-900 text-lg text-center">Nudelsorte wählen *</h4>
+            <div className="grid grid-cols-2 gap-3">
+              {pastaTypes.map((pastaType) => (
+                <button
+                  key={pastaType.name}
+                  onClick={() => setSelectedPastaType(pastaType.name)}
+                  className={`p-4 rounded-lg border-2 transition-all ${
+                    selectedPastaType === pastaType.name
+                      ? 'border-orange-500 bg-orange-50'
+                      : 'border-gray-200 hover:border-orange-300'
+                  }`}
+                >
+                  <span className="font-medium text-lg">{pastaType.name}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        );
+
+      case 'sauce':
+        const sauceTitle = item.isBeerSelection ? 'Bier wählen *' : 
+                          (item.id >= 568 && item.id <= 573 && item.isSpezialitaet) ? 'Dressing wählen *' : 
+                          'Soße wählen *';
+        const sauceOptions = item.isBeerSelection ? beerTypes :
+                           (item.id >= 568 && item.id <= 573 && item.isSpezialitaet) ? saladSauceTypes :
+                           sauceTypes;
+        
+        return (
+          <div className="space-y-4">
+            <h4 className="font-semibold text-gray-900 text-lg text-center">{sauceTitle}</h4>
+            <div className="grid grid-cols-1 gap-3">
+              {sauceOptions.map((sauce) => (
+                <button
+                  key={sauce.name}
+                  onClick={() => setSelectedSauce(sauce.name)}
+                  className={`p-4 rounded-lg border-2 transition-all text-left ${
+                    selectedSauce === sauce.name
+                      ? 'border-orange-500 bg-orange-50'
+                      : 'border-gray-200 hover:border-orange-300'
+                  }`}
+                >
+                  <span className="font-medium text-lg">{sauce.name}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        );
+
+      case 'ingredients':
+        return (
+          <div className="space-y-4">
+            <h4 className="font-semibold text-gray-900 text-lg text-center">
+              Zutaten wählen * (genau 4 Zutaten oder "ohne Zutat")
+            </h4>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-80 overflow-y-auto">
+              {wunschPizzaIngredients.map((ingredient) => (
+                <button
+                  key={ingredient.name}
+                  onClick={() => handleIngredientToggle(ingredient.name)}
+                  disabled={ingredient.disabled}
+                  className={`p-3 rounded-lg border-2 transition-all text-sm ${
+                    selectedIngredients.includes(ingredient.name)
+                      ? 'border-orange-500 bg-orange-50'
+                      : ingredient.disabled
+                      ? 'border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed'
+                      : 'border-gray-200 hover:border-orange-300'
+                  }`}
+                >
+                  {ingredient.name}
+                </button>
+              ))}
+            </div>
+            <p className="text-sm text-gray-600 text-center">
+              Ausgewählt: {selectedIngredients.length} / {selectedIngredients.includes('ohne Zutat') ? '0' : '4'}
+            </p>
+          </div>
+        );
+
+      case 'extras':
+        return (
+          <div className="space-y-4">
+            <h4 className="font-semibold text-gray-900 text-lg text-center">
+              Extras hinzufügen (je +1,50€)
+            </h4>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-80 overflow-y-auto">
+              {pizzaExtras.map((extra) => (
+                <button
+                  key={extra.name}
+                  onClick={() => handleExtraToggle(extra.name)}
+                  className={`p-3 rounded-lg border-2 transition-all text-sm ${
+                    selectedExtras.includes(extra.name)
+                      ? 'border-orange-500 bg-orange-50'
+                      : 'border-gray-200 hover:border-orange-300'
+                  }`}
+                >
+                  {extra.name}
+                </button>
+              ))}
+            </div>
+            {selectedExtras.length > 0 && (
+              <p className="text-sm text-gray-600 text-center">
+                Extras: +{(selectedExtras.length * 1.50).toFixed(2).replace('.', ',')} €
+              </p>
+            )}
+          </div>
+        );
+
+      case 'summary':
+        return (
+          <div className="space-y-4">
+            <h4 className="font-semibold text-gray-900 text-lg text-center">Bestellung bestätigen</h4>
+            <div className="bg-gray-50 rounded-lg p-4 space-y-3">
+              <div className="font-medium text-gray-900">{item.name}</div>
+              {selectedSize && (
+                <div className="text-sm text-blue-600">
+                  Größe: {selectedSize.name} {selectedSize.description && `- ${selectedSize.description}`}
+                </div>
+              )}
+              {selectedPastaType && (
+                <div className="text-sm text-yellow-600">
+                  Nudelsorte: {selectedPastaType}
+                </div>
+              )}
+              {selectedSauce && (
+                <div className="text-sm text-red-600">
+                  {item.isBeerSelection ? 'Bier' : (item.id >= 568 && item.id <= 573 && item.isSpezialitaet) ? 'Dressing' : 'Soße'}: {selectedSauce}
+                </div>
+              )}
+              {selectedIngredients.length > 0 && (
+                <div className="text-sm text-green-600">
+                  Zutaten: {selectedIngredients.join(', ')}
+                </div>
+              )}
+              {selectedExtras.length > 0 && (
+                <div className="text-sm text-purple-600">
+                  Extras: {selectedExtras.join(', ')} (+{(selectedExtras.length * 1.50).toFixed(2).replace('.', ',')}€)
+                </div>
+              )}
+              <div className="text-xl font-bold text-orange-600 pt-2 border-t">
+                Preis: {getCurrentPrice().toFixed(2).replace('.', ',')} €
+              </div>
+            </div>
+          </div>
+        );
+
+      default:
+        return null;
+    }
+  };
 
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+      <div className="bg-white rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
         <div className="p-6">
           <div className="flex justify-between items-start mb-4">
             <div>
@@ -153,204 +506,51 @@ const ItemModal: React.FC<ItemModalProps> = memo(({ item, isOpen, onClose, onAdd
             </button>
           </div>
 
-          {/* Size Selection for Pizzas and Drinks */}
-          {item.sizes && item.sizes.length > 0 && (
-            <div className="mb-6">
-              <h4 className="font-semibold text-gray-900 mb-3">
-                {item.isPizza ? 'Größe wählen *' : 'Größe wählen *'}
-              </h4>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {item.sizes.map((size) => (
-                  <button
-                    key={size.name}
-                    onClick={() => setSelectedSize(size)}
-                    className={`p-3 rounded-lg border-2 transition-all ${
-                      selectedSize?.name === size.name
-                        ? 'border-orange-500 bg-orange-50'
-                        : 'border-gray-200 hover:border-orange-300'
-                    }`}
-                  >
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <span className="font-medium">{size.name}</span>
-                        {size.description && (
-                          <span className="text-sm text-gray-600 block">{size.description}</span>
-                        )}
-                      </div>
-                      <span className="font-bold text-orange-600">
-                        {size.price.toFixed(2).replace('.', ',')} €
-                      </span>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
+          {renderStepIndicator()}
 
-          {/* Pasta Type Selection */}
-          {item.isPasta && (
-            <div className="mb-6">
-              <h4 className="font-semibold text-gray-900 mb-3">Nudelsorte wählen *</h4>
-              <div className="grid grid-cols-2 gap-3">
-                {pastaTypes.map((pastaType) => (
-                  <button
-                    key={pastaType.name}
-                    onClick={() => setSelectedPastaType(pastaType.name)}
-                    className={`p-3 rounded-lg border-2 transition-all ${
-                      selectedPastaType === pastaType.name
-                        ? 'border-orange-500 bg-orange-50'
-                        : 'border-gray-200 hover:border-orange-300'
-                    }`}
-                  >
-                    <span className="font-medium">{pastaType.name}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
+          <div className="min-h-[400px] flex flex-col justify-center">
+            {renderCurrentStep()}
+          </div>
 
-          {/* Sauce Selection for Spezialitäten (excluding Gyros Hollandaise and Gyros Topf) */}
-          {item.isSpezialitaet && ![81, 82].includes(item.id) && (
-            <div className="mb-6">
-              <h4 className="font-semibold text-gray-900 mb-3">Soße wählen *</h4>
-              <div className="grid grid-cols-1 gap-3">
-                {sauceTypes.map((sauce) => (
-                  <button
-                    key={sauce.name}
-                    onClick={() => setSelectedSauce(sauce.name)}
-                    className={`p-3 rounded-lg border-2 transition-all text-left ${
-                      selectedSauce === sauce.name
-                        ? 'border-orange-500 bg-orange-50'
-                        : 'border-gray-200 hover:border-orange-300'
-                    }`}
-                  >
-                    <span className="font-medium">{sauce.name}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
+          <div className="flex items-center justify-between pt-6 border-t mt-6">
+            <button
+              onClick={handleBack}
+              disabled={currentStep === (item.sizes?.length ? 'size' : item.isPasta ? 'pasta' : item.isSpezialitaet && ![81, 82].includes(item.id) ? 'sauce' : item.id >= 568 && item.id <= 573 && item.isSpezialitaet ? 'sauce' : item.isBeerSelection ? 'sauce' : item.isWunschPizza ? 'ingredients' : item.isPizza ? 'extras' : 'summary')}
+              className={`px-6 py-3 rounded-lg font-semibold transition-all ${
+                currentStep === (item.sizes?.length ? 'size' : item.isPasta ? 'pasta' : item.isSpezialitaet && ![81, 82].includes(item.id) ? 'sauce' : item.id >= 568 && item.id <= 573 && item.isSpezialitaet ? 'sauce' : item.isBeerSelection ? 'sauce' : item.isWunschPizza ? 'ingredients' : item.isPizza ? 'extras' : 'summary')
+                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  : 'bg-gray-500 text-white hover:bg-gray-600'
+              }`}
+            >
+              Zurück
+            </button>
 
-          {/* Dressing Selection for Salads */}
-          {item.id >= 568 && item.id <= 573 && item.isSpezialitaet && (
-            <div className="mb-6">
-              <h4 className="font-semibold text-gray-900 mb-3">Dressing wählen *</h4>
-              <div className="grid grid-cols-1 gap-3">
-                {saladSauceTypes.map((sauce) => (
-                  <button
-                    key={sauce.name}
-                    onClick={() => setSelectedSauce(sauce.name)}
-                    className={`p-3 rounded-lg border-2 transition-all text-left ${
-                      selectedSauce === sauce.name
-                        ? 'border-orange-500 bg-orange-50'
-                        : 'border-gray-200 hover:border-orange-300'
-                    }`}
-                  >
-                    <span className="font-medium">{sauce.name}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Beer Selection */}
-          {item.isBeerSelection && (
-            <div className="mb-6">
-              <h4 className="font-semibold text-gray-900 mb-3">Bier wählen *</h4>
-              <div className="grid grid-cols-1 gap-3">
-                {beerTypes.map((beer) => (
-                  <button
-                    key={beer.name}
-                    onClick={() => setSelectedSauce(beer.name)}
-                    className={`p-3 rounded-lg border-2 transition-all text-left ${
-                      selectedSauce === beer.name
-                        ? 'border-orange-500 bg-orange-50'
-                        : 'border-gray-200 hover:border-orange-300'
-                    }`}
-                  >
-                    <span className="font-medium">{beer.name}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Wunsch Pizza Ingredients */}
-          {item.isWunschPizza && (
-            <div className="mb-6">
-              <h4 className="font-semibold text-gray-900 mb-3">
-                Zutaten wählen * (genau 4 Zutaten oder "ohne Zutat")
-              </h4>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-60 overflow-y-auto">
-                {wunschPizzaIngredients.map((ingredient) => (
-                  <button
-                    key={ingredient.name}
-                    onClick={() => handleIngredientToggle(ingredient.name)}
-                    disabled={ingredient.disabled}
-                    className={`p-2 rounded-lg border-2 transition-all text-sm ${
-                      selectedIngredients.includes(ingredient.name)
-                        ? 'border-orange-500 bg-orange-50'
-                        : ingredient.disabled
-                        ? 'border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed'
-                        : 'border-gray-200 hover:border-orange-300'
-                    }`}
-                  >
-                    {ingredient.name}
-                  </button>
-                ))}
-              </div>
-              <p className="text-sm text-gray-600 mt-2">
-                Ausgewählt: {selectedIngredients.length} / {selectedIngredients.includes('ohne Zutat') ? '0' : '4'}
-              </p>
-            </div>
-          )}
-
-          {/* Pizza Extras */}
-          {(item.isPizza || item.isWunschPizza) && (
-            <div className="mb-6">
-              <h4 className="font-semibold text-gray-900 mb-3">
-                Extras hinzufügen (je +1,50€)
-              </h4>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-60 overflow-y-auto">
-                {pizzaExtras.map((extra) => (
-                  <button
-                    key={extra.name}
-                    onClick={() => handleExtraToggle(extra.name)}
-                    className={`p-2 rounded-lg border-2 transition-all text-sm ${
-                      selectedExtras.includes(extra.name)
-                        ? 'border-orange-500 bg-orange-50'
-                        : 'border-gray-200 hover:border-orange-300'
-                    }`}
-                  >
-                    {extra.name}
-                  </button>
-                ))}
-              </div>
-              {selectedExtras.length > 0 && (
-                <p className="text-sm text-gray-600 mt-2">
-                  Extras: +{(selectedExtras.length * 1.50).toFixed(2).replace('.', ',')} €
-                </p>
-              )}
-            </div>
-          )}
-
-          {/* Add to Order Button */}
-          <div className="flex items-center justify-between pt-4 border-t">
             <div className="text-xl font-bold text-orange-600">
               {getCurrentPrice().toFixed(2).replace('.', ',')} €
             </div>
-            <button
-              onClick={handleAddToOrder}
-              disabled={!isFormValid()}
-              className={`flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all ${
-                isFormValid()
-                  ? 'bg-orange-500 text-white hover:bg-orange-600'
-                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-              }`}
-            >
-              <ShoppingCart className="w-5 h-5" />
-              In den Warenkorb
-            </button>
+
+            {currentStep === 'summary' ? (
+              <button
+                onClick={handleAddToOrder}
+                className="flex items-center gap-2 px-6 py-3 rounded-lg font-semibold bg-orange-500 text-white hover:bg-orange-600 transition-all"
+              >
+                <ShoppingCart className="w-5 h-5" />
+                In den Warenkorb
+              </button>
+            ) : (
+              <button
+                onClick={handleNext}
+                disabled={!canProceedToNext()}
+                className={`flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all ${
+                  canProceedToNext()
+                    ? 'bg-orange-500 text-white hover:bg-orange-600'
+                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                }`}
+              >
+                Weiter
+                <ArrowRight className="w-5 h-5" />
+              </button>
+            )}
           </div>
         </div>
       </div>
