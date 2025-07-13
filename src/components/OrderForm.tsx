@@ -82,7 +82,7 @@ const useTimeSlots = () => {
       return { availableHours: [], getAvailableMinutes: () => [] };
     } else if (isWeekendOrFriday) {
       startHour = 12;
-      endHour = 22; // Last order at 22:00 for 23:00 closing
+      endHour = 21; // Last order at 21:00 for 22:00 closing
     } else if (isRegularDay) {
       startHour = 11;
       endHour = 21; // Last order at 21:00 for 22:00 closing

@@ -77,7 +77,7 @@ const OpeningHoursCard: React.FC<{ data: OpeningHoursData }> = memo(({ data }) =
               Fr, Sa, So & Feiertage
             </span>
             <span className='text-lg font-bold text-gray-900'>
-              12:00–23:00
+              12:00–22:00
             </span>
           </div>
           <div className={`${SHARED_CLASSES.timeSlot} bg-gray-100`}>
