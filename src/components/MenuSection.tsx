@@ -263,7 +263,7 @@ const ItemModal: React.FC<ItemModalProps> = memo(({ item, isOpen, onClose, onAdd
                 <h4 className="font-semibold text-gray-900 text-lg">
                   Extras hinzufügen (je +1,50€)
                 </h4>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-80 overflow-y-auto">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-80 overflow-y-auto ingredients-scroll">
                   {pizzaExtras.map((extra) => (
                     <button
                       key={extra.name}
