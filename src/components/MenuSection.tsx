@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { MenuItem, PizzaSize } from '../types';
 import { useInView } from 'react-intersection-observer';
 import { Plus, X, AlertCircle } from 'lucide-react';
-import { wunschPizzaIngredients, pizzaExtras, pastaTypes, sauceTypes } from '../data/menuItems';
+import { wunschPizzaIngredients, pizzaExtras, pastaTypes, sauceTypes, saladSauceTypes } from '../data/menuItems';
 
 interface MenuSectionProps {
   title: string;
@@ -625,7 +625,7 @@ const MenuSection: React.FC<MenuSectionProps> = ({
             </div>
             
             <div className="p-4 space-y-3">
-              {sauceTypes.map((sauce) => {
+              {(title === 'Salate' ? saladSauceTypes : sauceTypes).map((sauce) => {
                 const isSelected = selectedSauces[showSaucePopup] === sauce.name;
                 
                 return (
