@@ -408,13 +408,18 @@ const MenuSection: React.FC<MenuSectionProps> = ({ title, description, subTitle,
       </div>
 
       <div className="bg-white rounded-b-xl shadow-lg overflow-hidden">
-        <div className="divide-y divide-gray-100">
+        <div className="divide-y divide-gray-200/60">
           {items.map((item, index) => (
             <div
               key={`${item.id}-${index}`}
-              className="p-4 sm:p-6 hover:bg-gray-50 transition-colors group cursor-pointer"
+              className="p-4 sm:p-6 hover:bg-gradient-to-r hover:from-gray-50 hover:to-orange-50/30 transition-all duration-200 group cursor-pointer relative"
               onClick={() => handleItemClick(item)}
             >
+              {/* Subtle shaded background for alternating items */}
+              {index % 2 === 1 && (
+                <div className="absolute inset-0 bg-gray-50/40 pointer-events-none" />
+              )}
+              
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start gap-3 mb-2">
