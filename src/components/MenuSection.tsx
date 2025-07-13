@@ -422,7 +422,7 @@ const MenuSection: React.FC<MenuSectionProps> = ({ title, description, subTitle,
                       {item.number}
                     </span>
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-gray-900 text-base sm:text-lg leading-tight group-hover:text-orange-600 transition-colors">
+                      <h3 className="font-bold text-gray-900 text-base sm:text-lg leading-tight group-hover:text-orange-600 transition-colors">
                         {item.name}
                       </h3>
                       {item.description && (
