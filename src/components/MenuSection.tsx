@@ -690,7 +690,101 @@ const MenuSection: React.FC<MenuSectionProps> = ({
                 onClick={closeSaucePopup}
                 className="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-4 rounded-lg transition-colors"
               >
-                Soße bestätigen
+                {title === 'Getränke' ? 'Biersorte bestätigen' : 'Soße bestätigen'}
+              </button>
+              
+              {/* Add to cart button for beer selection */}
+              {title === 'Getränke' && showSaucePopup && selectedSauces[showSaucePopup] && (
+                <button
+                  onClick={() => {
+                    const item = items.find(item => item.id === showSaucePopup);
+                    if (item) {
+                      handleAddToOrder(item);
+                      closeSaucePopup();
+                    }
+                  }}
+                  className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg transition-colors mt-2"
+                >
+                  In den Warenkorb
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Wunsch Pizza Ingredients Popup */}
+      {showIngredientsPopup && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full max-h-[80vh] overflow-y-auto">
+            <div className="sticky top-0 bg-white border-b border-gray-200 p-4 rounded-t-xl">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-bold text-gray-900">Wunsch Pizza Zutaten</h3>
+                <button
+                  onClick={closeIngredientsPopup}
+                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                >
+                  <X className="w-5 h-5 text-gray-500" />
+                </button>
+              </div>
+              <p className="text-sm text-gray-600 mt-1">
+                Wählen Sie 4 Zutaten für Ihre Wunsch Pizza ({(selectedIngredients[showIngredientsPopup] || []).length}/4)
+              </p>
+            </div>
+            
+            <div className="p-4 space-y-3">
+              {wunschPizzaIngredients.map((ingredient) => {
+                const itemIngredients = selectedIngredients[showIngredientsPopup] || [];
+                const isSelected = itemIngredients.includes(ingredient.name);
+                const isDisabled = ingredient.disabled || (!isSelected && itemIngredients.length >= 4);
+                
+                return (
+                  <label
+                    key={ingredient.name}
+                    className={`flex items-center p-3 rounded-lg border-2 transition-all duration-200 ${
+                      isSelected
+                        ? 'border-blue-500 bg-blue-50 cursor-pointer'
+                        : isDisabled
+                        ? 'border-gray-200 bg-gray-100 cursor-not-allowed'
+                        : 'border-gray-200 hover:border-blue-300 hover:bg-blue-50 cursor-pointer'
+                    }`}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={isSelected}
+                      disabled={isDisabled}
+                      onChange={() => !isDisabled && handleIngredientToggle(showIngredientsPopup, ingredient.name)}
+                      className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 focus:ring-2 disabled:opacity-50"
+                    />
+                    <div className="ml-3 flex-1">
+                      <div className={`font-medium ${isDisabled ? 'text-gray-400' : 'text-gray-900'}`}>
+                        {ingredient.name}
+                      </div>
+                      {ingredient.disabled && (
+                        <div className="text-xs text-gray-400 mt-0.5">
+                          (nicht verfügbar)
+                        </div>
+                      )}
+                    </div>
+                  </label>
+                );
+              })}
+            </div>
+            
+            <div className="sticky bottom-0 bg-white border-t border-gray-200 p-4 rounded-b-xl">
+              <div className="flex items-center justify-between mb-3">
+                <span className="font-medium text-gray-900">
+                  Gewählte Zutaten: {(selectedIngredients[showIngredientsPopup] || []).length}/4
+                </span>
+                <span className="font-bold text-blue-600">
+                  {(selectedIngredients[showIngredientsPopup] || []).length === 4 ? '✓ Vollständig' : 'Noch auswählen'}
+                </span>
+              </div>
+              <button
+                onClick={closeIngredientsPopup}
+                className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg transition-colors"
+              >
+                Zutaten bestätigen
               </button>
             </div>
           </div>
