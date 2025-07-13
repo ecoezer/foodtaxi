@@ -68,7 +68,7 @@ const OpeningHoursCard: React.FC<{ data: OpeningHoursData }> = memo(({ data }) =
             <span className='text-xs text-gray-700 block mb-0.5'>
               Mo, Mi, Do
             </span>
-            <span className='text-base font-bold text-gray-900'>
+            <span className='text-base font-bold text-gray-900' style={{ marginTop: '1px' }}>
               11:00–22:00
             </span>
           </div>
@@ -76,7 +76,7 @@ const OpeningHoursCard: React.FC<{ data: OpeningHoursData }> = memo(({ data }) =
             <span className='text-xs text-gray-700 block mb-0.5'>
               Fr, Sa, So & Feiertage
             </span>
-            <span className='text-base font-bold text-gray-900'>
+            <span className='text-base font-bold text-gray-900' style={{ marginTop: '1px' }}>
               12:00–22:00
             </span>
           </div>
