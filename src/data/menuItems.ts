@@ -21,6 +21,14 @@ export const sauceTypes: SauceType[] = [
   { name: 'ohne Soße' }
 ];
 
+// Sauce types for Salads
+export const saladSauceTypes: SauceType[] = [
+  { name: 'Joghurt' },
+  { name: 'French' },
+  { name: 'Essig/Öl' },
+  { name: 'Knoblauch-Dressing' }
+];
+
 // Wunsch Pizza ingredients - Updated with new items and removed "Ei", Rindersalami now available
 export const wunschPizzaIngredients: WunschPizzaIngredient[] = [
   { name: 'Ananas' },
