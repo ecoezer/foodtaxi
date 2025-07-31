@@ -181,24 +181,6 @@ export const donerDishes: MenuItem[] = [
     allergens: "1,2,3,4/A,C,F"
   },
   {
-    id: 86,
-    number: 86,
-    name: "Döner Box",
-    description: "",
-    price: 6.50,
-    allergens: "1,2,3,4/A,C,F,G",
-    isSpezialitaet: true
-  },
-  {
-    id: 87,
-    number: 87,
-    name: "Dönertasche",
-    description: "",
-    price: 7.00,
-    allergens: "1,2,3,4/A,C,F,G",
-    isSpezialitaet: true
-  },
-  {
     id: 88,
     number: 88,
     name: "Döner Teller",
