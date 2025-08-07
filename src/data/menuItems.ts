@@ -950,15 +950,5 @@ export const pizzas: MenuItem[] = [
     allergens: "1,2,3/A,C",
     isPizza: true,
     sizes: createPizzaSizes({ medium: 9.90, large: 11.90, family: 18.90, mega: 28.90 })
-  },
-  {
-    id: 529,
-    number: 28,
-    name: "Döner",
-    description: "mit Döner und Zwiebeln",
-    price: 9.90,
-    allergens: "1,2,3,4/A,C,G",
-    isPizza: true,
-    sizes: createPizzaSizes({ medium: 9.90, large: 11.90, family: 18.90, mega: 28.90 })
   }
 ];
