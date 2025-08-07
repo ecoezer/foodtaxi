@@ -179,15 +179,6 @@ export const donerDishes: MenuItem[] = [
     description: "mit Curry Sauce und Pommes",
     price: 9.90,
     allergens: "1,2,3,4/A,C,F"
-  },
-  {
-    id: 88,
-    number: 88,
-    name: "Döner Teller",
-    description: "",
-    price: 13.00,
-    allergens: "1,2,3,4/A,C,F,G",
-    isSpezialitaet: true
   }
 ];
 
