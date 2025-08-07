@@ -403,11 +403,6 @@ const MenuSection: React.FC<MenuSectionProps> = ({ title, description, subTitle,
               key={`${item.id}-${index}`}
               className="p-3 sm:p-4 hover:bg-gradient-to-r hover:from-gray-50 hover:to-orange-50/30 transition-all duration-200 group relative"
             >
-              {/* Subtle shaded background for alternating items */}
-              {index % 2 === 1 && (
-                <div className="absolute inset-0 bg-gray-50/40 pointer-events-none" />
-              )}
-              
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start gap-3 mb-2">
