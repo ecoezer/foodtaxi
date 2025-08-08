@@ -620,10 +620,17 @@ const OrderForm: React.FC<OrderFormProps> = ({ orderItems, onRemoveItem, onUpdat
 
       // Send email notification (don't block WhatsApp if this fails)
       try {
-        const emailResponse = await fetch('/api/send-order-email', {
+        // Use environment variables for Supabase function URL
+        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+        const emailApiUrl = supabaseUrl 
+          ? `${supabaseUrl}/functions/v1/send-order-email`
+          : '/api/send-order-email'; // Fallback for local development
+        
+        const emailResponse = await fetch(emailApiUrl, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
           },
           body: JSON.stringify(orderData),
         });

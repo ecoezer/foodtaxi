@@ -63,7 +63,11 @@ RESTAURANT_EMAIL=orders@your-restaurant.com
 
 1. Sign up for [Resend](https://resend.com)
 2. Get your API key from the Resend dashboard
-3. Add your API key to the Supabase Edge Function environment variables
+3. Add your API key to the Supabase Edge Function environment variables:
+   - Go to your Supabase project dashboard
+   - Navigate to Edge Functions → Environment Variables
+   - Add `RESEND_API_KEY` with your Resend API key
+   - Add `RESTAURANT_EMAIL` with your restaurant's email address
 
 ### 5. Development
 
