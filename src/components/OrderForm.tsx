@@ -600,6 +600,43 @@ const OrderForm: React.FC<OrderFormProps> = ({ orderItems, onRemoveItem, onUpdat
     setIsSubmitting(true);
     
     try {
+      // Prepare order data for email
+      const orderData = {
+        orderType: data.orderType,
+        deliveryZone: data.deliveryZone,
+        deliveryTime: data.deliveryTime,
+        specificTime: data.specificTime,
+        name: data.name,
+        phone: data.phone,
+        street: data.street,
+        houseNumber: data.houseNumber,
+        postcode: data.postcode,
+        note: data.note,
+        orderItems: orderItems,
+        subtotal: subtotal,
+        deliveryFee: deliveryFee,
+        total: total
+      };
+
+      // Send email notification (don't block WhatsApp if this fails)
+      try {
+        const emailResponse = await fetch('/api/send-order-email', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(orderData),
+        });
+
+        if (emailResponse.ok) {
+          console.log('Order email sent successfully');
+        } else {
+          console.warn('Failed to send order email, but continuing with WhatsApp');
+        }
+      } catch (emailError) {
+        console.warn('Email service error, but continuing with WhatsApp:', emailError);
+      }
+
       const orderDetails = orderItems
         .map(item => {
           let itemText = `${item.quantity}x Nr. ${item.menuItem.number} ${item.menuItem.name}`;
