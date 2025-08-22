@@ -592,12 +592,27 @@ const OrderForm: React.FC<OrderFormProps> = ({ orderItems, onRemoveItem, onUpdat
   const onSubmit = useCallback(async (data: OrderFormData) => {
     if (isSubmitting) return;
     
+    // Prevent double submission on mobile
+    const submitButton = document.querySelector('button[type="submit"]') as HTMLButtonElement;
+    if (submitButton) {
+      submitButton.disabled = true;
+    }
+    
     // Check minimum order requirement for delivery
     if (data.orderType === 'delivery' && !minOrderMet) {
+      if (submitButton) {
+        submitButton.disabled = false;
+      }
       return; // Don't submit if minimum order not met
     }
     
     setIsSubmitting(true);
+    
+    console.log('Order submission started on mobile:', {
+      isMobile: /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent),
+      orderData: data,
+      orderItems: orderItems.length
+    });
     
     try {
       // Prepare order data for email
@@ -703,30 +718,50 @@ const OrderForm: React.FC<OrderFormProps> = ({ orderItems, onRemoveItem, onUpdat
       const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
       const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
       const isAndroid = /Android/i.test(navigator.userAgent);
+      const isSafari = /Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent);
       
       console.log('Opening WhatsApp:', { isMobile, isIOS, isAndroid, url: whatsappURL });
       
       if (isMobile) {
-        // For mobile devices, try multiple approaches
+        // For mobile devices, use the most compatible approach
         try {
-          // Method 1: Direct window.open (works on most mobile browsers)
-          const whatsappWindow = window.open(whatsappURL, '_blank');
-          
-          // Method 2: If window.open fails or is blocked, try location.href
-          if (!whatsappWindow || whatsappWindow.closed || typeof whatsappWindow.closed === 'undefined') {
-            console.log('Window.open failed, trying location.href');
+          if (isIOS && isSafari) {
+            // iOS Safari - use location.href directly
+            console.log('iOS Safari detected - using location.href');
             window.location.href = whatsappURL;
+          } else if (isAndroid) {
+            // Android - try window.open first, then location.href
+            console.log('Android detected - trying window.open');
+            const whatsappWindow = window.open(whatsappURL, '_blank', 'noopener,noreferrer');
+            
+            // Check if window.open was blocked
+            setTimeout(() => {
+              if (!whatsappWindow || whatsappWindow.closed || typeof whatsappWindow.closed === 'undefined') {
+                console.log('Window.open blocked on Android - using location.href');
+                window.location.href = whatsappURL;
+              }
+            }, 100);
+          } else {
+            // Other mobile browsers - try window.open with fallback
+            console.log('Other mobile browser - trying window.open with fallback');
+            const whatsappWindow = window.open(whatsappURL, '_blank', 'noopener,noreferrer');
+            
+            setTimeout(() => {
+              if (!whatsappWindow || whatsappWindow.closed || typeof whatsappWindow.closed === 'undefined') {
+                console.log('Window.open failed - using location.href');
+                window.location.href = whatsappURL;
+              }
+            }, 100);
           }
         } catch (error) {
           console.error('Error opening WhatsApp:', error);
-          // Method 3: Fallback - create and click a temporary link
-          const tempLink = document.createElement('a');
-          tempLink.href = whatsappURL;
-          tempLink.target = '_blank';
-          tempLink.rel = 'noopener noreferrer';
-          document.body.appendChild(tempLink);
-          tempLink.click();
-          document.body.removeChild(tempLink);
+          // Ultimate fallback - direct navigation
+          try {
+            window.location.href = whatsappURL;
+          } catch (fallbackError) {
+            console.error('All WhatsApp opening methods failed:', fallbackError);
+            alert('WhatsApp konnte nicht geöffnet werden. Bitte rufen Sie uns direkt an: 01525 9630500');
+          }
         }
       } else {
         // For desktop, use window.open
@@ -739,6 +774,11 @@ const OrderForm: React.FC<OrderFormProps> = ({ orderItems, onRemoveItem, onUpdat
       alert('Es gab ein Problem beim Senden der Bestellung. Bitte versuchen Sie es erneut oder rufen Sie uns direkt an: 01525 9630500');
     } finally {
       setIsSubmitting(false);
+      // Re-enable submit button
+      const submitButton = document.querySelector('button[type="submit"]') as HTMLButtonElement;
+      if (submitButton) {
+        submitButton.disabled = false;
+      }
     }
   }, [orderItems, subtotal, total, isSubmitting, minOrderMet]);
 
@@ -1026,11 +1066,18 @@ const OrderForm: React.FC<OrderFormProps> = ({ orderItems, onRemoveItem, onUpdat
         <button
           type="submit"
           disabled={!isValid || isSubmitting || (orderType === 'delivery' && !minOrderMet)}
-          className={`w-full flex items-center justify-center gap-2 sm:gap-3 py-3 sm:py-4 px-4 sm:px-6 rounded-xl font-bold transition-all duration-300 transform text-sm sm:text-base ${
+          className={`w-full flex items-center justify-center gap-2 sm:gap-3 py-3 sm:py-4 px-4 sm:px-6 rounded-xl font-bold transition-all duration-300 transform text-sm sm:text-base touch-manipulation ${
             isValid && !isSubmitting && (orderType === 'pickup' || minOrderMet)
-              ? 'bg-green-500 text-white hover:bg-green-600 hover:scale-[1.02] shadow-lg hover:shadow-xl'
+              ? 'bg-green-500 text-white hover:bg-green-600 active:bg-green-700 hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-xl'
               : 'bg-gray-300 text-gray-500 cursor-not-allowed'
           }`}
+          style={{ 
+            WebkitTapHighlightColor: 'transparent',
+            touchAction: 'manipulation'
+          }}
+          onTouchStart={() => {
+            // Prevent iOS double-tap zoom and improve touch responsiveness
+          }}
         >
           {isSubmitting ? (
             <>

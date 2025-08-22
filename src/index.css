@@ -230,6 +230,20 @@ h1, h2, h3, h4, h5, h6 {
     transform: scale(0.98);
     transition: transform 0.2s;
   }
+  
+  /* Improve button touch responsiveness on mobile */
+  button {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  /* Ensure form buttons are properly sized for touch */
+  button[type="submit"] {
+    min-height: 44px; /* iOS recommended minimum touch target */
+    -webkit-appearance: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
