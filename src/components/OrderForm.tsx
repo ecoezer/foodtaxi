@@ -698,10 +698,45 @@ const OrderForm: React.FC<OrderFormProps> = ({ orderItems, onRemoveItem, onUpdat
       }
 
       const whatsappURL = `https://wa.me/+4915259630500?text=${encodeURIComponent(messageText)}`;
-      window.open(whatsappURL, '_blank');
+      
+      // Enhanced mobile detection and WhatsApp opening
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+      const isAndroid = /Android/i.test(navigator.userAgent);
+      
+      console.log('Opening WhatsApp:', { isMobile, isIOS, isAndroid, url: whatsappURL });
+      
+      if (isMobile) {
+        // For mobile devices, try multiple approaches
+        try {
+          // Method 1: Direct window.open (works on most mobile browsers)
+          const whatsappWindow = window.open(whatsappURL, '_blank');
+          
+          // Method 2: If window.open fails or is blocked, try location.href
+          if (!whatsappWindow || whatsappWindow.closed || typeof whatsappWindow.closed === 'undefined') {
+            console.log('Window.open failed, trying location.href');
+            window.location.href = whatsappURL;
+          }
+        } catch (error) {
+          console.error('Error opening WhatsApp:', error);
+          // Method 3: Fallback - create and click a temporary link
+          const tempLink = document.createElement('a');
+          tempLink.href = whatsappURL;
+          tempLink.target = '_blank';
+          tempLink.rel = 'noopener noreferrer';
+          document.body.appendChild(tempLink);
+          tempLink.click();
+          document.body.removeChild(tempLink);
+        }
+      } else {
+        // For desktop, use window.open
+        window.open(whatsappURL, '_blank', 'noopener,noreferrer');
+      }
       
     } catch (error) {
       console.error('Error submitting order:', error);
+      // Show user-friendly error message
+      alert('Es gab ein Problem beim Senden der Bestellung. Bitte versuchen Sie es erneut oder rufen Sie uns direkt an: 01525 9630500');
     } finally {
       setIsSubmitting(false);
     }

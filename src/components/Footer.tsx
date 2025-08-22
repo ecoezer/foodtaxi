@@ -7,12 +7,30 @@ const Footer = () => {
 
   const handleWhatsApp = async (e) => {
     e.preventDefault();
+    
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    
     try {
       await navigator.clipboard.writeText(phoneNumber);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {}
-    window.open(`https://wa.me/${phoneNumber}`, '_blank');
+    
+    const whatsappURL = `https://wa.me/${phoneNumber}`;
+    
+    if (isMobile) {
+      try {
+        const whatsappWindow = window.open(whatsappURL, '_blank');
+        if (!whatsappWindow || whatsappWindow.closed || typeof whatsappWindow.closed === 'undefined') {
+          window.location.href = whatsappURL;
+        }
+      } catch (error) {
+        console.error('Error opening WhatsApp:', error);
+        window.location.href = whatsappURL;
+      }
+    } else {
+      window.open(whatsappURL, '_blank', 'noopener,noreferrer');
+    }
   };
 
   return (

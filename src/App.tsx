@@ -32,7 +32,7 @@ const SCROLL_CONFIG = {
 
 const CONTACT_INFO = {
   PHONE: '01525 9630500',
-  WHATSAPP_URL: '#doener'
+  WHATSAPP_URL: 'https://wa.me/+4915259630500'
 };
 
 const CART_SELECTORS = [
@@ -362,6 +362,24 @@ function App() {
 
       <a
         href={CONTACT_INFO.WHATSAPP_URL}
+        onClick={(e) => {
+          e.preventDefault();
+          const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+          
+          if (isMobile) {
+            try {
+              const whatsappWindow = window.open(CONTACT_INFO.WHATSAPP_URL, '_blank');
+              if (!whatsappWindow || whatsappWindow.closed || typeof whatsappWindow.closed === 'undefined') {
+                window.location.href = CONTACT_INFO.WHATSAPP_URL;
+              }
+            } catch (error) {
+              console.error('Error opening WhatsApp:', error);
+              window.location.href = CONTACT_INFO.WHATSAPP_URL;
+            }
+          } else {
+            window.open(CONTACT_INFO.WHATSAPP_URL, '_blank', 'noopener,noreferrer');
+          }
+        }}
         className='flex items-center justify-center space-x-1 sm:space-x-2 md:space-x-3 lg:space-x-4 font-bold text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl hover:text-green-100 transition-all w-full text-center px-1 sm:px-2 group relative z-10'
         aria-label="Jetzt per WhatsApp bestellen"
         role="button"
