@@ -16,7 +16,6 @@ export const pastaTypes: PastaType[] = [
 
 // Sauce types for Spezialitäten
 export const sauceTypes: SauceType[] = [
-  { name: 'Tzatziki' },
   { name: 'Chilli' },
   { name: 'ohne Soße' }
 ];
@@ -68,7 +67,6 @@ export const wunschPizzaIngredients: WunschPizzaIngredient[] = [
   { name: 'Spiegelei' },
   { name: 'Spinat' },
   { name: 'Tomaten' },
-  { name: 'Tzatziki' },
   { name: 'Würstchen' },
   { name: 'Zwiebeln' },
   { name: 'ohne Zutat' }
@@ -107,7 +105,6 @@ export const pizzaExtras: PizzaExtra[] = [
   { name: 'Spiegelei', price: 1.50 },
   { name: 'Spinat', price: 1.50 },
   { name: 'Tomaten', price: 1.50 },
-  { name: 'Tzatziki', price: 1.50 },
   { name: 'Würstchen', price: 1.50 },
   { name: 'Zwiebeln', price: 1.50 }
 ];
@@ -130,7 +127,7 @@ export const donerDishes: MenuItem[] = [
     id: 80,
     number: 80,
     name: "Gyros Teller",
-    description: "mit Zaziki und Krautsalat, dazu Pommes",
+    description: "mit Krautsalat, dazu Pommes",
     price: 13.00,
     allergens: "1,2,3,4/A,C,F,G",
     isSpezialitaet: true
@@ -157,7 +154,7 @@ export const donerDishes: MenuItem[] = [
     id: 83,
     number: 83,
     name: "Gyros Box",
-    description: "mit Gyros, Pommes, Zaziki und Salat",
+    description: "mit Gyros, Pommes und Salat",
     price: 7.90,
     allergens: "1,2,3,4/A,C,F,G",
     isSpezialitaet: true
@@ -514,13 +511,6 @@ export const dips: MenuItem[] = [
   {
     id: 206,
     number: "206",
-    name: "Tzaziki",
-    description: "",
-    price: 1.50
-  },
-  {
-    id: 207,
-    number: "207",
     name: "BBQ",
     description: "",
     price: 1.50
