@@ -35,6 +35,7 @@ const DELIVERY_ZONES = {
   'barfelde': { label: 'Barfelde', minOrder: 20, fee: 2.5 },
   'betheln': { label: 'Betheln', minOrder: 25, fee: 3 },
   'brueggen': { label: 'Brüggen', minOrder: 35, fee: 3 },
+  'burgstemmen': { label: 'Burgstemmen', minOrder: 35, fee: 4 },
   'deinsen': { label: 'Deinsen', minOrder: 35, fee: 4 },
   'duingen': { label: 'Duingen', minOrder: 40, fee: 4 },
   'dunsen-gime': { label: 'Dunsen (Gime)', minOrder: 30, fee: 3 },
@@ -146,6 +147,7 @@ const orderFormSchema = z
     }),
     deliveryZone: z.enum([
       'banteln', 'barfelde', 'betheln', 'brueggen', 'deinsen', 'duingen', 
+      'burgstemmen',
       'dunsen-gime', 'eime', 'eitzum', 'elze', 'gronau', 'gronau-doetzum', 
       'gronau-eddighausen', 'haus-escherde', 'heinum', 'kolonie-godenau', 
       'mehle-elze', 'nienstedt', 'nordstemmen', 'rheden-elze', 'sibesse', 
