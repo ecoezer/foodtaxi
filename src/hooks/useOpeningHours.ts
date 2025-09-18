@@ -8,7 +8,7 @@ export const useOpeningHours = () => {
   // Tuesday is closed (Ruhetag)
   const isTuesday = day === 2;
   
-  // Friday, Saturday, Sunday and holidays: 12:00 - 23:00
+  // Friday, Saturday, Sunday and holidays: 12:00 - 21:30
   const isWeekendOrFriday = day === 0 || day === 5 || day === 6;
   
   // Monday, Wednesday, Thursday: 12:00 - 21:30
@@ -37,8 +37,8 @@ export const useOpeningHours = () => {
 
   const getNextOpeningTime = () => {
     if (isTuesday) {
-      // If it's Tuesday, next opening is Wednesday at 11:00
-      return 'Mittwoch ab 11:00 Uhr wieder geöffnet';
+      // If it's Tuesday, next opening is Wednesday at 12:00
+      return 'Mittwoch ab 12:00 Uhr wieder geöffnet';
     }
     
     if (currentTime >= closingTime) {
@@ -58,16 +58,12 @@ export const useOpeningHours = () => {
         weekday: 'long'
       }).format(nextDay);
       
-      const nextDayIsWeekendOrFriday = nextDayOfWeek === 0 || nextDayOfWeek === 5 || nextDayOfWeek === 6;
-      const nextOpeningHour = '12';
-      
-      return `${nextDayName} ab ${nextOpeningHour}:00 Uhr wieder geöffnet`;
+      return `${nextDayName} ab 12:00 Uhr wieder geöffnet`;
     }
     
     if (currentTime < openingTime) {
       // If it's before opening time today
-      const todayOpeningHour = '12';
-      return `heute ab ${todayOpeningHour}:00 Uhr wieder geöffnet`;
+      return `heute ab 12:00 Uhr wieder geöffnet`;
     }
     
     return '';

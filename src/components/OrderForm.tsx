@@ -69,7 +69,7 @@ const useTimeSlots = () => {
     // Tuesday is closed (Ruhetag)
     const isTuesday = day === 2;
     
-    // Friday, Saturday, Sunday: 12:00 - 23:00
+    // Friday, Saturday, Sunday: 12:00 - 21:30
     const isWeekendOrFriday = day === 0 || day === 5 || day === 6;
     
     // Monday, Wednesday, Thursday: 12:00 - 21:30
@@ -81,27 +81,37 @@ const useTimeSlots = () => {
     if (isTuesday) {
       // Tuesday is closed - no available hours
       return { availableHours: [], getAvailableMinutes: () => [] };
-    } else if (isWeekendOrFriday) {
-      endHour = 20; // Last order at 20:00 for 21:30 closing
-      endHour = 21; // Last order at 21:00 for 22:00 closing
-      // Monday, Wednesday, Thursday: 12:00 - 21:30
-      startHour = 12; // Restaurant opens at 11:00, but first orders at 12:00
-      endHour = 20; // Last order at 20:00 for 21:30 closing
+    } else if (isWeekendOrFriday || isRegularDay) {
+      // All open days: 12:00 - 21:30
+      startHour = 12; // Restaurant opens at 12:00
+      endHour = 21; // Last order at 21:00 for 21:30 closing
     } else {
       return { availableHours: [], getAvailableMinutes: () => [] };
     }
 
-    // Filter available hours based on current time
-    const availableHours = Array.from(
+    // Generate all possible hours from start to end
+    const allHours = Array.from(
       { length: endHour - startHour + 1 },
       (_, i) => startHour + i
-    ).filter(hour => {
-      return hour >= currentHour || currentHour > endHour;
+    );
+
+    // Filter available hours based on current time
+    // Only show future time slots (at least 30 minutes from now)
+    const availableHours = allHours.filter(hour => {
+      if (hour > currentHour) {
+        return true; // Future hours are always available
+      } else if (hour === currentHour) {
+        // For current hour, check if there are available minutes
+        const availableMinutes = AVAILABLE_MINUTES.filter(min => parseInt(min) > currentMinute + 30);
+        return availableMinutes.length > 0;
+      }
+      return false; // Past hours are not available
     });
 
     const getAvailableMinutes = (selectedHour: number): string[] => {
       if (selectedHour === currentHour) {
-        return AVAILABLE_MINUTES.filter(min => parseInt(min) > currentMinute);
+        // For current hour, only show minutes that are at least 30 minutes from now
+        return AVAILABLE_MINUTES.filter(min => parseInt(min) > currentMinute + 30);
       }
       return AVAILABLE_MINUTES;
     };
