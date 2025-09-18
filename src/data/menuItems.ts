@@ -35,8 +35,7 @@ export const sauceTypes: SauceType[] = [
 export const saladSauceTypes: SauceType[] = [
   { name: 'Joghurt' },
   { name: 'French' },
-  { name: 'Essig/Öl' },
-  { name: 'Knoblauch-Dressing' }
+  { name: 'Essig/Öl' }
 ];
 
 // Beer types for beer selection
