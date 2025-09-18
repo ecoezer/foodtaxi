@@ -292,11 +292,11 @@ export const schnitzel: MenuItem[] = [
   {
     id: 546,
     number: 70,
-    name: isSchnitzelTag() ? "🍖 Schnitzel Wiener Art - SCHNITZEL-TAG!" : "Schnitzel Wiener Art",
+    name: "Schnitzel Wiener Art",
     description: isSchnitzelTag() 
       ? "mit Zitronenscheiben und Preiselbeeren - DONNERSTAG SPEZIAL!" 
       : "mit Zitronenscheiben und Preiselbeeren",
-    price: isSchnitzelTag() ? 11.00 : 12.90
+    price: 11.00
   },
   {
     id: 547,
@@ -314,15 +314,6 @@ export const schnitzel: MenuItem[] = [
     description: isSchnitzelTag() 
       ? "in Sauce Hollandaise - DONNERSTAG SPEZIAL!" 
       : "in Sauce Hollandaise",
-    price: isSchnitzelTag() ? 11.00 : 12.90
-  },
-  {
-    id: 549,
-    number: 73,
-    name: isSchnitzelTag() ? "🍖 Hawaii Schnitzel - SCHNITZEL-TAG!" : "Hawaii Schnitzel",
-    description: isSchnitzelTag() 
-      ? "mit Formfleisch-Vorderschinken, Ananas, Preiselbeeren und Käse überbacken - DONNERSTAG SPEZIAL!" 
-      : "mit Formfleisch-Vorderschinken, Ananas, Preiselbeeren und Käse überbacken",
     price: isSchnitzelTag() ? 11.00 : 12.90
   }
 ];

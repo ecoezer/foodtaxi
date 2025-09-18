@@ -440,13 +440,13 @@ const MenuSection: React.FC<MenuSectionProps> = ({ title, description, subTitle,
                       <div className="text-lg sm:text-xl font-bold text-orange-600 relative">
                         {/* Show original price crossed out if there's a special offer */}
                         {((item.id === 84 && new Date().getDay() === 3) || 
-                          ([546, 547, 548, 549].includes(item.id) && new Date().getDay() === 4)) && (
+                          ([547, 548].includes(item.id) && new Date().getDay() === 4)) && (
                           <div className="text-sm text-gray-500 line-through">
                             {item.id === 84 ? '14,90' : '12,90'} €
                           </div>
                         )}
                         <div className={((item.id === 84 && new Date().getDay() === 3) || 
-                          ([546, 547, 548, 549].includes(item.id) && new Date().getDay() === 4)) 
+                          ([547, 548].includes(item.id) && new Date().getDay() === 4)) 
                           ? 'text-red-600 font-extrabold animate-pulse' : ''}>
                           {item.price.toFixed(2).replace('.', ',')} €
                         </div>

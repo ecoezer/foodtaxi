@@ -210,10 +210,10 @@ const Header: React.FC = memo(() => {
             isThursday ? 'border-blue-500 ring-2 ring-blue-200 animate-pulse' : 'border-blue-300'
           }`}>
             <p className='text-sm font-semibold text-blue-800 mb-1'>
-              🍖 Donnerstag: Schnitzel-Tag – 11,00 € {isThursday ? '🔥 HEUTE!' : ''}
+              🍖 Donnerstag: Schnitzel-Tag – ab 11,00 € {isThursday ? '🔥 HEUTE!' : ''}
             </p>
             <p className='text-xs text-blue-700'>
-              (Wiener, Jäger oder Hollandaise){isThursday ? ' - Sparen Sie 1,90€!' : ''}
+              (Jäger oder Hollandaise){isThursday ? ' - Sparen Sie 1,90€!' : ''}
             </p>
           </div>
         </div>
