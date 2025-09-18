@@ -85,40 +85,23 @@ const useTimeSlots = () => {
       startHour = 12;
       endHour = 21; // Last order at 21:00 for 22:00 closing
     } else if (isRegularDay) {
-      startHour = 11; // Restaurant opens at 11:00, but first orders at 11:30
+      startHour = 12; // Restaurant opens at 11:00, but first orders at 12:00
       endHour = 21; // Last order at 21:00 for 22:00 closing
     } else {
       return { availableHours: [], getAvailableMinutes: () => [] };
     }
 
-    // Filter available hours based on current time and first order policy
+    // Filter available hours based on current time
     const availableHours = Array.from(
       { length: endHour - startHour + 1 },
       (_, i) => startHour + i
     ).filter(hour => {
-      // For regular days (Mon, Wed, Thu), first order starts at 11:30
-      if (isRegularDay && hour === 11) {
-        // Only allow 11:00 hour if current time is past 11:30 or if it's not today
-        if (currentHour === 11) {
-          return currentMinute >= 30;
-        } else if (currentHour < 11) {
-          return false; // Too early for first order
-        }
-      }
       return hour >= currentHour || currentHour > endHour;
     });
 
     const getAvailableMinutes = (selectedHour: number): string[] => {
       if (selectedHour === currentHour) {
-        // For regular days at 11:00 hour, first order starts at 11:30
-        if (isRegularDay && selectedHour === 11) {
-          return AVAILABLE_MINUTES.filter(min => parseInt(min) >= 30 && parseInt(min) > currentMinute);
-        }
         return AVAILABLE_MINUTES.filter(min => parseInt(min) > currentMinute);
-      }
-      // For regular days at 11:00 hour (when not current hour), start from 11:30
-      if (isRegularDay && selectedHour === 11) {
-        return AVAILABLE_MINUTES.filter(min => parseInt(min) >= 30);
       }
       return AVAILABLE_MINUTES;
     };
