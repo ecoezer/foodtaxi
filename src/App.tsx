@@ -494,7 +494,7 @@ function App() {
               {renderMenuSection(
                 MENU_SECTIONS.DOENER,
                 'Spezialitäten', 
-                'Alle Spezialitäten werden mit Eisbergsalat, Tomaten, Gurken, Zwiebeln und einer Soße Ihrer Wahl zubereitet.',
+                undefined,
                 donerDishes
               )}
 
