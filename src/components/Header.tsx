@@ -69,7 +69,7 @@ const OpeningHoursCard: React.FC<{ data: OpeningHoursData }> = memo(({ data }) =
               Mo, Mi, Do
             </span>
             <span className='text-base font-bold text-gray-900' style={{ marginTop: '1px' }}>
-              12:00–22:00
+              12:00–21:30
             </span>
           </div>
           <div className={SHARED_CLASSES.timeSlot}>
@@ -77,7 +77,7 @@ const OpeningHoursCard: React.FC<{ data: OpeningHoursData }> = memo(({ data }) =
               Fr, Sa, So & Feiertage
             </span>
             <span className='text-base font-bold text-gray-900' style={{ marginTop: '1px' }}>
-              12:00–22:00
+              12:00–21:30
             </span>
           </div>
           <div className={`${SHARED_CLASSES.timeSlot} bg-gray-100`}>

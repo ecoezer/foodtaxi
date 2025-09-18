@@ -72,7 +72,7 @@ const useTimeSlots = () => {
     // Friday, Saturday, Sunday: 12:00 - 23:00
     const isWeekendOrFriday = day === 0 || day === 5 || day === 6;
     
-    // Monday, Wednesday, Thursday: 11:00 - 22:00
+    // Monday, Wednesday, Thursday: 12:00 - 21:30
     const isRegularDay = day === 1 || day === 3 || day === 4;
 
     let startHour: number;
@@ -82,11 +82,11 @@ const useTimeSlots = () => {
       // Tuesday is closed - no available hours
       return { availableHours: [], getAvailableMinutes: () => [] };
     } else if (isWeekendOrFriday) {
-      startHour = 12;
+      endHour = 20; // Last order at 20:00 for 21:30 closing
       endHour = 21; // Last order at 21:00 for 22:00 closing
-    } else if (isRegularDay) {
+      // Monday, Wednesday, Thursday: 12:00 - 21:30
       startHour = 12; // Restaurant opens at 11:00, but first orders at 12:00
-      endHour = 21; // Last order at 21:00 for 22:00 closing
+      endHour = 20; // Last order at 20:00 for 21:30 closing
     } else {
       return { availableHours: [], getAvailableMinutes: () => [] };
     }
@@ -802,8 +802,8 @@ const OrderForm: React.FC<OrderFormProps> = ({ orderItems, onRemoveItem, onUpdat
           <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
             <p className="text-sm text-gray-700">
               <strong>Öffnungszeiten:</strong><br />
-              Mo, Mi, Do: 12:00–22:00<br />
-              Fr, Sa, So & Feiertage: 12:00–23:00<br />
+              Mo, Mi, Do: 12:00–21:30<br />
+              Fr, Sa, So & Feiertage: 12:00–21:30<br />
               Di: Ruhetag
             </p>
           </div>

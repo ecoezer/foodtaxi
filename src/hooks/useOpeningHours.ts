@@ -11,7 +11,7 @@ export const useOpeningHours = () => {
   // Friday, Saturday, Sunday and holidays: 12:00 - 23:00
   const isWeekendOrFriday = day === 0 || day === 5 || day === 6;
   
-  // Monday, Wednesday, Thursday: 11:00 - 22:00
+  // Monday, Wednesday, Thursday: 12:00 - 21:30
   const isRegularDay = day === 1 || day === 3 || day === 4;
 
   let openingTime: number;
@@ -24,14 +24,14 @@ export const useOpeningHours = () => {
     closingTime = 0;
     isOpen = false;
   } else if (isWeekendOrFriday) {
-    // Friday, Saturday, Sunday: 12:00 - 22:00
+    // Friday, Saturday, Sunday: 12:00 - 21:30
     openingTime = 12;
-    closingTime = 22;
+    closingTime = 21.5; // 21:30
     isOpen = currentTime >= openingTime && currentTime < closingTime;
   } else if (isRegularDay) {
-    // Monday, Wednesday, Thursday: 12:00 - 22:00
+    // Monday, Wednesday, Thursday: 12:00 - 21:30
     openingTime = 12;
-    closingTime = 22;
+    closingTime = 21.5; // 21:30
     isOpen = currentTime >= openingTime && currentTime < closingTime;
   }
 
@@ -77,7 +77,7 @@ export const useOpeningHours = () => {
     if (isTuesday) {
       return 'Ruhetag';
     } else {
-      return '12:00–22:00';
+      return '12:00–21:30';
     }
   };
 
