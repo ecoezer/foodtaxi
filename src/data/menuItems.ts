@@ -16,7 +16,7 @@ export const pastaTypes: PastaType[] = [
 
 // Sauce types for Spezialitäten
 export const sauceTypes: SauceType[] = [
-  { name: 'Chilli' },
+  { name: 'Tzatziki' },
   { name: 'ohne Soße' }
 ];
 
