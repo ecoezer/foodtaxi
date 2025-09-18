@@ -196,7 +196,7 @@ const Header: React.FC = memo(() => {
               🍖 Mittwoch: Rippchen-Tag – 13,00 € 
             </p>
             <p className='text-xs text-orange-700'>
-              (genau wie die Rippchen bei den Spezialitäten)
+              (mit BBQ Sauce, Pommes und Krautsalat)
             </p>
           </div>
           <div className='bg-gradient-to-r from-blue-100 to-indigo-100 border-2 border-blue-300 rounded-lg p-3 shadow-sm'>
