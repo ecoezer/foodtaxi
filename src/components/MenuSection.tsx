@@ -421,8 +421,19 @@ const MenuSection: React.FC<MenuSectionProps> = ({ title, description, subTitle,
                       {item.allergens && (
                         <p className="text-xs text-gray-500 mt-2">
                           <span className="font-medium">Allergene:</span> {item.allergens}
-                        </p>
+                    <div className="text-lg sm:text-xl font-bold text-orange-600 relative">
+                      {/* Show original price crossed out if there's a special offer */}
+                      {((item.id === 84 && new Date().getDay() === 3) || 
+                        ([546, 547, 548, 549].includes(item.id) && new Date().getDay() === 4)) && (
+                        <div className="text-sm text-gray-500 line-through">
+                          {item.id === 84 ? '14,90' : '12,90'} €
+                        </div>
                       )}
+                      <div className={((item.id === 84 && new Date().getDay() === 3) || 
+                        ([546, 547, 548, 549].includes(item.id) && new Date().getDay() === 4)) 
+                        ? 'text-red-600 font-extrabold animate-pulse' : ''}>
+                        {item.price.toFixed(2).replace('.', ',')} €
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -456,6 +467,17 @@ const MenuSection: React.FC<MenuSectionProps> = ({ title, description, subTitle,
 
               {/* Configuration indicators */}
               <div className="flex flex-wrap gap-2 mt-3">
+                {/* Special offer indicators */}
+                {item.id === 84 && new Date().getDay() === 3 && (
+                  <span className="inline-flex items-center gap-1 px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full animate-pulse">
+                    🔥 RIPPCHEN-TAG SPEZIAL
+                  </span>
+                )}
+                {[546, 547, 548, 549].includes(item.id) && new Date().getDay() === 4 && (
+                  <span className="inline-flex items-center gap-1 px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full animate-pulse">
+                    🔥 SCHNITZEL-TAG SPEZIAL
+                  </span>
+                )}
                 {item.sizes && (
                   <span className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
                     <Star className="w-3 h-3" />

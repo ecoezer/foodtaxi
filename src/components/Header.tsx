@@ -156,6 +156,11 @@ const AddressCard: React.FC = memo(() => {
 
 const Header: React.FC = memo(() => {
   const openingHoursData = useOpeningHours();
+  
+  // Get current day for special offers
+  const currentDay = new Date().getDay();
+  const isWednesday = currentDay === 3;
+  const isThursday = currentDay === 4;
 
   // Memoize the opening hours data to prevent unnecessary re-renders
   const memoizedOpeningHours = useMemo(() => openingHoursData, [
@@ -191,20 +196,24 @@ const Header: React.FC = memo(() => {
 
         {/* Special Day Offers */}
         <div className='mb-6 text-center space-y-2'>
-          <div className='bg-gradient-to-r from-orange-100 to-yellow-100 border-2 border-orange-300 rounded-lg p-3 shadow-sm'>
+          <div className={`bg-gradient-to-r from-orange-100 to-yellow-100 border-2 rounded-lg p-3 shadow-sm ${
+            isWednesday ? 'border-orange-500 ring-2 ring-orange-200 animate-pulse' : 'border-orange-300'
+          }`}>
             <p className='text-sm font-semibold text-orange-800 mb-1'>
-              🍖 Mittwoch: Rippchen-Tag – 13,00 € 
+              🍖 Mittwoch: Rippchen-Tag – 13,00 € {isWednesday ? '🔥 HEUTE!' : ''}
             </p>
             <p className='text-xs text-orange-700'>
-              (mit BBQ Sauce, Pommes und Krautsalat)
+              (mit BBQ Sauce, Pommes und Krautsalat){isWednesday ? ' - Sparen Sie 1,90€!' : ''}
             </p>
           </div>
-          <div className='bg-gradient-to-r from-blue-100 to-indigo-100 border-2 border-blue-300 rounded-lg p-3 shadow-sm'>
+          <div className={`bg-gradient-to-r from-blue-100 to-indigo-100 border-2 rounded-lg p-3 shadow-sm ${
+            isThursday ? 'border-blue-500 ring-2 ring-blue-200 animate-pulse' : 'border-blue-300'
+          }`}>
             <p className='text-sm font-semibold text-blue-800 mb-1'>
-              🍖 Donnerstag: Schnitzel-Tag – 11,00 €
+              🍖 Donnerstag: Schnitzel-Tag – 11,00 € {isThursday ? '🔥 HEUTE!' : ''}
             </p>
             <p className='text-xs text-blue-700'>
-              (Wiener, Jäger oder Hollandaise)
+              (Wiener, Jäger oder Hollandaise){isThursday ? ' - Sparen Sie 1,90€!' : ''}
             </p>
           </div>
         </div>

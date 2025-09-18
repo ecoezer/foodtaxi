@@ -279,30 +279,38 @@ export const schnitzel: MenuItem[] = [
   {
     id: 546,
     number: 70,
-    name: "Schnitzel Wiener Art",
-    description: "mit Zitronenscheiben und Preiselbeeren",
-    price: 11.00
+    name: isSchnitzelTag() ? "🍖 Schnitzel Wiener Art - SCHNITZEL-TAG!" : "Schnitzel Wiener Art",
+    description: isSchnitzelTag() 
+      ? "mit Zitronenscheiben und Preiselbeeren - DONNERSTAG SPEZIAL!" 
+      : "mit Zitronenscheiben und Preiselbeeren",
+    price: isSchnitzelTag() ? 11.00 : 12.90
   },
   {
     id: 547,
     number: 71,
-    name: "Schnitzel Jäger Art",
-    description: "mit Jägersauce",
-    price: 12.90
+    name: isSchnitzelTag() ? "🍖 Schnitzel Jäger Art - SCHNITZEL-TAG!" : "Schnitzel Jäger Art",
+    description: isSchnitzelTag() 
+      ? "mit Jägersauce - DONNERSTAG SPEZIAL!" 
+      : "mit Jägersauce",
+    price: isSchnitzelTag() ? 11.00 : 12.90
   },
   {
     id: 548,
     number: 72,
-    name: "Hollandaiseschnitzel",
-    description: "in Sauce Hollandaise",
-    price: 12.90
+    name: isSchnitzelTag() ? "🍖 Hollandaiseschnitzel - SCHNITZEL-TAG!" : "Hollandaiseschnitzel",
+    description: isSchnitzelTag() 
+      ? "in Sauce Hollandaise - DONNERSTAG SPEZIAL!" 
+      : "in Sauce Hollandaise",
+    price: isSchnitzelTag() ? 11.00 : 12.90
   },
   {
     id: 549,
     number: 73,
-    name: "Hawaii Schnitzel",
-    description: "mit Formfleisch-Vorderschinken, Ananas, Preiselbeeren und Käse überbacken",
-    price: 12.90
+    name: isSchnitzelTag() ? "🍖 Hawaii Schnitzel - SCHNITZEL-TAG!" : "Hawaii Schnitzel",
+    description: isSchnitzelTag() 
+      ? "mit Formfleisch-Vorderschinken, Ananas, Preiselbeeren und Käse überbacken - DONNERSTAG SPEZIAL!" 
+      : "mit Formfleisch-Vorderschinken, Ananas, Preiselbeeren und Käse überbacken",
+    price: isSchnitzelTag() ? 11.00 : 12.90
   }
 ];
 
