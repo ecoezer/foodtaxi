@@ -1,5 +1,16 @@
 import { MenuItem, WunschPizzaIngredient, PizzaExtra, PastaType, SauceType } from '../types';
 
+// Helper functions to check current day for special offers
+const isRippchen = () => {
+  const today = new Date().getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+  return today === 3; // Wednesday
+};
+
+const isSchnitzelTag = () => {
+  const today = new Date().getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+  return today === 4; // Thursday
+};
+
 // Pizza sizes configuration with new structure
 const pizzaSizes = [
   { name: 'Medium', price: 8.90, description: 'Ø ca. 26 cm' },
@@ -162,9 +173,11 @@ export const donerDishes: MenuItem[] = [
   {
     id: 84,
     number: 84,
-    name: "Spareribs (Rippchen 450g)",
-    description: "mit BBQ Sauce, Pommes und Krautsalat",
-    price: 14.90,
+    name: isRippchen() ? "🍖 Spareribs (Rippchen 450g) - RIPPCHEN-TAG!" : "Spareribs (Rippchen 450g)",
+    description: isRippchen() 
+      ? "mit BBQ Sauce, Pommes und Krautsalat - MITTWOCH SPEZIAL!" 
+      : "mit BBQ Sauce, Pommes und Krautsalat",
+    price: isRippchen() ? 13.00 : 14.90,
     allergens: "1,2,3,4/A,C,F,G"
   },
   {
