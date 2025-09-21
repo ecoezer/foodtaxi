@@ -460,7 +460,6 @@ const MenuSection: React.FC<MenuSectionProps> = ({ title, description, subTitle,
                   >
                     <Plus className="w-3 h-3" />
                     <span className="hidden sm:inline">Hinzufügen</span>
-                    <span className="sm:hidden">+</span>
                   </button>
                 </div>
               </div>
