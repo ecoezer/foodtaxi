@@ -198,7 +198,7 @@ const Header: React.FC = memo(() => {
         <div className='mb-6 text-center space-y-2'>
           {/* New Special Offers */}
           <div className='bg-gradient-to-r from-green-100 to-emerald-100 border-2 border-green-400 rounded-lg p-4 shadow-sm'>
-            <h3 className='text-lg font-bold text-green-800 mb-3'>🎯 AKTUELLE ANGEBOTE</h3>
+            <h3 className='text-lg font-bold text-green-800 mb-3'>🎯 Jeden Tag von 12 bis 14 Uhr – unser Schüler-Deal! nur zum Abholen! </h3>
             <div className='grid grid-cols-1 sm:grid-cols-3 gap-3'>
               <div className='bg-white/80 rounded-lg p-3 border border-green-200'>
                 <div className='font-bold text-green-700 text-sm mb-1'>ANGEBOT 1</div>
