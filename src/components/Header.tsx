@@ -195,48 +195,42 @@ const Header: React.FC = memo(() => {
         </h1>
 
         {/* Special Day Offers */}
-        <div className='mb-6 text-center space-y-2'>
+        <div className='mb-4 text-center space-y-2'>
           {/* New Special Offers */}
-          <div className='bg-gradient-to-r from-green-100 to-emerald-100 border-2 border-green-400 rounded-lg p-4 shadow-sm'>
-            <h3 className='text-lg font-bold text-green-800 mb-3'>🎯 Jeden Tag von 12 bis 14 Uhr – unser Schüler-Deal! nur zum Abholen! </h3>
-            <div className='grid grid-cols-1 sm:grid-cols-3 gap-3'>
-              <div className='bg-white/80 rounded-lg p-3 border border-green-200'>
-                <div className='font-bold text-green-700 text-sm mb-1'>ANGEBOT 1</div>
-                <div className='text-sm text-gray-800 mb-2'>Pizza (26cm) Margherita oder Salami</div>
-                <div className='text-xl font-bold text-green-600'>6€</div>
+          <div className='bg-gradient-to-r from-green-100 to-emerald-100 border border-green-300 rounded-lg p-3 shadow-sm'>
+            <h3 className='text-base font-bold text-green-800 mb-2'>🎯 Schüler-Deal 12-14 Uhr (nur Abholung)</h3>
+            <div className='grid grid-cols-1 sm:grid-cols-3 gap-2'>
+              <div className='bg-white/80 rounded-md p-2 border border-green-200'>
+                <div className='font-bold text-green-700 text-xs mb-1'>ANGEBOT 1</div>
+                <div className='text-xs text-gray-800 mb-1'>Pizza (26cm) Margherita/Salami</div>
+                <div className='text-lg font-bold text-green-600'>6€</div>
               </div>
-              <div className='bg-white/80 rounded-lg p-3 border border-green-200'>
-                <div className='font-bold text-green-700 text-sm mb-1'>ANGEBOT 2</div>
-                <div className='text-sm text-gray-800 mb-2'>Chicken Burger mit Pommes + Mayo oder Ketchup</div>
-                <div className='text-xl font-bold text-green-600'>5€</div>
+              <div className='bg-white/80 rounded-md p-2 border border-green-200'>
+                <div className='font-bold text-green-700 text-xs mb-1'>ANGEBOT 2</div>
+                <div className='text-xs text-gray-800 mb-1'>Chicken Burger + Pommes + Soße</div>
+                <div className='text-lg font-bold text-green-600'>5€</div>
               </div>
-              <div className='bg-white/80 rounded-lg p-3 border border-green-200'>
-                <div className='font-bold text-green-700 text-sm mb-1'>ANGEBOT 3</div>
-                <div className='text-sm text-gray-800 mb-2'>Burger mit Pommes + Mayo oder Ketchup</div>
-                <div className='text-xl font-bold text-green-600'>5€</div>
+              <div className='bg-white/80 rounded-md p-2 border border-green-200'>
+                <div className='font-bold text-green-700 text-xs mb-1'>ANGEBOT 3</div>
+                <div className='text-xs text-gray-800 mb-1'>Burger + Pommes + Soße</div>
+                <div className='text-lg font-bold text-green-600'>5€</div>
               </div>
             </div>
           </div>
 
           {/* Existing Special Day Offers */}
-          <div className={`bg-gradient-to-r from-orange-100 to-yellow-100 border-2 rounded-lg p-3 shadow-sm ${
-            isWednesday ? 'border-orange-500 ring-2 ring-orange-200 animate-pulse' : 'border-orange-300'
+          <div className={`bg-gradient-to-r from-orange-100 to-yellow-100 border rounded-md p-2 shadow-sm ${
+            isWednesday ? 'border-orange-400 animate-pulse' : 'border-orange-300'
           }`}>
-            <p className='text-sm font-semibold text-orange-800 mb-1'>
+            <p className='text-sm font-semibold text-orange-800'>
               🍖 Mittwoch: Rippchen-Tag – 13,00 € {isWednesday ? '🔥 HEUTE!' : ''}
             </p>
-            <p className='text-xs text-orange-700'>
-              (mit BBQ Sauce, Pommes und Krautsalat){isWednesday ? ' - Sparen Sie 1,90€!' : ''}
-            </p>
           </div>
-          <div className={`bg-gradient-to-r from-blue-100 to-indigo-100 border-2 rounded-lg p-3 shadow-sm ${
-            isThursday ? 'border-blue-500 ring-2 ring-blue-200 animate-pulse' : 'border-blue-300'
+          <div className={`bg-gradient-to-r from-blue-100 to-indigo-100 border rounded-md p-2 shadow-sm ${
+            isThursday ? 'border-blue-400 animate-pulse' : 'border-blue-300'
           }`}>
-            <p className='text-sm font-semibold text-blue-800 mb-1'>
+            <p className='text-sm font-semibold text-blue-800'>
               🍖 Donnerstag: Schnitzel-Tag – ab 11,00 € {isThursday ? '🔥 HEUTE!' : ''}
-            </p>
-            <p className='text-xs text-blue-700'>
-              (Jäger oder Hollandaise){isThursday ? ' - Sparen Sie 1,90€!' : ''}
             </p>
           </div>
         </div>
