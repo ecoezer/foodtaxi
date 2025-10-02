@@ -8,7 +8,8 @@ import {
   sauceTypes,
   saladSauceTypes,
   beerTypes,
-  pizzaStyles
+  pizzaStyles,
+  getPizzaStylesForSize
 } from '../data/menuItems';
 
 interface MenuSectionProps {
@@ -69,6 +70,18 @@ const ItemModal: React.FC<ItemModalProps> = memo(({ item, isOpen, onClose, onAdd
       resetSelections();
     }
   }, [isOpen, resetSelections]);
+
+  // Update pizza style when size changes to reflect new pricing
+  React.useEffect(() => {
+    if ((item.isPizza || item.isWunschPizza) && selectedSize) {
+      const currentStyleName = selectedPizzaStyle?.name || 'Standard';
+      const newStyles = getPizzaStylesForSize(selectedSize.name);
+      const newStyle = newStyles.find(s => s.name === currentStyleName);
+      if (newStyle) {
+        setSelectedPizzaStyle(newStyle);
+      }
+    }
+  }, [selectedSize, item.isPizza, item.isWunschPizza]);
 
   const handleIngredientToggle = useCallback((ingredient: string) => {
     setSelectedIngredients(prev => {
@@ -190,7 +203,7 @@ const ItemModal: React.FC<ItemModalProps> = memo(({ item, isOpen, onClose, onAdd
               <div className="space-y-4">
                 <h4 className="font-semibold text-gray-900 text-lg">Sonderwunsch</h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {pizzaStyles.map((style) => (
+                  {getPizzaStylesForSize(selectedSize?.name || 'Medium').map((style) => (
                     <button
                       key={style.name}
                       onClick={() => setSelectedPizzaStyle(style)}

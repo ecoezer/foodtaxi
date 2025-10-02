@@ -38,12 +38,39 @@ export const saladSauceTypes: SauceType[] = [
   { name: 'Essig/Öl' }
 ];
 
-// Pizza styles (Sonderwunsch)
+// Pizza styles (Sonderwunsch) - prices vary by size
+export const getPizzaStylesForSize = (size: string): PizzaStyle[] => {
+  // Only Medium, Large, and Family sizes support Sonderwunsch options
+  // Mega size only gets Standard option
+  const prices: Record<string, { käserand: number; american: number; calzone: number }> = {
+    'Medium': { käserand: 2.50, american: 2.00, calzone: 1.00 },
+    'Large': { käserand: 3.00, american: 3.00, calzone: 2.00 },
+    'Family': { käserand: 3.00, american: 3.00, calzone: 2.00 }
+  };
+
+  // If size not in prices (like Mega), only return Standard option
+  if (!prices[size]) {
+    return [
+      { name: 'Standard', price: 0, description: 'Normale Pizza' }
+    ];
+  }
+
+  const sizePrice = prices[size];
+
+  return [
+    { name: 'Standard', price: 0, description: 'Normale Pizza' },
+    { name: 'Käserand', price: sizePrice.käserand, description: `Mit Käserand (+${sizePrice.käserand.toFixed(2)}€)` },
+    { name: 'Americanstyle', price: sizePrice.american, description: `Amerikanischer Stil (+${sizePrice.american.toFixed(2)}€)` },
+    { name: 'als Calzone', price: sizePrice.calzone, description: `Als gefüllte Calzone (+${sizePrice.calzone.toFixed(2)}€)` }
+  ];
+};
+
+// Default pizza styles for initial display
 export const pizzaStyles: PizzaStyle[] = [
   { name: 'Standard', price: 0, description: 'Normale Pizza' },
-  { name: 'Käserand', price: 2.00, description: 'Mit Käserand (+2,00€)' },
-  { name: 'Americanstyle', price: 1.50, description: 'Amerikanischer Stil (+1,50€)' },
-  { name: 'als Calzone', price: 1.00, description: 'Als gefüllte Calzone (+1,00€)' }
+  { name: 'Käserand', price: 2.50, description: 'Mit Käserand (Preis variiert nach Größe)' },
+  { name: 'Americanstyle', price: 2.00, description: 'Amerikanischer Stil (Preis variiert nach Größe)' },
+  { name: 'als Calzone', price: 1.00, description: 'Als gefüllte Calzone (Preis variiert nach Größe)' }
 ];
 
 // Beer types for beer selection
