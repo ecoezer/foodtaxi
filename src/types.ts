@@ -32,6 +32,12 @@ export interface SauceType {
   name: string;
 }
 
+export interface PizzaStyle {
+  name: string;
+  price: number;
+  description: string;
+}
+
 export interface OrderItem {
   menuItem: MenuItem;
   quantity: number;
@@ -40,6 +46,7 @@ export interface OrderItem {
   selectedExtras?: string[];
   selectedPastaType?: string;
   selectedSauce?: string;
+  selectedPizzaStyle?: PizzaStyle;
 }
 
 export interface CustomerInfo {

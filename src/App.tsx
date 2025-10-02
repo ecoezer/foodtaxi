@@ -18,7 +18,7 @@ import {
 } from './data/menuItems';
 import { useCartStore } from './store/cart.store';
 import { ShoppingCart, ChevronUp, ChevronDown } from 'lucide-react';
-import { MenuItem, PizzaSize } from './types';
+import { MenuItem, PizzaSize, PizzaStyle } from './types';
 
 // =================== CONSTANTS ===================
 const SCROLL_CONFIG = {
@@ -297,16 +297,16 @@ function App() {
   }, [findCartElement, calculateScrollPosition, animateCartHighlight, performFallbackScroll]);
 
   // =================== MEMOIZED CALLBACKS ===================
-  const memoizedAddItem = useCallback((menuItem: MenuItem, selectedSize?: PizzaSize, selectedIngredients?: string[], selectedExtras?: string[], selectedPastaType?: string, selectedSauce?: string) => {
-    addItem(menuItem, selectedSize, selectedIngredients, selectedExtras, selectedPastaType, selectedSauce);
+  const memoizedAddItem = useCallback((menuItem: MenuItem, selectedSize?: PizzaSize, selectedIngredients?: string[], selectedExtras?: string[], selectedPastaType?: string, selectedSauce?: string, selectedPizzaStyle?: PizzaStyle) => {
+    addItem(menuItem, selectedSize, selectedIngredients, selectedExtras, selectedPastaType, selectedSauce, selectedPizzaStyle);
   }, [addItem]);
 
-  const memoizedRemoveItem = useCallback((id: number, selectedSize?: PizzaSize, selectedIngredients?: string[], selectedExtras?: string[], selectedPastaType?: string, selectedSauce?: string) => {
-    removeItem(id, selectedSize, selectedIngredients, selectedExtras, selectedPastaType, selectedSauce);
+  const memoizedRemoveItem = useCallback((id: number, selectedSize?: PizzaSize, selectedIngredients?: string[], selectedExtras?: string[], selectedPastaType?: string, selectedSauce?: string, selectedPizzaStyle?: PizzaStyle) => {
+    removeItem(id, selectedSize, selectedIngredients, selectedExtras, selectedPastaType, selectedSauce, selectedPizzaStyle);
   }, [removeItem]);
 
-  const memoizedUpdateQuantity = useCallback((id: number, quantity: number, selectedSize?: PizzaSize, selectedIngredients?: string[], selectedExtras?: string[], selectedPastaType?: string, selectedSauce?: string) => {
-    updateQuantity(id, quantity, selectedSize, selectedIngredients, selectedExtras, selectedPastaType, selectedSauce);
+  const memoizedUpdateQuantity = useCallback((id: number, quantity: number, selectedSize?: PizzaSize, selectedIngredients?: string[], selectedExtras?: string[], selectedPastaType?: string, selectedSauce?: string, selectedPizzaStyle?: PizzaStyle) => {
+    updateQuantity(id, quantity, selectedSize, selectedIngredients, selectedExtras, selectedPastaType, selectedSauce, selectedPizzaStyle);
   }, [updateQuantity]);
 
   const memoizedClearCart = useCallback(() => {

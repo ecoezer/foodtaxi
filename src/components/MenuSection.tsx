@@ -1,13 +1,14 @@
 import React, { useState, useCallback, memo } from 'react';
 import { Plus, Minus, ShoppingCart, ChefHat, Clock, Star, ArrowRight, Check } from 'lucide-react';
-import { MenuItem, PizzaSize } from '../types';
-import { 
-  wunschPizzaIngredients, 
-  pizzaExtras, 
-  pastaTypes, 
-  sauceTypes, 
+import { MenuItem, PizzaSize, PizzaStyle } from '../types';
+import {
+  wunschPizzaIngredients,
+  pizzaExtras,
+  pastaTypes,
+  sauceTypes,
   saladSauceTypes,
-  beerTypes 
+  beerTypes,
+  pizzaStyles
 } from '../data/menuItems';
 
 interface MenuSectionProps {
@@ -17,12 +18,13 @@ interface MenuSectionProps {
   items: MenuItem[];
   bgColor?: string;
   onAddToOrder: (
-    menuItem: MenuItem, 
-    selectedSize?: PizzaSize, 
-    selectedIngredients?: string[], 
+    menuItem: MenuItem,
+    selectedSize?: PizzaSize,
+    selectedIngredients?: string[],
     selectedExtras?: string[],
     selectedPastaType?: string,
-    selectedSauce?: string
+    selectedSauce?: string,
+    selectedPizzaStyle?: PizzaStyle
   ) => void;
 }
 
@@ -31,12 +33,13 @@ interface ItemModalProps {
   isOpen: boolean;
   onClose: () => void;
   onAddToOrder: (
-    menuItem: MenuItem, 
-    selectedSize?: PizzaSize, 
-    selectedIngredients?: string[], 
+    menuItem: MenuItem,
+    selectedSize?: PizzaSize,
+    selectedIngredients?: string[],
     selectedExtras?: string[],
     selectedPastaType?: string,
-    selectedSauce?: string
+    selectedSauce?: string,
+    selectedPizzaStyle?: PizzaStyle
   ) => void;
 }
 
@@ -48,6 +51,9 @@ const ItemModal: React.FC<ItemModalProps> = memo(({ item, isOpen, onClose, onAdd
   const [selectedExtras, setSelectedExtras] = useState<string[]>([]);
   const [selectedPastaType, setSelectedPastaType] = useState<string>('');
   const [selectedSauce, setSelectedSauce] = useState<string>('');
+  const [selectedPizzaStyle, setSelectedPizzaStyle] = useState<PizzaStyle | undefined>(
+    (item.isPizza || item.isWunschPizza) ? pizzaStyles[0] : undefined
+  );
 
   const resetSelections = useCallback(() => {
     setSelectedSize(item.sizes ? item.sizes[0] : undefined);
@@ -55,6 +61,7 @@ const ItemModal: React.FC<ItemModalProps> = memo(({ item, isOpen, onClose, onAdd
     setSelectedExtras([]);
     setSelectedPastaType('');
     setSelectedSauce('');
+    setSelectedPizzaStyle((item.isPizza || item.isWunschPizza) ? pizzaStyles[0] : undefined);
   }, [item]);
 
   React.useEffect(() => {
@@ -85,15 +92,18 @@ const ItemModal: React.FC<ItemModalProps> = memo(({ item, isOpen, onClose, onAdd
   }, []);
 
   const handleAddToOrder = useCallback(() => {
-    onAddToOrder(item, selectedSize, selectedIngredients, selectedExtras, selectedPastaType, selectedSauce);
+    onAddToOrder(item, selectedSize, selectedIngredients, selectedExtras, selectedPastaType, selectedSauce, selectedPizzaStyle);
     onClose();
-  }, [item, selectedSize, selectedIngredients, selectedExtras, selectedPastaType, selectedSauce, onAddToOrder, onClose]);
+  }, [item, selectedSize, selectedIngredients, selectedExtras, selectedPastaType, selectedSauce, selectedPizzaStyle, onAddToOrder, onClose]);
 
   const getCurrentPrice = useCallback(() => {
     let price = selectedSize ? selectedSize.price : item.price;
     price += selectedExtras.length * 1.50;
+    if (selectedPizzaStyle && selectedPizzaStyle.price > 0) {
+      price += selectedPizzaStyle.price;
+    }
     return price;
-  }, [selectedSize, selectedExtras, item.price]);
+  }, [selectedSize, selectedExtras, selectedPizzaStyle, item.price]);
 
   const canAddToOrder = useCallback(() => {
     // Check if pasta type is required and selected
@@ -168,6 +178,38 @@ const ItemModal: React.FC<ItemModalProps> = memo(({ item, isOpen, onClose, onAdd
                         <span className="font-bold text-orange-600 text-lg">
                           {size.price.toFixed(2).replace('.', ',')} €
                         </span>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Pizza Style Selection (Sonderwunsch) */}
+            {(item.isPizza || item.isWunschPizza) && (
+              <div className="space-y-4">
+                <h4 className="font-semibold text-gray-900 text-lg">Sonderwunsch</h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {pizzaStyles.map((style) => (
+                    <button
+                      key={style.name}
+                      onClick={() => setSelectedPizzaStyle(style)}
+                      className={`p-4 rounded-lg border-2 transition-all ${
+                        selectedPizzaStyle?.name === style.name
+                          ? 'border-orange-500 bg-orange-50'
+                          : 'border-gray-200 hover:border-orange-300'
+                      }`}
+                    >
+                      <div className="flex justify-between items-center">
+                        <div className="text-left">
+                          <span className="font-medium text-base block">{style.name}</span>
+                          <span className="text-sm text-gray-600 block">{style.description}</span>
+                        </div>
+                        {style.price > 0 && (
+                          <span className="font-bold text-orange-600 text-base ml-2">
+                            +{style.price.toFixed(2).replace('.', ',')} €
+                          </span>
+                        )}
                       </div>
                     </button>
                   ))}
@@ -292,6 +334,11 @@ const ItemModal: React.FC<ItemModalProps> = memo(({ item, isOpen, onClose, onAdd
               {selectedSize && (
                 <div className="text-sm text-blue-600">
                   Größe: {selectedSize.name} {selectedSize.description && `- ${selectedSize.description}`}
+                </div>
+              )}
+              {selectedPizzaStyle && selectedPizzaStyle.name !== 'Standard' && (
+                <div className="text-sm text-blue-600">
+                  Sonderwunsch: {selectedPizzaStyle.name} (+{selectedPizzaStyle.price.toFixed(2).replace('.', ',')}€)
                 </div>
               )}
               {selectedPastaType && (

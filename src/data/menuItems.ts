@@ -1,4 +1,4 @@
-import { MenuItem, WunschPizzaIngredient, PizzaExtra, PastaType, SauceType } from '../types';
+import { MenuItem, WunschPizzaIngredient, PizzaExtra, PastaType, SauceType, PizzaStyle } from '../types';
 
 // Helper functions to check current day for special offers
 const isRippchen = () => {
@@ -36,6 +36,14 @@ export const saladSauceTypes: SauceType[] = [
   { name: 'Joghurt' },
   { name: 'French' },
   { name: 'Essig/Öl' }
+];
+
+// Pizza styles (Sonderwunsch)
+export const pizzaStyles: PizzaStyle[] = [
+  { name: 'Standard', price: 0, description: 'Normale Pizza' },
+  { name: 'Käserand', price: 2.00, description: 'Mit Käserand (+2,00€)' },
+  { name: 'Americanstyle', price: 1.50, description: 'Amerikanischer Stil (+1,50€)' },
+  { name: 'als Calzone', price: 1.00, description: 'Als gefüllte Calzone (+1,00€)' }
 ];
 
 // Beer types for beer selection
