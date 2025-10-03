@@ -32,8 +32,8 @@ interface OrderFormProps {
 
 // Constants - Delivery zones sorted alphabetically
 const DELIVERY_ZONES = {
-  'banteln': { label: 'Banteln', minOrder: 25, fee: 2.5 },
-  'barfelde': { label: 'Barfelde', minOrder: 20, fee: 2.5 },
+  'banteln': { label: 'Banteln', minOrder: 25, fee: 3 },
+  'barfelde': { label: 'Barfelde', minOrder: 20, fee: 3 },
   'betheln': { label: 'Betheln', minOrder: 25, fee: 3 },
   'brueggen': { label: 'Brüggen', minOrder: 35, fee: 3 },
   'burgstemmen': { label: 'Burgstemmen', minOrder: 35, fee: 4 },
@@ -45,7 +45,7 @@ const DELIVERY_ZONES = {
   'elze': { label: 'Elze', minOrder: 35, fee: 4 },
   'gronau': { label: 'Gronau', minOrder: 15, fee: 1.5 },
   'gronau-doetzum': { label: 'Gronau Dötzum', minOrder: 20, fee: 2 },
-  'gronau-eddighausen': { label: 'Gronau Eddighausen', minOrder: 20, fee: 2.5 },
+  'gronau-eddighausen': { label: 'Gronau Eddighausen', minOrder: 20, fee: 3 },
   'haus-escherde': { label: 'Haus Escherde', minOrder: 25, fee: 3 },
   'heinum': { label: 'Heinum', minOrder: 25, fee: 3 },
   'kolonie-godenau': { label: 'Kolonie Godenau', minOrder: 40, fee: 4 },
