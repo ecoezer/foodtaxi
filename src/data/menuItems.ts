@@ -43,7 +43,7 @@ export const getPizzaStylesForSize = (size: string): PizzaStyle[] => {
   // Only Medium, Large, and Family sizes support Sonderwunsch options
   // Mega size only gets Standard option
   const prices: Record<string, { käserand: number; american: number; calzone: number }> = {
-    'Medium': { käserand: 2.50, american: 2.00, calzone: 1.00 },
+    'Medium': { käserand: 2.50, american: 2.00, calzone: 1.50 },
     'Large': { käserand: 3.00, american: 3.00, calzone: 2.00 },
     'Family': { käserand: 3.00, american: 3.00, calzone: 2.00 }
   };
@@ -70,7 +70,7 @@ export const pizzaStyles: PizzaStyle[] = [
   { name: 'Standard', price: 0, description: 'Normale Pizza' },
   { name: 'Käserand', price: 2.50, description: 'Mit Käserand (Preis variiert nach Größe)' },
   { name: 'Americanstyle', price: 2.00, description: 'Amerikanischer Stil (Preis variiert nach Größe)' },
-  { name: 'als Calzone', price: 1.00, description: 'Als gefüllte Calzone (Preis variiert nach Größe)' }
+  { name: 'als Calzone', price: 1.50, description: 'Als gefüllte Calzone (Preis variiert nach Größe)' }
 ];
 
 // Beer types for beer selection
