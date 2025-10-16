@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { collection, query, orderBy, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
 import { db } from '../config/firebase';
-import { LogOut, Trash2, Phone, Mail, User, MapPin, Clock, Package, MessageSquare } from 'lucide-react';
+import { LogOut, Trash2, Phone, Mail, User, MapPin, Clock, Package, MessageSquare, BarChart3 } from 'lucide-react';
 
 interface Order {
   id: string;
@@ -87,13 +87,22 @@ export default function AdminDashboard() {
             <h1 className="text-4xl font-bold text-white mb-2">Order Management</h1>
             <p className="text-slate-300">Manage and track all incoming orders</p>
           </div>
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg transition"
-          >
-            <LogOut className="w-5 h-5" />
-            Logout
-          </button>
+          <div className="flex gap-3">
+            <Link
+              to="/admin/analytics"
+              className="flex items-center gap-2 bg-orange-600 hover:bg-orange-700 text-white px-6 py-3 rounded-lg transition"
+            >
+              <BarChart3 className="w-5 h-5" />
+              Analytics
+            </Link>
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg transition"
+            >
+              <LogOut className="w-5 h-5" />
+              Logout
+            </button>
+          </div>
         </div>
 
         {orders.length === 0 ? (

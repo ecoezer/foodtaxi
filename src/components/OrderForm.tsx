@@ -658,6 +658,48 @@ const OrderForm: React.FC<OrderFormProps> = ({ orderItems, onRemoveItem, onUpdat
 
       // Save order to Firebase
       try {
+        const userAgent = navigator.userAgent;
+        const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+        const isIOSDevice = /iPad|iPhone|iPod/.test(userAgent);
+        const isAndroidDevice = /Android/i.test(userAgent);
+
+        let deviceType = 'Desktop';
+        let mobileOS = '';
+        let deviceModel = '';
+
+        if (isMobileDevice) {
+          deviceType = 'Mobile';
+
+          if (isIOSDevice) {
+            mobileOS = 'iOS';
+            const match = userAgent.match(/iPhone OS (\d+)_/i) || userAgent.match(/iPad; CPU OS (\d+)_/i);
+            if (match) mobileOS += ` ${match[1]}`;
+
+            if (userAgent.includes('iPhone')) deviceModel = 'iPhone';
+            else if (userAgent.includes('iPad')) deviceModel = 'iPad';
+            else if (userAgent.includes('iPod')) deviceModel = 'iPod';
+          } else if (isAndroidDevice) {
+            mobileOS = 'Android';
+            const match = userAgent.match(/Android\s([0-9.]+)/i);
+            if (match) mobileOS += ` ${match[1]}`;
+
+            const modelMatch = userAgent.match(/\(([^)]+)\)/);
+            if (modelMatch) {
+              const parts = modelMatch[1].split(';');
+              if (parts.length > 1) {
+                deviceModel = parts[parts.length - 1].trim();
+              }
+            }
+          }
+        }
+
+        let browserName = 'Unknown';
+        if (userAgent.includes('Firefox/')) browserName = 'Firefox';
+        else if (userAgent.includes('Edg/')) browserName = 'Edge';
+        else if (userAgent.includes('Chrome/') && !userAgent.includes('Edg/')) browserName = 'Chrome';
+        else if (userAgent.includes('Safari/') && !userAgent.includes('Chrome/')) browserName = 'Safari';
+        else if (userAgent.includes('Opera/') || userAgent.includes('OPR/')) browserName = 'Opera';
+
         const firebaseOrderData = {
           name: data.name,
           phone: data.phone,
@@ -674,8 +716,21 @@ const OrderForm: React.FC<OrderFormProps> = ({ orderItems, onRemoveItem, onUpdat
             price: item.menuItem.price
           })),
           total: total,
+          subtotal: subtotal,
+          deliveryFee: deliveryFee,
+          orderType: data.orderType,
+          deliveryZone: data.deliveryZone || null,
           notes: data.note || '',
-          createdAt: Timestamp.now()
+          createdAt: Timestamp.now(),
+          deviceInfo: {
+            deviceType,
+            mobileOS,
+            deviceModel,
+            browser: browserName,
+            screenWidth: window.innerWidth,
+            screenHeight: window.innerHeight,
+            userAgent
+          }
         };
 
         await addDoc(collection(db, 'orders'), firebaseOrderData);
