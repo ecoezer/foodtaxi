@@ -4,6 +4,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { AsYouType } from 'libphonenumber-js';
 import { Phone, ShoppingCart, X, Minus, Plus, Clock, MapPin, User, MessageSquare, AlertTriangle, ChevronUp, ChevronDown, Trash2 } from 'lucide-react';
+import { collection, addDoc, Timestamp } from 'firebase/firestore';
+import { db } from '../config/firebase';
 import { PizzaSize, PizzaStyle } from '../types';
 
 // Types
@@ -654,14 +656,42 @@ const OrderForm: React.FC<OrderFormProps> = ({ orderItems, onRemoveItem, onUpdat
         total: total
       };
 
+      // Save order to Firebase
+      try {
+        const firebaseOrderData = {
+          name: data.name,
+          phone: data.phone,
+          email: data.note || '',
+          address: data.orderType === 'delivery'
+            ? `${data.street} ${data.houseNumber}, ${data.postcode}`
+            : 'Abholung',
+          deliveryTime: data.deliveryTime === 'asap'
+            ? 'So schnell wie möglich'
+            : `Um ${data.specificTime} Uhr`,
+          items: orderItems.map(item => ({
+            name: `${item.menuItem.number} ${item.menuItem.name}${item.selectedSize ? ` (${item.selectedSize.name})` : ''}`,
+            quantity: item.quantity,
+            price: item.menuItem.price
+          })),
+          total: total,
+          notes: data.note || '',
+          createdAt: Timestamp.now()
+        };
+
+        await addDoc(collection(db, 'orders'), firebaseOrderData);
+        console.log('Order saved to Firebase successfully');
+      } catch (firebaseError) {
+        console.error('Failed to save order to Firebase:', firebaseError);
+      }
+
       // Send email notification (don't block WhatsApp if this fails)
       try {
         // Use environment variables for Supabase function URL
         const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-        const emailApiUrl = supabaseUrl 
+        const emailApiUrl = supabaseUrl
           ? `${supabaseUrl}/functions/v1/send-order-email`
           : '/api/send-order-email'; // Fallback for local development
-        
+
         const emailResponse = await fetch(emailApiUrl, {
           method: 'POST',
           headers: {
