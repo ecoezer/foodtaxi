@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { collection, query, orderBy, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
 import { db } from '../config/firebase';
-import { useAuth } from '../context/AuthContext';
 import { LogOut, Trash2, Phone, Mail, User, MapPin, Clock, Package, MessageSquare } from 'lucide-react';
 
 interface Order {
@@ -21,11 +20,12 @@ interface Order {
 export default function AdminDashboard() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
-  const { logout, user } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!user) {
+    const isAuthenticated = localStorage.getItem('adminAuthenticated') === 'true';
+
+    if (!isAuthenticated) {
       navigate('/admin/login');
       return;
     }
@@ -42,10 +42,10 @@ export default function AdminDashboard() {
     });
 
     return () => unsubscribe();
-  }, [user, navigate]);
+  }, [navigate]);
 
   const handleLogout = async () => {
-    await logout();
+    localStorage.removeItem('adminAuthenticated');
     navigate('/admin/login');
   };
 
