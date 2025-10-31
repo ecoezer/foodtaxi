@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { MapPin, Phone, Heart } from 'lucide-react';
+import { MapPin, Phone, Heart, X } from 'lucide-react';
 
 const Footer = () => {
   const [copied, setCopied] = useState(false);
+  const [showImpressum, setShowImpressum] = useState(false);
   const phoneNumber = '+4915259630500';
 
   const handleWhatsApp = async (e) => {
@@ -88,7 +89,71 @@ const Footer = () => {
           <p className="text-xs text-gray-500">
             © 2025 FoodsTaxi-Gronau 🚕 - Alle Rechte vorbehalten
           </p>
+          <button
+            onClick={() => setShowImpressum(true)}
+            className="text-xs text-orange-600 hover:text-orange-700 underline mt-2 transition-colors"
+          >
+            Impressum
+          </button>
         </div>
+
+        {/* Impressum Modal */}
+        {showImpressum && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-2xl max-w-md max-h-[90vh] overflow-y-auto shadow-2xl relative">
+              <button
+                onClick={() => setShowImpressum(false)}
+                className="absolute top-4 right-4 p-2 hover:bg-gray-100 rounded-full transition-colors"
+              >
+                <X className="h-6 w-6 text-gray-600" />
+              </button>
+
+              <div className="p-6 pt-12">
+                <h2 className="text-2xl font-bold text-gray-800 mb-6">Impressum</h2>
+
+                <div className="space-y-4 text-sm text-gray-700">
+                  <div>
+                    <h3 className="font-bold text-gray-800">Foods Taxi</h3>
+                    <p>Ladestraße 3</p>
+                    <p>31028 Gronau (Leine)</p>
+                  </div>
+
+                  <div>
+                    <h3 className="font-bold text-gray-800">Vertretungsberechtigt</h3>
+                    <p>Hamid Roshan</p>
+                  </div>
+
+                  <div>
+                    <h3 className="font-bold text-gray-800">Kontakt</h3>
+                    <p>Telefon: <span className="text-gray-500">[bitte ergänzen]</span></p>
+                    <p>Telefax: <span className="text-gray-500">[bitte ergänzen]</span></p>
+                    <p>E-Mail: <span className="text-gray-500">[bitte ergänzen]</span></p>
+                  </div>
+
+                  <div>
+                    <h3 className="font-bold text-gray-800">Umsatzsteueridentifikationsnummer</h3>
+                    <p className="text-gray-500">gemäß § 27a Umsatzsteuergesetz: [bitte ergänzen]</p>
+                  </div>
+
+                  <div>
+                    <h3 className="font-bold text-gray-800">Inhaltlich Verantwortlicher</h3>
+                    <p>gemäß § 55 Abs. 2 RStV:</p>
+                    <p>Hamid Roshan</p>
+                    <p>Ladestraße 3</p>
+                    <p>31028 Gronau (Leine)</p>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => setShowImpressum(false)}
+                  className="w-full mt-6 bg-orange-500 hover:bg-orange-600 text-white font-medium py-2 rounded-lg transition-colors"
+                >
+                  Schließen
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </footer>
   );
