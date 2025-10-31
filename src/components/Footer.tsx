@@ -83,9 +83,6 @@ const Footer = () => {
 
         {/* Footer Text */}
         <div className="space-y-1">
-          <div className="font-medium text-gray-700">
-            🍽️ Leckere Döner, Pizza & mehr in Gronau (Leine)
-          </div>
           <p className="text-xs text-gray-500">
             © 2025 FoodsTaxi-Gronau 🚕 - Alle Rechte vorbehalten
           </p>
