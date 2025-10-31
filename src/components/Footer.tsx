@@ -126,7 +126,6 @@ const Footer = () => {
                   <div>
                     <h3 className="font-bold text-gray-800">Kontakt</h3>
                     <p>Telefon: 01525 9630500</p>
-                    <p>Telefax: <span className="text-gray-500">[bitte ergänzen]</span></p>
                     <p>E-Mail: roshanhamid38@gmail.com</p>
                   </div>
 
