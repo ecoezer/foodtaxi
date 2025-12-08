@@ -1,6 +1,6 @@
 # FoodsTaxi-Gronau 🚕
 
-A modern food delivery website for FoodsTaxi-Gronau with WhatsApp ordering and email notifications.
+A modern food delivery website for FoodsTaxi-Gronau with WhatsApp ordering and Firebase backend.
 
 ## Features
 
@@ -8,7 +8,8 @@ A modern food delivery website for FoodsTaxi-Gronau with WhatsApp ordering and e
 - 🍕 Complete menu with pizzas, döner, burgers, pasta, and more
 - 🛒 Shopping cart with item customization
 - 📞 WhatsApp integration for order placement
-- 📧 Email notifications for restaurant staff
+- 💾 Order management with Firebase Firestore
+- 👤 Admin dashboard for order tracking and analytics
 - ⏰ Real-time opening hours display
 - 🚚 Delivery zone management with minimum order requirements
 - 🎨 Modern UI with smooth animations
@@ -19,8 +20,8 @@ A modern food delivery website for FoodsTaxi-Gronau with WhatsApp ordering and e
 - **Styling**: Tailwind CSS
 - **State Management**: Zustand
 - **Forms**: React Hook Form + Zod validation
-- **Backend**: Supabase Edge Functions
-- **Email Service**: Resend
+- **Database**: Firebase Firestore
+- **Authentication**: Firebase Auth
 - **Icons**: Lucide React
 
 ## Setup Instructions
@@ -41,35 +42,28 @@ Create a `.env` file based on `.env.example`:
 cp .env.example .env
 ```
 
-Fill in your configuration:
+Fill in your Firebase configuration:
 
 ```env
-# Supabase Configuration
-VITE_SUPABASE_URL=your_supabase_project_url
-VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
-
-# Email Configuration (for Edge Function)
-RESEND_API_KEY=your_resend_api_key
-RESTAURANT_EMAIL=orders@your-restaurant.com
+# Firebase Configuration
+VITE_FIREBASE_API_KEY=your_firebase_api_key
+VITE_FIREBASE_AUTH_DOMAIN=your_project_id.firebaseapp.com
+VITE_FIREBASE_PROJECT_ID=your_project_id
+VITE_FIREBASE_STORAGE_BUCKET=your_project_id.firebasestorage.app
+VITE_FIREBASE_MESSAGING_SENDER_ID=your_messaging_sender_id
+VITE_FIREBASE_APP_ID=your_firebase_app_id
+VITE_FIREBASE_MEASUREMENT_ID=your_measurement_id
 ```
 
-### 3. Supabase Setup
+### 3. Firebase Setup
 
-1. Create a new Supabase project at [supabase.com](https://supabase.com)
-2. Get your project URL and anon key from the project settings
-3. The Edge Function will be automatically deployed when you connect to Supabase
+1. Create a new Firebase project at [console.firebase.google.com](https://console.firebase.google.com)
+2. Enable Firestore Database in your Firebase project
+3. Enable Authentication (optional, for admin panel)
+4. Get your Firebase config from Project Settings
+5. Add the config values to your `.env` file
 
-### 4. Email Service Setup
-
-1. Sign up for [Resend](https://resend.com)
-2. Get your API key from the Resend dashboard
-3. Add your API key to the Supabase Edge Function environment variables:
-   - Go to your Supabase project dashboard
-   - Navigate to Edge Functions → Environment Variables
-   - Add `RESEND_API_KEY` with your Resend API key
-   - Add `RESTAURANT_EMAIL` with your restaurant's email address
-
-### 5. Development
+### 4. Development
 
 ```bash
 npm run dev
@@ -77,28 +71,29 @@ npm run dev
 
 The application will be available at `http://localhost:5173`
 
-### 6. Production Build
+### 5. Production Build
 
 ```bash
 npm run build
 npm run preview
 ```
 
-## Email Notification System
+## Order Management
 
-The application includes an automated email notification system:
+The application stores all orders in Firebase Firestore:
 
-- **Trigger**: Automatically sends when an order is submitted
-- **Content**: Complete order details, customer info, and totals
-- **Fallback**: WhatsApp ordering continues to work even if email fails
-- **Service**: Uses Resend for reliable email delivery
+- **Storage**: Orders are automatically saved to Firestore when submitted
+- **Admin Panel**: Access order history and analytics at `/admin/login`
+- **WhatsApp**: Orders are sent via WhatsApp for immediate notification
+- **Device Tracking**: Captures device information for analytics
 
-### Email Features:
-- Professional HTML email template
-- Complete order breakdown with pricing
-- Customer contact information
-- Delivery details and special instructions
-- Mobile-responsive email design
+### Admin Features:
+- Real-time order tracking
+- Order history with search and filtering
+- Analytics dashboard with sales insights
+- Device and browser statistics
+- Peak hours analysis
+- Delivery zone performance metrics
 
 ## Menu Management
 

@@ -739,32 +739,6 @@ const OrderForm: React.FC<OrderFormProps> = ({ orderItems, onRemoveItem, onUpdat
         console.error('Failed to save order to Firebase:', firebaseError);
       }
 
-      // Send email notification (don't block WhatsApp if this fails)
-      try {
-        // Use environment variables for Supabase function URL
-        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-        const emailApiUrl = supabaseUrl
-          ? `${supabaseUrl}/functions/v1/send-order-email`
-          : '/api/send-order-email'; // Fallback for local development
-
-        const emailResponse = await fetch(emailApiUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-          },
-          body: JSON.stringify(orderData),
-        });
-
-        if (emailResponse.ok) {
-          console.log('Order email sent successfully');
-        } else {
-          console.warn('Failed to send order email, but continuing with WhatsApp');
-        }
-      } catch (emailError) {
-        console.warn('Email service error, but continuing with WhatsApp:', emailError);
-      }
-
       const orderDetails = orderItems
         .map(item => {
           let itemText = `${item.quantity}x Nr. ${item.menuItem.number} ${item.menuItem.name}`;
