@@ -119,7 +119,8 @@ The application supports multiple delivery zones with individual:
 
 ## Opening Hours
 
-- **Monday, Wednesday, Thursday**: 12:00 - 21:30
+- **Monday**: 12:00 - 21:00
+- **Wednesday, Thursday**: 12:00 - 21:30
 - **Friday, Saturday, Sunday & Holidays**: 12:00 - 21:30
 - **Tuesday**: Closed (Ruhetag)
 

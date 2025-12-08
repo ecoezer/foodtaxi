@@ -128,7 +128,7 @@ const Footer = () => {
 
                   <div>
                     <h3 className="font-bold text-gray-800">Umsatzsteueridentifikationsnummer</h3>
-                    <p className="text-gray-500">gemäß § 27a Umsatzsteuergesetz: [bitte ergänzen]</p>
+                    <p className="text-gray-600">gemäß § 27a Umsatzsteuergesetz: DE457943378</p>
                   </div>
 
                   <div>

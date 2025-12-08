@@ -882,7 +882,8 @@ const OrderForm: React.FC<OrderFormProps> = ({ orderItems, onRemoveItem, onUpdat
           <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
             <p className="text-sm text-gray-700">
               <strong>Öffnungszeiten:</strong><br />
-              Mo, Mi, Do: 12:00–21:30<br />
+              Mo: 12:00–21:00<br />
+              Mi, Do: 12:00–21:30<br />
               Fr, Sa, So & Feiertage: 12:00–21:30<br />
               Di: Ruhetag
             </p>
