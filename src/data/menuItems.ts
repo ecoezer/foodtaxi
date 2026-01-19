@@ -155,7 +155,7 @@ export const pizzaExtras: PizzaExtra[] = [
 ];
 
 // Helper function to create drink sizes for soft drinks
-const createDrinkSizes = (smallPrice: number, largePrice: number = 3.60) => [
+const createDrinkSizes = (smallPrice: number, largePrice: number = 3.80) => [
   { name: '0,33 L', price: smallPrice, description: 'Klein' },
   { name: '1,0 L', price: largePrice, description: 'Groß' }
 ];
@@ -571,32 +571,32 @@ export const drinks: MenuItem[] = [
     number: 100,
     name: "Coca-Cola",
     description: "Wählen Sie Ihre gewünschte Größe",
-    price: 2.20,
-    sizes: createDrinkSizes(2.20)
+    price: 2.40,
+    sizes: createDrinkSizes(2.40)
   },
   {
     id: 11,
     number: 100,
     name: "Coca-Cola Light",
     description: "Wählen Sie Ihre gewünschte Größe",
-    price: 2.20,
-    sizes: createDrinkSizes(2.20)
+    price: 2.40,
+    sizes: createDrinkSizes(2.40)
   },
   {
     id: 12,
     number: 100,
     name: "Fanta Orange",
     description: "Wählen Sie Ihre gewünschte Größe",
-    price: 2.20,
-    sizes: createDrinkSizes(2.20)
+    price: 2.40,
+    sizes: createDrinkSizes(2.40)
   },
   {
     id: 13,
     number: 100,
     name: "Sprite",
     description: "Wählen Sie Ihre gewünschte Größe",
-    price: 2.20,
-    sizes: createDrinkSizes(2.20)
+    price: 2.40,
+    sizes: createDrinkSizes(2.40)
   },
   {
     id: 18,
@@ -610,7 +610,7 @@ export const drinks: MenuItem[] = [
     number: 102,
     name: "Becks oder Herrenhäuser",
     description: "0,3 L",
-    price: 2.40,
+    price: 2.50,
     isBeerSelection: true
   },
   {
@@ -618,7 +618,7 @@ export const drinks: MenuItem[] = [
     number: 103,
     name: "Chianti (Italienische Rotwein)",
     description: "0,7 L",
-    price: 9.00
+    price: 9.50
   },
   {
     id: 564,
@@ -632,7 +632,7 @@ export const drinks: MenuItem[] = [
     number: 105,
     name: "Suave (Italienischer Weißwein)",
     description: "0,7 L",
-    price: 9.00
+    price: 9.50
   },
   {
     id: 566,
@@ -712,210 +712,210 @@ export const pizzas: MenuItem[] = [
     number: 0,
     name: "Wunsch Pizza",
     description: "mit 4 Zutaten nach Wahl",
-    price: 9.90,
+    price: 10.90,
     allergens: "1,2,3/A,C",
     isWunschPizza: true,
-    sizes: createPizzaSizes({ medium: 9.90, large: 11.90, family: 21.90, mega: 30.90 })
+    sizes: createPizzaSizes({ medium: 10.90, large: 11.90, family: 21.90, mega: 30.90 })
   },
   {
     id: 502,
     number: 1,
     name: "Margherita",
     description: "",
-    price: 8.90,
+    price: 10.30,
     allergens: "1,2,3/A,C",
     isPizza: true,
-    sizes: createPizzaSizes({ medium: 8.90, large: 9.90, family: 17.90, mega: 26.90 })
+    sizes: createPizzaSizes({ medium: 10.30, large: 9.90, family: 17.90, mega: 26.90 })
   },
   {
     id: 503,
     number: 2,
     name: "Salami",
     description: "mit Rindersalami",
-    price: 9.90,
+    price: 10.30,
     allergens: "1,2,3,4/A,C",
     isPizza: true,
-    sizes: createPizzaSizes({ medium: 9.90, large: 11.90, family: 18.90, mega: 28.90 })
+    sizes: createPizzaSizes({ medium: 10.30, large: 11.90, family: 18.90, mega: 28.90 })
   },
   {
     id: 504,
     number: 3,
     name: "Schinken",
     description: "mit Formfleisch-Vorderschinken",
-    price: 9.90,
+    price: 10.30,
     allergens: "1,2,3,4/A,C",
     isPizza: true,
-    sizes: createPizzaSizes({ medium: 9.90, large: 11.90, family: 18.90, mega: 28.90 })
+    sizes: createPizzaSizes({ medium: 10.30, large: 11.90, family: 18.90, mega: 28.90 })
   },
   {
     id: 505,
     number: 4,
     name: "Bomba",
     description: "mit Rindersalami und Peperoni (scharf)",
-    price: 9.90,
+    price: 10.30,
     allergens: "1,2,3,4/A,C",
     isPizza: true,
-    sizes: createPizzaSizes({ medium: 9.90, large: 11.90, family: 18.90, mega: 28.90 })
+    sizes: createPizzaSizes({ medium: 10.30, large: 11.90, family: 18.90, mega: 28.90 })
   },
   {
     id: 506,
     number: 5,
     name: "Sucuk",
     description: "mit Knoblauchwurst, Tomaten und Zwiebeln",
-    price: 9.90,
+    price: 10.30,
     allergens: "1,2,3,4/A,C,F",
     isPizza: true,
-    sizes: createPizzaSizes({ medium: 9.90, large: 11.90, family: 18.90, mega: 28.90 })
+    sizes: createPizzaSizes({ medium: 10.30, large: 11.90, family: 18.90, mega: 28.90 })
   },
   {
     id: 507,
     number: 6,
     name: "Casa",
     description: "mit Rindersalami, fr. Champignons und Paprika",
-    price: 9.90,
+    price: 10.30,
     allergens: "1,2,3,4/A,C",
     isPizza: true,
-    sizes: createPizzaSizes({ medium: 9.90, large: 11.90, family: 18.90, mega: 28.90 })
+    sizes: createPizzaSizes({ medium: 10.30, large: 11.90, family: 18.90, mega: 28.90 })
   },
   {
     id: 508,
     number: 7,
     name: "Mais",
     description: "mit Formfleisch-Vorderschinken, Mais und Sauce Hollandaise",
-    price: 9.90,
+    price: 10.30,
     allergens: "1,2,3,4/A,C,F,G",
     isPizza: true,
-    sizes: createPizzaSizes({ medium: 9.90, large: 11.90, family: 18.90, mega: 28.90 })
+    sizes: createPizzaSizes({ medium: 10.30, large: 11.90, family: 18.90, mega: 28.90 })
   },
   {
     id: 509,
     number: 8,
     name: "Monopoly",
     description: "mit Formfleisch-Vorderschinken, Rindersalami, fr. Champignons und Paprika",
-    price: 9.90,
+    price: 10.30,
     allergens: "1,2,3,4/A,C",
     isPizza: true,
-    sizes: createPizzaSizes({ medium: 9.90, large: 11.90, family: 18.90, mega: 28.90 })
+    sizes: createPizzaSizes({ medium: 10.30, large: 11.90, family: 18.90, mega: 28.90 })
   },
   {
     id: 510,
     number: 9,
     name: "Hawaii",
     description: "mit Formfleisch-Vorderschinken und Ananas",
-    price: 9.90,
+    price: 10.30,
     allergens: "1,2,3,4/A,C",
     isPizza: true,
-    sizes: createPizzaSizes({ medium: 9.90, large: 11.90, family: 18.90, mega: 28.90 })
+    sizes: createPizzaSizes({ medium: 10.30, large: 11.90, family: 18.90, mega: 28.90 })
   },
   {
     id: 511,
     number: 10,
     name: "Parma",
     description: "mit Original Parmaschinken, Tomaten, Mozzarella, Rucola",
-    price: 10.90,
+    price: 11.30,
     allergens: "1,2,3,4/A,C",
     isPizza: true,
-    sizes: createPizzaSizes({ medium: 10.90, large: 12.90, family: 21.90, mega: 30.90 })
+    sizes: createPizzaSizes({ medium: 11.30, large: 12.90, family: 21.90, mega: 30.90 })
   },
   {
     id: 512,
     number: 11,
     name: "Italia",
     description: "mit Formfleisch-Vorderschinken, Rindersalami, fr. Champignons",
-    price: 9.90,
+    price: 10.30,
     allergens: "1,2,3,4/A,C",
     isPizza: true,
-    sizes: createPizzaSizes({ medium: 9.90, large: 11.90, family: 18.90, mega: 28.90 })
+    sizes: createPizzaSizes({ medium: 10.30, large: 11.90, family: 18.90, mega: 28.90 })
   },
   {
     id: 513,
     number: 12,
     name: "Chilli-Cheese",
     description: "Chilli-Cheese Sauce, Sucuk, Jalapenos und Zwiebeln",
-    price: 9.90,
+    price: 10.90,
     allergens: "1,2,3,4/A,C,F",
     isPizza: true,
-    sizes: createPizzaSizes({ medium: 9.90, large: 11.90, family: 19.90, mega: 29.90 })
+    sizes: createPizzaSizes({ medium: 10.90, large: 11.90, family: 19.90, mega: 29.90 })
   },
   {
     id: 514,
     number: 13,
     name: "Gyros",
     description: "mit Gyros und Zwiebeln",
-    price: 9.90,
+    price: 10.30,
     allergens: "1,2,3,4/A,C,G",
     isPizza: true,
-    sizes: createPizzaSizes({ medium: 9.90, large: 11.90, family: 18.90, mega: 28.90 })
+    sizes: createPizzaSizes({ medium: 10.30, large: 11.90, family: 18.90, mega: 28.90 })
   },
   {
     id: 515,
     number: 14,
     name: "Hollandaise",
     description: "mit Hähnchenbrust, Jalapenos und Sauce Hollandaise",
-    price: 10.90,
+    price: 11.30,
     allergens: "1,2,3,4/A,C,F,G",
     isPizza: true,
-    sizes: createPizzaSizes({ medium: 10.90, large: 12.90, family: 20.90, mega: 30.90 })
+    sizes: createPizzaSizes({ medium: 11.30, large: 12.90, family: 20.90, mega: 30.90 })
   },
   {
     id: 516,
     number: 15,
     name: "Polo",
     description: "mit Hähnchenbrust, Sucuk, Broccoli, Paprika",
-    price: 10.90,
+    price: 11.30,
     allergens: "1,2,3,4/A,C,F,G",
     isPizza: true,
-    sizes: createPizzaSizes({ medium: 10.90, large: 12.90, family: 20.90, mega: 30.90 })
+    sizes: createPizzaSizes({ medium: 11.30, large: 12.90, family: 20.90, mega: 30.90 })
   },
   {
     id: 517,
     number: 16,
     name: "Palermo",
     description: "mit Hähnchenbrust, fr. Champignons und Paprika, Jalapenos und Sauce Hollandaise",
-    price: 10.90,
+    price: 11.30,
     allergens: "1,2,3,4/A,C,F,G",
     isPizza: true,
-    sizes: createPizzaSizes({ medium: 10.90, large: 12.90, family: 20.90, mega: 30.90 })
+    sizes: createPizzaSizes({ medium: 11.30, large: 12.90, family: 20.90, mega: 30.90 })
   },
   {
     id: 518,
     number: 17,
     name: "Desperado",
     description: "mit Hähnchenbrust, fr. Paprika, Zwiebeln und Sauce Hollandaise",
-    price: 10.90,
+    price: 11.30,
     allergens: "1,2,3,4/A,C,F,G",
     isPizza: true,
-    sizes: createPizzaSizes({ medium: 10.90, large: 12.90, family: 20.90, mega: 30.90 })
+    sizes: createPizzaSizes({ medium: 11.30, large: 12.90, family: 20.90, mega: 30.90 })
   },
   {
     id: 519,
     number: 18,
     name: "Tonno",
     description: "mit Thunfisch und Zwiebeln",
-    price: 9.90,
+    price: 10.30,
     allergens: "1,2,3/A,C,H",
     isPizza: true,
-    sizes: createPizzaSizes({ medium: 9.90, large: 11.90, family: 18.90, mega: 28.90 })
+    sizes: createPizzaSizes({ medium: 10.30, large: 11.90, family: 18.90, mega: 28.90 })
   },
   {
     id: 520,
     number: 19,
     name: "Shrimps",
     description: "mit Shrimps und Knoblauch",
-    price: 10.90,
+    price: 11.30,
     allergens: "1,2,3/A,C,D",
     isPizza: true,
-    sizes: createPizzaSizes({ medium: 10.90, large: 13.90, family: 21.90, mega: 30.90 })
+    sizes: createPizzaSizes({ medium: 11.30, large: 13.90, family: 21.90, mega: 30.90 })
   },
   {
     id: 521,
     number: 20,
     name: "Frutti di Mare",
     description: "mit Meeresfrüchten und Knoblauch",
-    price: 10.90,
+    price: 11.30,
     allergens: "1,2,3/A,C,D",
     isPizza: true,
-    sizes: createPizzaSizes({ medium: 10.90, large: 13.90, family: 21.90, mega: 30.90 })
+    sizes: createPizzaSizes({ medium: 11.30, large: 13.90, family: 21.90, mega: 30.90 })
   },
   {
     id: 522,
