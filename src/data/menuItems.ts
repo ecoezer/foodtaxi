@@ -44,7 +44,7 @@ export const getPizzaStylesForSize = (size: string): PizzaStyle[] => {
   // Mega size only gets Standard option
   const prices: Record<string, { käserand: number; american: number; calzone: number }> = {
     'Medium': { käserand: 2.50, american: 2.00, calzone: 1.50 },
-    'Large': { käserand: 3.00, american: 3.00, calzone: 2.00 },
+    'Large': { käserand: 3.00, american: 3.50, calzone: 2.00 },
     'Family': { käserand: 3.00, american: 3.00, calzone: 2.00 }
   };
 
@@ -273,7 +273,7 @@ export const pasta: MenuItem[] = [
     number: 55,
     name: "Maccheroni Gyros",
     description: "in Sauce Hollandaise",
-    price: 13.00,
+    price: 13.50,
     isPasta: true
   },
   {
@@ -281,28 +281,28 @@ export const pasta: MenuItem[] = [
     number: 56,
     name: "Kartoffel-Gemüse Auflauf",
     description: "mit Broccoli, fr.Paprika und Mais in Sahnesauce",
-    price: 13.00
+    price: 13.50
   },
   {
     id: 541,
     number: 57,
     name: "Kartoffel-Hähnchen-Brust Auflauf",
     description: "mit Broccoli und Mais in Sahnesauce",
-    price: 14.00
+    price: 14.50
   },
   {
     id: 542,
     number: 58,
     name: "Lasagne Gemüse",
     description: "in Sahnesauce und Tomatensauce",
-    price: 13.00
+    price: 14.00
   },
   {
     id: 543,
     number: 59,
     name: "Lasagne Rind",
     description: "in Sahnesauce und Tomatensauce",
-    price: 14.00
+    price: 15.00
   },
   // Spätzle
   {
@@ -317,7 +317,7 @@ export const pasta: MenuItem[] = [
     number: 61,
     name: "Spätzle Hähnchen",
     description: "mit Hirtenkäse in Sahnesauce",
-    price: 14.00
+    price: 14.50
   }
 ];
 
@@ -666,18 +666,18 @@ export const burgers: MenuItem[] = [
     number: 41,
     name: "Texas Bacon Burger",
     description: "mit Cheddar°, BBQ sauce, Bacon, Zwiebeln",
-    price: 12.00,
+    price: 12.70,
     allergens: "A,C",
-    sizes: createBurgerSizes(12.00)
+    sizes: createBurgerSizes(12.70)
   },
   {
     id: 531,
     number: 42,
     name: "Chilli Cheese Burger",
     description: "mit Chilli-Cheesesauce¹,³,⁴, Jalapenos und Cheddar°",
-    price: 12.00,
+    price: 12.50,
     allergens: "A,C",
-    sizes: createBurgerSizes(12.00)
+    sizes: createBurgerSizes(12.50)
   },
   {
     id: 532,
@@ -692,8 +692,8 @@ export const burgers: MenuItem[] = [
     number: 44,
     name: "Crispy Chilli-Chicken Burger",
     description: "mit %100 Chicken-Patty, Chilli-Cheesesauce¹,³,⁴, Cheddar° und Jalapenos",
-    price: 12.00,
-    sizes: createBurgerSizes(12.00)
+    price: 12.70,
+    sizes: createBurgerSizes(12.70)
   }
 ];
 
@@ -922,69 +922,69 @@ export const pizzas: MenuItem[] = [
     number: 21,
     name: "Funghi",
     description: "mit fr.Champignons",
-    price: 9.90,
+    price: 10.30,
     allergens: "1,2,3/A,C",
     isPizza: true,
-    sizes: createPizzaSizes({ medium: 9.90, large: 11.90, family: 18.90, mega: 28.90 })
+    sizes: createPizzaSizes({ medium: 10.30, large: 12.30, family: 19.30, mega: 29.30 })
   },
   {
     id: 523,
     number: 22,
     name: "Vier Jahreszeiten",
     description: "mit fr.Champignons, Paprika, Tomaten, Artischocken",
-    price: 9.90,
+    price: 10.30,
     allergens: "1,2,3/A,C",
     isPizza: true,
-    sizes: createPizzaSizes({ medium: 9.90, large: 11.90, family: 18.90, mega: 28.90 })
+    sizes: createPizzaSizes({ medium: 10.30, large: 12.30, family: 19.30, mega: 29.30 })
   },
   {
     id: 524,
     number: 23,
     name: "Spinat",
     description: "mit Spinat, Hirtenkäse°, Knoblauch und Zwiebeln",
-    price: 9.90,
+    price: 10.30,
     allergens: "1,2,3/A,C",
     isPizza: true,
-    sizes: createPizzaSizes({ medium: 9.90, large: 11.90, family: 18.90, mega: 28.90 })
+    sizes: createPizzaSizes({ medium: 10.30, large: 12.30, family: 19.30, mega: 29.30 })
   },
   {
     id: 525,
     number: 24,
     name: "Quattro Formaggi",
     description: "mit Mozzarella°, Gorgonzola°, Hirtenkäse° und Edamer°",
-    price: 9.90,
+    price: 10.30,
     allergens: "1,2,3/A,C",
     isPizza: true,
-    sizes: createPizzaSizes({ medium: 9.90, large: 11.90, family: 18.90, mega: 28.90 })
+    sizes: createPizzaSizes({ medium: 10.30, large: 12.30, family: 19.30, mega: 29.30 })
   },
   {
     id: 526,
     number: 25,
     name: "Roma",
     description: "mit Broccoli, fr.Paprika und Mais",
-    price: 9.90,
+    price: 10.30,
     allergens: "1,2,3/A,C",
     isPizza: true,
-    sizes: createPizzaSizes({ medium: 9.90, large: 11.90, family: 18.90, mega: 28.90 })
+    sizes: createPizzaSizes({ medium: 10.30, large: 12.30, family: 19.30, mega: 29.30 })
   },
   {
     id: 527,
     number: 26,
     name: "Fitness",
     description: "mit fr.Tomaten, Mozzarella°, Rucola, Mais",
-    price: 9.90,
+    price: 10.30,
     allergens: "1,2,3/A,C",
     isPizza: true,
-    sizes: createPizzaSizes({ medium: 9.90, large: 11.90, family: 18.90, mega: 28.90 })
+    sizes: createPizzaSizes({ medium: 10.30, large: 12.30, family: 19.30, mega: 29.30 })
   },
   {
     id: 528,
     number: 27,
     name: "Vegetarisch",
     description: "mit Broccoli, Spinat, Milden Peperoni²,³",
-    price: 9.90,
+    price: 10.30,
     allergens: "1,2,3/A,C",
     isPizza: true,
-    sizes: createPizzaSizes({ medium: 9.90, large: 11.90, family: 18.90, mega: 28.90 })
+    sizes: createPizzaSizes({ medium: 10.30, large: 12.30, family: 19.30, mega: 29.30 })
   }
 ];
