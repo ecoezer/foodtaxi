@@ -560,6 +560,13 @@ export const dips: MenuItem[] = [
     name: "BBQ",
     description: "",
     price: 1.50
+  },
+  {
+    id: 207,
+    number: "207",
+    name: "Foods-Taxi Soße",
+    description: "",
+    price: 1.50
   }
 ];
 
