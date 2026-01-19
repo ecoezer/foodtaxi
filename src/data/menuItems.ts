@@ -173,7 +173,7 @@ export const donerDishes: MenuItem[] = [
     number: 80,
     name: "Gyros Teller",
     description: "mit Krautsalat, dazu Pommes",
-    price: 13.00,
+    price: 13.70,
     allergens: "1,2,3,4/A,C,F,G",
     isSpezialitaet: true
   },
@@ -191,7 +191,7 @@ export const donerDishes: MenuItem[] = [
     number: 82,
     name: "Gyros Topf",
     description: "mit fr. Champignons in Sauce Hollandaise mit Käse überbacken",
-    price: 14.00,
+    price: 14.50,
     allergens: "1,2,3,4/A,C,F,G",
     isSpezialitaet: true
   },
@@ -208,10 +208,10 @@ export const donerDishes: MenuItem[] = [
     id: 84,
     number: 84,
     name: isRippchen() ? "🍖 Spareribs (Rippchen 450g) - RIPPCHEN-TAG!" : "Spareribs (Rippchen 450g)",
-    description: isRippchen() 
-      ? "mit BBQ Sauce, Pommes und Krautsalat - MITTWOCH SPEZIAL!" 
+    description: isRippchen()
+      ? "mit BBQ Sauce, Pommes und Krautsalat - MITTWOCH SPEZIAL!"
       : "mit BBQ Sauce, Pommes und Krautsalat",
-    price: isRippchen() ? 13.00 : 14.90,
+    price: isRippchen() ? 13.00 : 15.50,
     allergens: "1,2,3,4/A,C,F,G"
   },
   {
@@ -359,7 +359,7 @@ export const fingerFood: MenuItem[] = [
     number: "F1",
     name: "Mozzarella Stick",
     description: "6 Stk.",
-    price: 5.90
+    price: 6.20
   },
   {
     id: 551,
@@ -380,42 +380,42 @@ export const fingerFood: MenuItem[] = [
     number: "F4",
     name: "Chili Cheese Nuggets",
     description: "8 Stk.",
-    price: 5.90
+    price: 7.00
   },
   {
     id: 554,
     number: "F5",
     name: "Pommes Frites",
     description: "",
-    price: 4.00
+    price: 4.50
   },
   {
     id: 555,
     number: "F6",
     name: "Twister Pommes",
     description: "",
-    price: 4.50
+    price: 5.00
   },
   {
     id: 556,
     number: "F7",
     name: "Wedges",
     description: "",
-    price: 4.50
+    price: 5.00
   },
   {
     id: 557,
     number: "F8",
     name: "Süßkartoffel",
     description: "",
-    price: 5.00
+    price: 5.50
   },
   {
     id: 558,
     number: "F9",
     name: "Onion Rings",
     description: "",
-    price: 5.90
+    price: 6.00
   },
   {
     id: 559,
