@@ -715,7 +715,7 @@ export const pizzas: MenuItem[] = [
     price: 10.90,
     allergens: "1,2,3/A,C",
     isWunschPizza: true,
-    sizes: createPizzaSizes({ medium: 10.90, large: 11.90, family: 21.90, mega: 30.90 })
+    sizes: createPizzaSizes({ medium: 10.90, large: 12.90, family: 22.90, mega: 30.90 })
   },
   {
     id: 502,
@@ -725,7 +725,7 @@ export const pizzas: MenuItem[] = [
     price: 10.30,
     allergens: "1,2,3/A,C",
     isPizza: true,
-    sizes: createPizzaSizes({ medium: 10.30, large: 9.90, family: 17.90, mega: 26.90 })
+    sizes: createPizzaSizes({ medium: 10.30, large: 10.30, family: 18.30, mega: 26.90 })
   },
   {
     id: 503,
@@ -735,7 +735,7 @@ export const pizzas: MenuItem[] = [
     price: 10.30,
     allergens: "1,2,3,4/A,C",
     isPizza: true,
-    sizes: createPizzaSizes({ medium: 10.30, large: 11.90, family: 18.90, mega: 28.90 })
+    sizes: createPizzaSizes({ medium: 10.30, large: 12.30, family: 19.30, mega: 28.90 })
   },
   {
     id: 504,
@@ -745,7 +745,7 @@ export const pizzas: MenuItem[] = [
     price: 10.30,
     allergens: "1,2,3,4/A,C",
     isPizza: true,
-    sizes: createPizzaSizes({ medium: 10.30, large: 11.90, family: 18.90, mega: 28.90 })
+    sizes: createPizzaSizes({ medium: 10.30, large: 12.30, family: 19.30, mega: 28.90 })
   },
   {
     id: 505,
@@ -755,7 +755,7 @@ export const pizzas: MenuItem[] = [
     price: 10.30,
     allergens: "1,2,3,4/A,C",
     isPizza: true,
-    sizes: createPizzaSizes({ medium: 10.30, large: 11.90, family: 18.90, mega: 28.90 })
+    sizes: createPizzaSizes({ medium: 10.30, large: 12.30, family: 19.30, mega: 28.90 })
   },
   {
     id: 506,
@@ -765,7 +765,7 @@ export const pizzas: MenuItem[] = [
     price: 10.30,
     allergens: "1,2,3,4/A,C,F",
     isPizza: true,
-    sizes: createPizzaSizes({ medium: 10.30, large: 11.90, family: 18.90, mega: 28.90 })
+    sizes: createPizzaSizes({ medium: 10.30, large: 12.30, family: 19.30, mega: 28.90 })
   },
   {
     id: 507,
@@ -775,7 +775,7 @@ export const pizzas: MenuItem[] = [
     price: 10.30,
     allergens: "1,2,3,4/A,C",
     isPizza: true,
-    sizes: createPizzaSizes({ medium: 10.30, large: 11.90, family: 18.90, mega: 28.90 })
+    sizes: createPizzaSizes({ medium: 10.30, large: 12.30, family: 19.30, mega: 28.90 })
   },
   {
     id: 508,
@@ -785,7 +785,7 @@ export const pizzas: MenuItem[] = [
     price: 10.30,
     allergens: "1,2,3,4/A,C,F,G",
     isPizza: true,
-    sizes: createPizzaSizes({ medium: 10.30, large: 11.90, family: 18.90, mega: 28.90 })
+    sizes: createPizzaSizes({ medium: 10.30, large: 12.30, family: 19.30, mega: 28.90 })
   },
   {
     id: 509,
@@ -795,7 +795,7 @@ export const pizzas: MenuItem[] = [
     price: 10.30,
     allergens: "1,2,3,4/A,C",
     isPizza: true,
-    sizes: createPizzaSizes({ medium: 10.30, large: 11.90, family: 18.90, mega: 28.90 })
+    sizes: createPizzaSizes({ medium: 10.30, large: 12.30, family: 19.30, mega: 28.90 })
   },
   {
     id: 510,
@@ -805,7 +805,7 @@ export const pizzas: MenuItem[] = [
     price: 10.30,
     allergens: "1,2,3,4/A,C",
     isPizza: true,
-    sizes: createPizzaSizes({ medium: 10.30, large: 11.90, family: 18.90, mega: 28.90 })
+    sizes: createPizzaSizes({ medium: 10.30, large: 12.30, family: 19.30, mega: 28.90 })
   },
   {
     id: 511,
@@ -815,7 +815,7 @@ export const pizzas: MenuItem[] = [
     price: 11.30,
     allergens: "1,2,3,4/A,C",
     isPizza: true,
-    sizes: createPizzaSizes({ medium: 11.30, large: 12.90, family: 21.90, mega: 30.90 })
+    sizes: createPizzaSizes({ medium: 11.30, large: 13.30, family: 22.30, mega: 30.90 })
   },
   {
     id: 512,
@@ -825,7 +825,7 @@ export const pizzas: MenuItem[] = [
     price: 10.30,
     allergens: "1,2,3,4/A,C",
     isPizza: true,
-    sizes: createPizzaSizes({ medium: 10.30, large: 11.90, family: 18.90, mega: 28.90 })
+    sizes: createPizzaSizes({ medium: 10.30, large: 12.30, family: 19.30, mega: 28.90 })
   },
   {
     id: 513,
@@ -835,7 +835,7 @@ export const pizzas: MenuItem[] = [
     price: 10.90,
     allergens: "1,2,3,4/A,C,F",
     isPizza: true,
-    sizes: createPizzaSizes({ medium: 10.90, large: 11.90, family: 19.90, mega: 29.90 })
+    sizes: createPizzaSizes({ medium: 10.90, large: 12.90, family: 20.90, mega: 29.90 })
   },
   {
     id: 514,
@@ -845,7 +845,7 @@ export const pizzas: MenuItem[] = [
     price: 10.30,
     allergens: "1,2,3,4/A,C,G",
     isPizza: true,
-    sizes: createPizzaSizes({ medium: 10.30, large: 11.90, family: 18.90, mega: 28.90 })
+    sizes: createPizzaSizes({ medium: 10.30, large: 12.30, family: 19.30, mega: 28.90 })
   },
   {
     id: 515,
@@ -855,7 +855,7 @@ export const pizzas: MenuItem[] = [
     price: 11.30,
     allergens: "1,2,3,4/A,C,F,G",
     isPizza: true,
-    sizes: createPizzaSizes({ medium: 11.30, large: 12.90, family: 20.90, mega: 30.90 })
+    sizes: createPizzaSizes({ medium: 11.30, large: 13.30, family: 21.30, mega: 30.90 })
   },
   {
     id: 516,
@@ -865,7 +865,7 @@ export const pizzas: MenuItem[] = [
     price: 11.30,
     allergens: "1,2,3,4/A,C,F,G",
     isPizza: true,
-    sizes: createPizzaSizes({ medium: 11.30, large: 12.90, family: 20.90, mega: 30.90 })
+    sizes: createPizzaSizes({ medium: 11.30, large: 13.30, family: 21.30, mega: 30.90 })
   },
   {
     id: 517,
@@ -875,7 +875,7 @@ export const pizzas: MenuItem[] = [
     price: 11.30,
     allergens: "1,2,3,4/A,C,F,G",
     isPizza: true,
-    sizes: createPizzaSizes({ medium: 11.30, large: 12.90, family: 20.90, mega: 30.90 })
+    sizes: createPizzaSizes({ medium: 11.30, large: 13.30, family: 21.30, mega: 30.90 })
   },
   {
     id: 518,
@@ -885,7 +885,7 @@ export const pizzas: MenuItem[] = [
     price: 11.30,
     allergens: "1,2,3,4/A,C,F,G",
     isPizza: true,
-    sizes: createPizzaSizes({ medium: 11.30, large: 12.90, family: 20.90, mega: 30.90 })
+    sizes: createPizzaSizes({ medium: 11.30, large: 13.30, family: 21.30, mega: 30.90 })
   },
   {
     id: 519,
@@ -895,7 +895,7 @@ export const pizzas: MenuItem[] = [
     price: 10.30,
     allergens: "1,2,3/A,C,H",
     isPizza: true,
-    sizes: createPizzaSizes({ medium: 10.30, large: 11.90, family: 18.90, mega: 28.90 })
+    sizes: createPizzaSizes({ medium: 10.30, large: 12.30, family: 19.30, mega: 28.90 })
   },
   {
     id: 520,
@@ -905,7 +905,7 @@ export const pizzas: MenuItem[] = [
     price: 11.30,
     allergens: "1,2,3/A,C,D",
     isPizza: true,
-    sizes: createPizzaSizes({ medium: 11.30, large: 13.90, family: 21.90, mega: 30.90 })
+    sizes: createPizzaSizes({ medium: 11.30, large: 14.30, family: 22.30, mega: 30.90 })
   },
   {
     id: 521,
@@ -915,7 +915,7 @@ export const pizzas: MenuItem[] = [
     price: 11.30,
     allergens: "1,2,3/A,C,D",
     isPizza: true,
-    sizes: createPizzaSizes({ medium: 11.30, large: 13.90, family: 21.90, mega: 30.90 })
+    sizes: createPizzaSizes({ medium: 11.30, large: 14.30, family: 22.30, mega: 30.90 })
   },
   {
     id: 522,
