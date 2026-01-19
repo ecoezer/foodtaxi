@@ -69,7 +69,7 @@ const OpeningHoursCard: React.FC<{ data: OpeningHoursData }> = memo(({ data }) =
               Montag
             </span>
             <span className='text-base font-bold text-gray-900' style={{ marginTop: '1px' }}>
-              12:00–21:00
+              16:00–21:00
             </span>
           </div>
           <div className={SHARED_CLASSES.timeSlot}>
@@ -77,7 +77,7 @@ const OpeningHoursCard: React.FC<{ data: OpeningHoursData }> = memo(({ data }) =
               Mi, Do
             </span>
             <span className='text-base font-bold text-gray-900' style={{ marginTop: '1px' }}>
-              12:00–21:30
+              16:00–21:30
             </span>
           </div>
           <div className={SHARED_CLASSES.timeSlot}>
@@ -204,28 +204,6 @@ const Header: React.FC = memo(() => {
 
         {/* Special Day Offers */}
         <div className='mb-4 text-center space-y-2'>
-          {/* New Special Offers */}
-          <div className='bg-gradient-to-r from-green-100 to-emerald-100 border border-green-300 rounded-lg p-3 shadow-sm'>
-            <h3 className='text-base font-bold text-green-800 mb-2'>🎯 Schüler-Deal 12-14 Uhr (nur Abholung)</h3>
-            <div className='grid grid-cols-1 sm:grid-cols-3 gap-2'>
-              <div className='bg-white/80 rounded-md p-2 border border-green-200'>
-                <div className='font-bold text-green-700 text-xs mb-1'>ANGEBOT 1</div>
-                <div className='text-xs text-gray-800 mb-1'>Pizza (26cm) Margherita/Salami</div>
-                <div className='text-lg font-bold text-green-600'>6€</div>
-              </div>
-              <div className='bg-white/80 rounded-md p-2 border border-green-200'>
-                <div className='font-bold text-green-700 text-xs mb-1'>ANGEBOT 2</div>
-                <div className='text-xs text-gray-800 mb-1'>Chicken Burger + Pommes + Soße</div>
-                <div className='text-lg font-bold text-green-600'>5€</div>
-              </div>
-              <div className='bg-white/80 rounded-md p-2 border border-green-200'>
-                <div className='font-bold text-green-700 text-xs mb-1'>ANGEBOT 3</div>
-                <div className='text-xs text-gray-800 mb-1'>Burger + Pommes + Soße</div>
-                <div className='text-lg font-bold text-green-600'>5€</div>
-              </div>
-            </div>
-          </div>
-
           {/* Existing Special Day Offers */}
           <div className={`bg-gradient-to-r from-orange-100 to-yellow-100 border rounded-md p-2 shadow-sm ${
             isWednesday ? 'border-orange-400 animate-pulse' : 'border-orange-300'

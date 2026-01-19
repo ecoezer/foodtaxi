@@ -327,28 +327,28 @@ export const schnitzel: MenuItem[] = [
     id: 546,
     number: 70,
     name: "Schnitzel Wiener Art",
-    description: isSchnitzelTag() 
-      ? "mit Zitronenscheiben und Preiselbeeren - DONNERSTAG SPEZIAL!" 
+    description: isSchnitzelTag()
+      ? "mit Zitronenscheiben und Preiselbeeren - DONNERSTAG SPEZIAL!"
       : "mit Zitronenscheiben und Preiselbeeren",
-    price: 11.00
+    price: 11.50
   },
   {
     id: 547,
     number: 71,
     name: isSchnitzelTag() ? "🍖 Schnitzel Jäger Art - SCHNITZEL-TAG!" : "Schnitzel Jäger Art",
-    description: isSchnitzelTag() 
-      ? "mit Jägersauce - DONNERSTAG SPEZIAL!" 
+    description: isSchnitzelTag()
+      ? "mit Jägersauce - DONNERSTAG SPEZIAL!"
       : "mit Jägersauce",
-    price: isSchnitzelTag() ? 11.00 : 12.90
+    price: isSchnitzelTag() ? 11.00 : 13.40
   },
   {
     id: 548,
     number: 72,
     name: isSchnitzelTag() ? "🍖 Hollandaiseschnitzel - SCHNITZEL-TAG!" : "Hollandaiseschnitzel",
-    description: isSchnitzelTag() 
-      ? "in Sauce Hollandaise - DONNERSTAG SPEZIAL!" 
+    description: isSchnitzelTag()
+      ? "in Sauce Hollandaise - DONNERSTAG SPEZIAL!"
       : "in Sauce Hollandaise",
-    price: isSchnitzelTag() ? 11.00 : 12.90
+    price: isSchnitzelTag() ? 11.00 : 13.40
   }
 ];
 

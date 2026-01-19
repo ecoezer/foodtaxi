@@ -45,10 +45,17 @@ const Footer = () => {
               <MapPin className="h-4 w-4 text-orange-600" />
             </div>
           </div>
-          <div className="text-center">
+          <div className="text-center space-y-1">
             <div className="font-bold text-gray-800">🏠 LADESTRASSE 3</div>
             <div className="text-sm text-gray-600">📮 31028 GRONAU (LEINE)</div>
-            <p className="text-xs text-gray-500 mt-1">🚗 FoodsTaxi Lieferservice</p>
+            <p className="text-xs text-gray-500">🚗 FoodsTaxi Lieferservice</p>
+            <div className="text-xs text-gray-600 bg-yellow-50 rounded-lg p-2 mt-2">
+              <strong>Öffnungszeiten:</strong><br />
+              Mo: 16:00–21:00<br />
+              Mi, Do: 16:00–21:30<br />
+              Fr, Sa, So & Feiertage: 12:00–21:30<br />
+              Di: Ruhetag
+            </div>
           </div>
         </div>
 
