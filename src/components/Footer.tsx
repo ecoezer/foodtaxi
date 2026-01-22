@@ -51,9 +51,7 @@ const Footer = () => {
             <p className="text-xs text-gray-500">🚗 FoodsTaxi Lieferservice</p>
             <div className="text-xs text-gray-600 bg-yellow-50 rounded-lg p-2 mt-2">
               <strong>Öffnungszeiten:</strong><br />
-              Mo: 16:00–21:00<br />
-              Mi, Do: 16:00–21:30<br />
-              Fr, Sa, So & Feiertage: 12:00–21:30<br />
+              Mo - So & Feiertage: 12:00–21:30<br />
               Di: Ruhetag
             </div>
           </div>

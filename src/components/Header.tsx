@@ -66,23 +66,7 @@ const OpeningHoursCard: React.FC<{ data: OpeningHoursData }> = memo(({ data }) =
         <div className='space-y-2 w-full'>
           <div className={SHARED_CLASSES.timeSlot}>
             <span className='text-xs text-gray-700 block mb-0.5'>
-              Montag
-            </span>
-            <span className='text-base font-bold text-gray-900' style={{ marginTop: '1px' }}>
-              16:00–21:00
-            </span>
-          </div>
-          <div className={SHARED_CLASSES.timeSlot}>
-            <span className='text-xs text-gray-700 block mb-0.5'>
-              Mi, Do
-            </span>
-            <span className='text-base font-bold text-gray-900' style={{ marginTop: '1px' }}>
-              16:00–21:30
-            </span>
-          </div>
-          <div className={SHARED_CLASSES.timeSlot}>
-            <span className='text-xs text-gray-700 block mb-0.5'>
-              Fr, Sa, So & Feiertage
+              Mo - So & Feiertage
             </span>
             <span className='text-base font-bold text-gray-900' style={{ marginTop: '1px' }}>
               12:00–21:30
@@ -209,14 +193,14 @@ const Header: React.FC = memo(() => {
             isWednesday ? 'border-orange-400 animate-pulse' : 'border-orange-300'
           }`}>
             <p className='text-sm font-semibold text-orange-800'>
-              🍖 Mittwoch: Rippchen-Tag – 13,00 € {isWednesday ? '🔥 HEUTE!' : ''}
+              🍖 Mittwoch: Rippchen-Tag – 13,50 € {isWednesday ? '🔥 HEUTE!' : ''}
             </p>
           </div>
           <div className={`bg-gradient-to-r from-blue-100 to-indigo-100 border rounded-md p-2 shadow-sm ${
             isThursday ? 'border-blue-400 animate-pulse' : 'border-blue-300'
           }`}>
             <p className='text-sm font-semibold text-blue-800'>
-              🍖 Donnerstag: Schnitzel-Tag – ab 11,00 € {isThursday ? '🔥 HEUTE!' : ''}
+              🍖 Donnerstag: Schnitzel-Tag – ab 11,50 € {isThursday ? '🔥 HEUTE!' : ''}
             </p>
           </div>
         </div>

@@ -42,10 +42,11 @@ export const saladSauceTypes: SauceType[] = [
 export const getPizzaStylesForSize = (size: string): PizzaStyle[] => {
   // Only Medium, Large, and Family sizes support Sonderwunsch options
   // Mega size only gets Standard option
-  const prices: Record<string, { käserand: number; american: number; calzone: number }> = {
+  // Family size does not support Calzone
+  const prices: Record<string, { käserand: number; american: number; calzone?: number }> = {
     'Medium': { käserand: 2.50, american: 2.00, calzone: 1.50 },
     'Large': { käserand: 3.00, american: 3.50, calzone: 2.00 },
-    'Family': { käserand: 3.00, american: 3.00, calzone: 2.00 }
+    'Family': { käserand: 4.00, american: 3.50 }
   };
 
   // If size not in prices (like Mega), only return Standard option
@@ -56,13 +57,18 @@ export const getPizzaStylesForSize = (size: string): PizzaStyle[] => {
   }
 
   const sizePrice = prices[size];
-
-  return [
+  const styles: PizzaStyle[] = [
     { name: 'Standard', price: 0, description: 'Normale Pizza' },
     { name: 'Käserand', price: sizePrice.käserand, description: `Mit Käserand (+${sizePrice.käserand.toFixed(2)}€)` },
-    { name: 'Americanstyle', price: sizePrice.american, description: `Amerikanischer Stil (+${sizePrice.american.toFixed(2)}€)` },
-    { name: 'als Calzone', price: sizePrice.calzone, description: `Als gefüllte Calzone (+${sizePrice.calzone.toFixed(2)}€)` }
+    { name: 'Americanstyle', price: sizePrice.american, description: `Amerikanischer Stil (+${sizePrice.american.toFixed(2)}€)` }
   ];
+
+  // Add Calzone option only if available for this size
+  if (sizePrice.calzone !== undefined) {
+    styles.push({ name: 'als Calzone', price: sizePrice.calzone, description: `Als gefüllte Calzone (+${sizePrice.calzone.toFixed(2)}€)` });
+  }
+
+  return styles;
 };
 
 // Default pizza styles for initial display
@@ -211,7 +217,7 @@ export const donerDishes: MenuItem[] = [
     description: isRippchen()
       ? "mit BBQ Sauce, Pommes und Krautsalat - MITTWOCH SPEZIAL!"
       : "mit BBQ Sauce, Pommes und Krautsalat",
-    price: isRippchen() ? 13.00 : 15.50,
+    price: isRippchen() ? 13.50 : 15.50,
     allergens: "1,2,3,4/A,C,F,G"
   },
   {
@@ -256,7 +262,7 @@ export const pasta: MenuItem[] = [
     number: 53,
     name: "Pasta Hähnchen-Brust",
     description: "in Sahnesauce, Milde Peperoni und Zwiebeln",
-    price: 13.00,
+    price: 14.00,
     isPasta: true
   },
   // Al Forno
@@ -339,7 +345,7 @@ export const schnitzel: MenuItem[] = [
     description: isSchnitzelTag()
       ? "mit Jägersauce - DONNERSTAG SPEZIAL!"
       : "mit Jägersauce",
-    price: isSchnitzelTag() ? 11.00 : 13.40
+    price: isSchnitzelTag() ? 11.50 : 13.40
   },
   {
     id: 548,
@@ -348,7 +354,7 @@ export const schnitzel: MenuItem[] = [
     description: isSchnitzelTag()
       ? "in Sauce Hollandaise - DONNERSTAG SPEZIAL!"
       : "in Sauce Hollandaise",
-    price: isSchnitzelTag() ? 11.00 : 13.40
+    price: isSchnitzelTag() ? 11.50 : 13.40
   }
 ];
 
@@ -423,6 +429,13 @@ export const fingerFood: MenuItem[] = [
     name: "Rosti",
     description: "4 Stk.",
     price: 5.90
+  },
+  {
+    id: 560,
+    number: "F11",
+    name: "Potato Dippers",
+    description: "",
+    price: 6.00
   }
 ];
 
@@ -524,49 +537,56 @@ export const dips: MenuItem[] = [
     number: "201",
     name: "Mayo",
     description: "",
-    price: 1.50
+    price: 1.80
   },
   {
     id: 202,
     number: "202",
     name: "Ketchup",
     description: "",
-    price: 1.50
+    price: 1.80
   },
   {
     id: 203,
     number: "203",
     name: "Knobi",
     description: "",
-    price: 1.50
+    price: 2.00
   },
   {
     id: 204,
     number: "204",
     name: "Hollandaise",
     description: "",
-    price: 1.50
+    price: 2.00
   },
   {
     id: 205,
     number: "205",
     name: "Chilli",
     description: "",
-    price: 1.50
+    price: 2.00
   },
   {
     id: 206,
     number: "206",
     name: "BBQ",
     description: "",
-    price: 1.50
+    price: 2.00
   },
   {
     id: 207,
     number: "207",
     name: "Foods-Taxi Soße",
     description: "",
-    price: 1.50
+    price: 2.00
+  },
+  {
+    id: 208,
+    number: "208",
+    name: "Zaziki",
+    description: "",
+    price: 3.00
   }
 ];
 
@@ -993,5 +1013,13 @@ export const pizzas: MenuItem[] = [
     allergens: "1,2,3/A,C",
     isPizza: true,
     sizes: createPizzaSizes({ medium: 10.30, large: 12.30, family: 19.30, mega: 29.30 })
+  },
+  {
+    id: 529,
+    number: "PK",
+    name: "PIZZABROT MIT Knobi",
+    description: "",
+    price: 5.50,
+    allergens: "1,2,3/A,C"
   }
 ];
