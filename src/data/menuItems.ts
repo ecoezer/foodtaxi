@@ -749,10 +749,10 @@ export const pizzas: MenuItem[] = [
     number: 1,
     name: "Margherita",
     description: "",
-    price: 10.30,
+    price: 9.30,
     allergens: "1,2,3/A,C",
     isPizza: true,
-    sizes: createPizzaSizes({ medium: 10.30, large: 10.30, family: 18.30, mega: 27.30 })
+    sizes: createPizzaSizes({ medium: 9.30, large: 10.30, family: 18.30, mega: 27.30 })
   },
   {
     id: 503,

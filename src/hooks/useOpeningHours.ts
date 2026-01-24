@@ -7,6 +7,7 @@ export const useOpeningHours = () => {
 
   // Tuesday is closed (Ruhetag)
   const isTuesday = day === 2;
+  const isMonday = day === 1;
 
   let openingTime: number;
   let closingTime: number;
@@ -17,8 +18,13 @@ export const useOpeningHours = () => {
     openingTime = 0;
     closingTime = 0;
     isOpen = false;
+  } else if (isMonday) {
+    // Monday: 12:00 - 21:00
+    openingTime = 12;
+    closingTime = 21;
+    isOpen = currentTime >= openingTime && currentTime < closingTime;
   } else {
-    // All other days (Monday - Sunday and holidays): 12:00 - 21:30
+    // Wednesday - Sunday and holidays: 12:00 - 21:30
     openingTime = 12;
     closingTime = 21.5; // 21:30
     isOpen = currentTime >= openingTime && currentTime < closingTime;
@@ -62,6 +68,8 @@ export const useOpeningHours = () => {
   const getCurrentHours = () => {
     if (isTuesday) {
       return 'Ruhetag';
+    } else if (isMonday) {
+      return '12:00–21:00';
     } else {
       return '12:00–21:30';
     }

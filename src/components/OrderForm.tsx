@@ -69,18 +69,10 @@ const useTimeSlots = () => {
     const currentHour = now.getHours();
     const currentMinute = now.getMinutes();
     const day = now.getDay(); // 0 is Sunday, 1 is Monday, etc.
-    
+
     // Tuesday is closed (Ruhetag)
     const isTuesday = day === 2;
-    
-    // Friday, Saturday, Sunday: 12:00 - 21:30
-    const isWeekendOrFriday = day === 0 || day === 5 || day === 6;
-
-    // Monday: 16:00 - 21:00
     const isMonday = day === 1;
-
-    // Wednesday, Thursday: 16:00 - 21:30
-    const isWedThurs = day === 3 || day === 4;
 
     let startHour: number;
     let endHour: number;
@@ -89,19 +81,13 @@ const useTimeSlots = () => {
       // Tuesday is closed - no available hours
       return { availableHours: [], getAvailableMinutes: () => [] };
     } else if (isMonday) {
-      // Monday: 16:00 - 21:00
-      startHour = 16;
-      endHour = 21;
-    } else if (isWedThurs) {
-      // Wednesday, Thursday: 16:00 - 21:30
-      startHour = 16;
-      endHour = 21;
-    } else if (isWeekendOrFriday) {
-      // Friday, Saturday, Sunday: 12:00 - 21:30
+      // Monday: 12:00 - 21:00
       startHour = 12;
       endHour = 21;
     } else {
-      return { availableHours: [], getAvailableMinutes: () => [] };
+      // Wednesday - Sunday and holidays: 12:00 - 21:30
+      startHour = 12;
+      endHour = 21;
     }
 
     // Generate all possible hours from start to end
@@ -127,6 +113,16 @@ const useTimeSlots = () => {
       if (selectedHour === currentHour) {
         // For current hour, only show minutes that are at least 30 minutes from now
         return AVAILABLE_MINUTES.filter(min => parseInt(min) > currentMinute + 30);
+      }
+      // For last hour (21:00), only show :00 and :30 depending on the day
+      if (selectedHour === endHour) {
+        if (isMonday) {
+          // Monday closes at 21:00, so only :00 is available
+          return ['00'];
+        } else {
+          // Other days close at 21:30, so :00 and :30 are available
+          return ['00', '30'];
+        }
       }
       return AVAILABLE_MINUTES;
     };
