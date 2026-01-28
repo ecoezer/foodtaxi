@@ -18,7 +18,7 @@ import {
 } from './data/menuItems';
 import { useCartStore } from './store/cart.store';
 import { ShoppingCart, ChevronUp, ChevronDown } from 'lucide-react';
-import { MenuItem, PizzaSize, PizzaStyle } from './types';
+import { MenuItem, PizzaSize, PizzaStyle, FriesOption } from './types';
 
 // =================== CONSTANTS ===================
 const SCROLL_CONFIG = {
@@ -297,16 +297,16 @@ function App() {
   }, [findCartElement, calculateScrollPosition, animateCartHighlight, performFallbackScroll]);
 
   // =================== MEMOIZED CALLBACKS ===================
-  const memoizedAddItem = useCallback((menuItem: MenuItem, selectedSize?: PizzaSize, selectedIngredients?: string[], selectedExtras?: string[], selectedPastaType?: string, selectedSauce?: string, selectedPizzaStyle?: PizzaStyle) => {
-    addItem(menuItem, selectedSize, selectedIngredients, selectedExtras, selectedPastaType, selectedSauce, selectedPizzaStyle);
+  const memoizedAddItem = useCallback((menuItem: MenuItem, selectedSize?: PizzaSize, selectedIngredients?: string[], selectedExtras?: string[], selectedPastaType?: string, selectedSauce?: string, selectedPizzaStyle?: PizzaStyle, selectedFriesOption?: FriesOption) => {
+    addItem(menuItem, selectedSize, selectedIngredients, selectedExtras, selectedPastaType, selectedSauce, selectedPizzaStyle, selectedFriesOption);
   }, [addItem]);
 
-  const memoizedRemoveItem = useCallback((id: number, selectedSize?: PizzaSize, selectedIngredients?: string[], selectedExtras?: string[], selectedPastaType?: string, selectedSauce?: string, selectedPizzaStyle?: PizzaStyle) => {
-    removeItem(id, selectedSize, selectedIngredients, selectedExtras, selectedPastaType, selectedSauce, selectedPizzaStyle);
+  const memoizedRemoveItem = useCallback((id: number, selectedSize?: PizzaSize, selectedFriesOption?: FriesOption, selectedIngredients?: string[], selectedExtras?: string[], selectedPastaType?: string, selectedSauce?: string, selectedPizzaStyle?: PizzaStyle) => {
+    removeItem(id, selectedSize, selectedFriesOption, selectedIngredients, selectedExtras, selectedPastaType, selectedSauce, selectedPizzaStyle);
   }, [removeItem]);
 
-  const memoizedUpdateQuantity = useCallback((id: number, quantity: number, selectedSize?: PizzaSize, selectedIngredients?: string[], selectedExtras?: string[], selectedPastaType?: string, selectedSauce?: string, selectedPizzaStyle?: PizzaStyle) => {
-    updateQuantity(id, quantity, selectedSize, selectedIngredients, selectedExtras, selectedPastaType, selectedSauce, selectedPizzaStyle);
+  const memoizedUpdateQuantity = useCallback((id: number, quantity: number, selectedSize?: PizzaSize, selectedFriesOption?: FriesOption, selectedIngredients?: string[], selectedExtras?: string[], selectedPastaType?: string, selectedSauce?: string, selectedPizzaStyle?: PizzaStyle) => {
+    updateQuantity(id, quantity, selectedSize, selectedFriesOption, selectedIngredients, selectedExtras, selectedPastaType, selectedSauce, selectedPizzaStyle);
   }, [updateQuantity]);
 
   const memoizedClearCart = useCallback(() => {

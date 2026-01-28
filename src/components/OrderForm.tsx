@@ -6,7 +6,7 @@ import { AsYouType } from 'libphonenumber-js';
 import { Phone, ShoppingCart, X, Minus, Plus, Clock, MapPin, User, MessageSquare, AlertTriangle, ChevronUp, ChevronDown, Trash2 } from 'lucide-react';
 import { collection, addDoc, Timestamp } from 'firebase/firestore';
 import { db } from '../config/firebase';
-import { PizzaSize, PizzaStyle } from '../types';
+import { PizzaSize, PizzaStyle, FriesOption } from '../types';
 
 // Types
 interface OrderItem {
@@ -18,6 +18,7 @@ interface OrderItem {
   };
   quantity: number;
   selectedSize?: PizzaSize;
+  selectedFriesOption?: FriesOption;
   selectedIngredients?: string[];
   selectedExtras?: string[];
   selectedPastaType?: string;
@@ -27,8 +28,8 @@ interface OrderItem {
 
 interface OrderFormProps {
   orderItems: OrderItem[];
-  onRemoveItem: (id: number, selectedSize?: PizzaSize, selectedIngredients?: string[], selectedExtras?: string[], selectedPastaType?: string, selectedSauce?: string, selectedPizzaStyle?: PizzaStyle) => void;
-  onUpdateQuantity: (id: number, quantity: number, selectedSize?: PizzaSize, selectedIngredients?: string[], selectedExtras?: string[], selectedPastaType?: string, selectedSauce?: string, selectedPizzaStyle?: PizzaStyle) => void;
+  onRemoveItem: (id: number, selectedSize?: PizzaSize, selectedFriesOption?: FriesOption, selectedIngredients?: string[], selectedExtras?: string[], selectedPastaType?: string, selectedSauce?: string, selectedPizzaStyle?: PizzaStyle) => void;
+  onUpdateQuantity: (id: number, quantity: number, selectedSize?: PizzaSize, selectedFriesOption?: FriesOption, selectedIngredients?: string[], selectedExtras?: string[], selectedPastaType?: string, selectedSauce?: string, selectedPizzaStyle?: PizzaStyle) => void;
   onClearCart?: () => void;
 }
 
@@ -212,8 +213,8 @@ type OrderFormData = z.infer<typeof orderFormSchema>;
 // Sub-components
 const OrderItemComponent = memo<{
   item: OrderItem;
-  onRemove: (id: number, selectedSize?: PizzaSize, selectedIngredients?: string[], selectedExtras?: string[], selectedPastaType?: string, selectedSauce?: string, selectedPizzaStyle?: PizzaStyle) => void;
-  onUpdateQuantity: (id: number, quantity: number, selectedSize?: PizzaSize, selectedIngredients?: string[], selectedExtras?: string[], selectedPastaType?: string, selectedSauce?: string, selectedPizzaStyle?: PizzaStyle) => void;
+  onRemove: (id: number, selectedSize?: PizzaSize, selectedFriesOption?: FriesOption, selectedIngredients?: string[], selectedExtras?: string[], selectedPastaType?: string, selectedSauce?: string, selectedPizzaStyle?: PizzaStyle) => void;
+  onUpdateQuantity: (id: number, quantity: number, selectedSize?: PizzaSize, selectedFriesOption?: FriesOption, selectedIngredients?: string[], selectedExtras?: string[], selectedPastaType?: string, selectedSauce?: string, selectedPizzaStyle?: PizzaStyle) => void;
 }>(({ item, onRemove, onUpdateQuantity }) => (
   <div className="flex items-start justify-between bg-gray-50 p-2 sm:p-3 md:p-4 rounded-lg group hover:bg-gray-100 transition-all duration-200">
     <div className="flex-1 min-w-0">
@@ -222,6 +223,11 @@ const OrderItemComponent = memo<{
         {item.selectedSize && (
           <span className="text-xs sm:text-sm text-blue-600 ml-1 sm:ml-2 block sm:inline">
             ({item.selectedSize.name} {item.selectedSize.description && `- ${item.selectedSize.description}`})
+          </span>
+        )}
+        {item.selectedFriesOption && (
+          <span className="text-xs text-teal-600 ml-1 sm:ml-2 block">
+            Pommes: {item.selectedFriesOption.name} {item.selectedFriesOption.price > 0 && `(+${item.selectedFriesOption.price.toFixed(2)}€)`}
           </span>
         )}
         {item.selectedPizzaStyle && item.selectedPizzaStyle.name !== 'Standard' && (
@@ -258,7 +264,7 @@ const OrderItemComponent = memo<{
       <div className="flex items-center gap-1 sm:gap-2 bg-white rounded-lg shadow-sm border border-gray-200">
         <button
           type="button"
-          onClick={() => onUpdateQuantity(item.menuItem.id, Math.max(0, item.quantity - 1), item.selectedSize, item.selectedIngredients, item.selectedExtras, item.selectedPastaType, item.selectedSauce, item.selectedPizzaStyle)}
+          onClick={() => onUpdateQuantity(item.menuItem.id, Math.max(0, item.quantity - 1), item.selectedSize, item.selectedFriesOption, item.selectedIngredients, item.selectedExtras, item.selectedPastaType, item.selectedSauce, item.selectedPizzaStyle)}
           className="p-1 hover:bg-gray-100 rounded-l-lg transition-colors"
           aria-label="Menge verringern"
         >
@@ -269,7 +275,7 @@ const OrderItemComponent = memo<{
         </span>
         <button
           type="button"
-          onClick={() => onUpdateQuantity(item.menuItem.id, item.quantity + 1, item.selectedSize, item.selectedIngredients, item.selectedExtras, item.selectedPastaType, item.selectedSauce, item.selectedPizzaStyle)}
+          onClick={() => onUpdateQuantity(item.menuItem.id, item.quantity + 1, item.selectedSize, item.selectedFriesOption, item.selectedIngredients, item.selectedExtras, item.selectedPastaType, item.selectedSauce, item.selectedPizzaStyle)}
           className="p-1 hover:bg-gray-100 rounded-r-lg transition-colors"
           aria-label="Menge erhöhen"
         >
@@ -278,7 +284,7 @@ const OrderItemComponent = memo<{
       </div>
       <button
         type="button"
-        onClick={() => onRemove(item.menuItem.id, item.selectedSize, item.selectedIngredients, item.selectedExtras, item.selectedPastaType, item.selectedSauce, item.selectedPizzaStyle)}
+        onClick={() => onRemove(item.menuItem.id, item.selectedSize, item.selectedFriesOption, item.selectedIngredients, item.selectedExtras, item.selectedPastaType, item.selectedSauce, item.selectedPizzaStyle)}
         className="text-red-500 hover:text-red-700 transition-colors p-1 hover:bg-red-50 rounded-full"
         aria-label="Artikel entfernen"
       >
@@ -751,6 +757,9 @@ const OrderForm: React.FC<OrderFormProps> = ({ orderItems, onRemoveItem, onUpdat
           let itemText = `${item.quantity}x Nr. ${item.menuItem.number} ${item.menuItem.name}`;
           if (item.selectedSize) {
             itemText += ` (${item.selectedSize.name}${item.selectedSize.description ? ` - ${item.selectedSize.description}` : ''})`;
+          }
+          if (item.selectedFriesOption) {
+            itemText += ` - Pommes: ${item.selectedFriesOption.name}${item.selectedFriesOption.price > 0 ? ` (+${item.selectedFriesOption.price.toFixed(2)}€)` : ''}`;
           }
           if (item.selectedPizzaStyle && item.selectedPizzaStyle.name !== 'Standard') {
             itemText += ` - Sonderwunsch: ${item.selectedPizzaStyle.name} (+${item.selectedPizzaStyle.price.toFixed(2)}€)`;

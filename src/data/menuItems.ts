@@ -1,4 +1,4 @@
-import { MenuItem, WunschPizzaIngredient, PizzaExtra, PastaType, SauceType, PizzaStyle } from '../types';
+import { MenuItem, WunschPizzaIngredient, PizzaExtra, PastaType, SauceType, PizzaStyle, FriesOption } from '../types';
 
 // Helper functions to check current day for special offers
 const isRippchen = () => {
@@ -172,6 +172,12 @@ const createBurgerSizes = (basePrice: number) => [
   { name: '250g', price: basePrice + 2.00, description: 'Doppel Patty (+2€)' }
 ];
 
+// Fries options for burgers and schnitzels
+export const friesOptions: FriesOption[] = [
+  { name: 'Pommes frites', price: 0 },
+  { name: 'Süßkartoffel-Pommes', price: 1.50 }
+];
+
 // Spezialitäten (Updated with sauce selection requirement)
 export const donerDishes: MenuItem[] = [
   {
@@ -336,7 +342,8 @@ export const schnitzel: MenuItem[] = [
     description: isSchnitzelTag()
       ? "mit Zitronenscheiben und Preiselbeeren - DONNERSTAG SPEZIAL!"
       : "mit Zitronenscheiben und Preiselbeeren",
-    price: 11.50
+    price: 11.50,
+    friesOptions: friesOptions
   },
   {
     id: 547,
@@ -345,7 +352,8 @@ export const schnitzel: MenuItem[] = [
     description: isSchnitzelTag()
       ? "mit Jägersauce - DONNERSTAG SPEZIAL!"
       : "mit Jägersauce",
-    price: isSchnitzelTag() ? 11.50 : 13.40
+    price: isSchnitzelTag() ? 11.50 : 13.40,
+    friesOptions: friesOptions
   },
   {
     id: 548,
@@ -354,7 +362,8 @@ export const schnitzel: MenuItem[] = [
     description: isSchnitzelTag()
       ? "in Sauce Hollandaise - DONNERSTAG SPEZIAL!"
       : "in Sauce Hollandaise",
-    price: isSchnitzelTag() ? 11.50 : 13.40
+    price: isSchnitzelTag() ? 11.50 : 13.40,
+    friesOptions: friesOptions
   }
 ];
 
@@ -686,7 +695,8 @@ export const burgers: MenuItem[] = [
     description: "mit Burgersauce und Cheddar°",
     price: 12.00,
     allergens: "A,C",
-    sizes: createBurgerSizes(12.00)
+    sizes: createBurgerSizes(12.00),
+    friesOptions: friesOptions
   },
   {
     id: 530,
@@ -695,7 +705,8 @@ export const burgers: MenuItem[] = [
     description: "mit Cheddar°, BBQ sauce, Bacon, Zwiebeln",
     price: 12.70,
     allergens: "A,C",
-    sizes: createBurgerSizes(12.70)
+    sizes: createBurgerSizes(12.70),
+    friesOptions: friesOptions
   },
   {
     id: 531,
@@ -704,7 +715,8 @@ export const burgers: MenuItem[] = [
     description: "mit Chilli-Cheesesauce¹,³,⁴, Jalapenos und Cheddar°",
     price: 12.50,
     allergens: "A,C",
-    sizes: createBurgerSizes(12.50)
+    sizes: createBurgerSizes(12.50),
+    friesOptions: friesOptions
   },
   {
     id: 532,
@@ -712,7 +724,8 @@ export const burgers: MenuItem[] = [
     name: "Crispy Chicken Burger",
     description: "mit %100 Chicken-Patty, mayonnaise und Burgersauce",
     price: 12.00,
-    sizes: createBurgerSizes(12.00)
+    sizes: createBurgerSizes(12.00),
+    friesOptions: friesOptions
   },
   {
     id: 533,
@@ -720,7 +733,8 @@ export const burgers: MenuItem[] = [
     name: "Crispy Chilli-Chicken Burger",
     description: "mit %100 Chicken-Patty, Chilli-Cheesesauce¹,³,⁴, Cheddar° und Jalapenos",
     price: 12.70,
-    sizes: createBurgerSizes(12.70)
+    sizes: createBurgerSizes(12.70),
+    friesOptions: friesOptions
   }
 ];
 

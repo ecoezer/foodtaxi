@@ -6,6 +6,7 @@ export interface MenuItem {
   price: number;
   allergens?: string;
   sizes?: PizzaSize[];
+  friesOptions?: FriesOption[];
   isWunschPizza?: boolean;
   isPizza?: boolean;
   isPasta?: boolean;
@@ -17,6 +18,11 @@ export interface PizzaSize {
   name: string;
   price: number;
   description?: string;
+}
+
+export interface FriesOption {
+  name: string;
+  price: number;
 }
 
 export interface PizzaExtra {
@@ -42,6 +48,7 @@ export interface OrderItem {
   menuItem: MenuItem;
   quantity: number;
   selectedSize?: PizzaSize;
+  selectedFriesOption?: FriesOption;
   selectedIngredients?: string[];
   selectedExtras?: string[];
   selectedPastaType?: string;

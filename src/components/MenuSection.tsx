@@ -1,6 +1,6 @@
 import React, { useState, useCallback, memo } from 'react';
 import { Plus, Minus, ShoppingCart, ChefHat, Clock, Star, ArrowRight, Check } from 'lucide-react';
-import { MenuItem, PizzaSize, PizzaStyle } from '../types';
+import { MenuItem, PizzaSize, PizzaStyle, FriesOption } from '../types';
 import {
   wunschPizzaIngredients,
   pizzaExtras,
@@ -9,6 +9,7 @@ import {
   saladSauceTypes,
   beerTypes,
   pizzaStyles,
+  friesOptions,
   getPizzaStylesForSize
 } from '../data/menuItems';
 
@@ -25,7 +26,8 @@ interface MenuSectionProps {
     selectedExtras?: string[],
     selectedPastaType?: string,
     selectedSauce?: string,
-    selectedPizzaStyle?: PizzaStyle
+    selectedPizzaStyle?: PizzaStyle,
+    selectedFriesOption?: FriesOption
   ) => void;
 }
 
@@ -40,7 +42,8 @@ interface ItemModalProps {
     selectedExtras?: string[],
     selectedPastaType?: string,
     selectedSauce?: string,
-    selectedPizzaStyle?: PizzaStyle
+    selectedPizzaStyle?: PizzaStyle,
+    selectedFriesOption?: FriesOption
   ) => void;
 }
 
@@ -55,6 +58,9 @@ const ItemModal: React.FC<ItemModalProps> = memo(({ item, isOpen, onClose, onAdd
   const [selectedPizzaStyle, setSelectedPizzaStyle] = useState<PizzaStyle | undefined>(
     (item.isPizza || item.isWunschPizza) ? pizzaStyles[0] : undefined
   );
+  const [selectedFriesOption, setSelectedFriesOption] = useState<FriesOption | undefined>(
+    item.friesOptions ? item.friesOptions[0] : undefined
+  );
 
   const resetSelections = useCallback(() => {
     setSelectedSize(item.sizes ? item.sizes[0] : undefined);
@@ -63,6 +69,7 @@ const ItemModal: React.FC<ItemModalProps> = memo(({ item, isOpen, onClose, onAdd
     setSelectedPastaType('');
     setSelectedSauce('');
     setSelectedPizzaStyle((item.isPizza || item.isWunschPizza) ? pizzaStyles[0] : undefined);
+    setSelectedFriesOption(item.friesOptions ? item.friesOptions[0] : undefined);
   }, [item]);
 
   React.useEffect(() => {
@@ -105,9 +112,9 @@ const ItemModal: React.FC<ItemModalProps> = memo(({ item, isOpen, onClose, onAdd
   }, []);
 
   const handleAddToOrder = useCallback(() => {
-    onAddToOrder(item, selectedSize, selectedIngredients, selectedExtras, selectedPastaType, selectedSauce, selectedPizzaStyle);
+    onAddToOrder(item, selectedSize, selectedIngredients, selectedExtras, selectedPastaType, selectedSauce, selectedPizzaStyle, selectedFriesOption);
     onClose();
-  }, [item, selectedSize, selectedIngredients, selectedExtras, selectedPastaType, selectedSauce, selectedPizzaStyle, onAddToOrder, onClose]);
+  }, [item, selectedSize, selectedIngredients, selectedExtras, selectedPastaType, selectedSauce, selectedPizzaStyle, selectedFriesOption, onAddToOrder, onClose]);
 
   const getCurrentPrice = useCallback(() => {
     let price = selectedSize ? selectedSize.price : item.price;
@@ -115,23 +122,31 @@ const ItemModal: React.FC<ItemModalProps> = memo(({ item, isOpen, onClose, onAdd
     if (selectedPizzaStyle && selectedPizzaStyle.price > 0) {
       price += selectedPizzaStyle.price;
     }
+    if (selectedFriesOption && selectedFriesOption.price > 0) {
+      price += selectedFriesOption.price;
+    }
     return price;
-  }, [selectedSize, selectedExtras, selectedPizzaStyle, item.price]);
+  }, [selectedSize, selectedExtras, selectedPizzaStyle, selectedFriesOption, item.price]);
 
   const canAddToOrder = useCallback(() => {
+    // Check if fries option is required and selected
+    if (item.friesOptions && !selectedFriesOption) {
+      return false;
+    }
+
     // Check if pasta type is required and selected
     if (item.isPasta && !selectedPastaType) {
       return false;
     }
-    
+
     // Check if sauce is required and selected
-    const needsSauceSelection = (item.isSpezialitaet && ![81, 82].includes(item.id)) || 
+    const needsSauceSelection = (item.isSpezialitaet && ![81, 82].includes(item.id)) ||
                                (item.id >= 568 && item.id <= 573 && item.isSpezialitaet) ||
                                item.isBeerSelection;
     if (needsSauceSelection && !selectedSauce) {
       return false;
     }
-    
+
     // Check Wunsch Pizza ingredients
     if (item.isWunschPizza) {
       const validIngredients = selectedIngredients.filter(ing => ing !== 'ohne Zutat');
@@ -140,9 +155,9 @@ const ItemModal: React.FC<ItemModalProps> = memo(({ item, isOpen, onClose, onAdd
       }
       return validIngredients.length === 4;
     }
-    
+
     return true;
-  }, [item, selectedPastaType, selectedSauce, selectedIngredients]);
+  }, [item, selectedFriesOption, selectedPastaType, selectedSauce, selectedIngredients]);
 
   if (!isOpen) return null;
 
@@ -191,6 +206,37 @@ const ItemModal: React.FC<ItemModalProps> = memo(({ item, isOpen, onClose, onAdd
                         <span className="font-bold text-orange-600 text-lg">
                           {size.price.toFixed(2).replace('.', ',')} €
                         </span>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Fries Selection */}
+            {item.friesOptions && item.friesOptions.length > 0 && (
+              <div className="space-y-4">
+                <h4 className="font-semibold text-gray-900 text-lg">Pommes wählen *</h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {item.friesOptions.map((fries) => (
+                    <button
+                      key={fries.name}
+                      onClick={() => setSelectedFriesOption(fries)}
+                      className={`p-4 rounded-lg border-2 transition-all ${
+                        selectedFriesOption?.name === fries.name
+                          ? 'border-teal-500 bg-teal-50'
+                          : 'border-gray-200 hover:border-teal-300'
+                      }`}
+                    >
+                      <div className="flex justify-between items-center">
+                        <div>
+                          <span className="font-medium text-lg">{fries.name}</span>
+                        </div>
+                        {fries.price > 0 && (
+                          <span className="font-bold text-teal-600 text-lg">
+                            +{fries.price.toFixed(2).replace('.', ',')} €
+                          </span>
+                        )}
                       </div>
                     </button>
                   ))}
@@ -349,6 +395,11 @@ const ItemModal: React.FC<ItemModalProps> = memo(({ item, isOpen, onClose, onAdd
                   Größe: {selectedSize.name} {selectedSize.description && `- ${selectedSize.description}`}
                 </div>
               )}
+              {selectedFriesOption && (
+                <div className="text-sm text-teal-600">
+                  Pommes: {selectedFriesOption.name} {selectedFriesOption.price > 0 && `(+${selectedFriesOption.price.toFixed(2).replace('.', ',')}€)`}
+                </div>
+              )}
               {selectedPizzaStyle && selectedPizzaStyle.name !== 'Standard' && (
                 <div className="text-sm text-blue-600">
                   Sonderwunsch: {selectedPizzaStyle.name} (+{selectedPizzaStyle.price.toFixed(2).replace('.', ',')}€)
@@ -412,9 +463,10 @@ const MenuSection: React.FC<MenuSectionProps> = ({ title, description, subTitle,
 
   const handleItemClick = useCallback((item: MenuItem) => {
     // Items that need configuration
-    const needsConfiguration = item.sizes || 
-                              item.isWunschPizza || 
-                              item.isPizza || 
+    const needsConfiguration = item.sizes ||
+                              item.friesOptions ||
+                              item.isWunschPizza ||
+                              item.isPizza ||
                               item.isPasta ||
                               item.isBeerSelection ||
                               (item.isSpezialitaet && ![81, 82].includes(item.id)) || // Exclude Gyros Hollandaise and Gyros Topf
@@ -541,6 +593,12 @@ const MenuSection: React.FC<MenuSectionProps> = ({ title, description, subTitle,
                   <span className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
                     <Star className="w-3 h-3" />
                     Größen verfügbar
+                  </span>
+                )}
+                {item.friesOptions && (
+                  <span className="inline-flex items-center gap-1 px-2 py-1 bg-teal-100 text-teal-800 text-xs rounded-full">
+                    <Plus className="w-3 h-3" />
+                    Pommes wählbar
                   </span>
                 )}
                 {item.isWunschPizza && (
